@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Translator Editor V2</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Lato:wght@400;700&family=Nunito:wght@400;700&family=Playfair+Display:wght@400;700&family=Merriweather:wght@400;700&family=Dancing+Script:wght@400;700&family=Pacifico&family=Oswald:wght@400;700&family=Raleway:wght@400;700&family=Noto+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fabric.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <style>
+        :root {
+            --bg-body: #f3f4f6;
+            --bg-panel: #ffffff;
+            --border: #e5e7eb;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- Header / Toolbar --- */
+        .toolbar {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            z-index: 10;
+        }
+
+        .tools-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-right: 1rem;
+            border-right: 1px solid var(--border);
+        }
+
+        .tools-group:last-child {
+            border-right: none;
+        }
+
+        .btn {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-main);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #f9fafb;
+        }
+
+        .btn i {
+            color: var(--text-muted);
+        }
+
+        .btn.active {
+            background: #eff6ff;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn.active i {
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-primary i {
+            color: white;
+        }
+
+        .text-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .text-controls select,
+        .text-controls input[type="number"],
+        .text-controls input[type="color"] {
+            padding: 0.4rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            height: 32px;
+        }
+
+        /* --- Main App Layout --- */
+        .app-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Canvas Workspace --- */
+        .workspace {
+            flex: 1;
+            background: #e5e5f7;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            padding: 2rem;
+        }
+
+        .canvas-container-wrap {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            background: white;
+            /* Auto sizing based on image later */
+        }
+
+        .empty-upload-state {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 380px;
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .api-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .api-input-group input {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        .translation-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f9fafb;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .trans-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.75rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .trans-ori {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .trans-res {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .trans-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            background: #f3f4f6;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        .btn-sm:hover {
+            background: #e5e7eb;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 50;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="tools-group">
+            <button class="btn" id="btnUpload" onclick="document.getElementById('fileInput').click()">
+                <i class="fa-solid fa-upload"></i> Tải ảnh lên
+            </button>
+            <input type="file" id="fileInput" accept="image/*" onchange="handleImageUpload(event)">
+        </div>
+
+        <div class="tools-group" id="canvasTools" style="opacity: 0.5; pointer-events: none;">
+            <button class="btn active" id="btnSelect" onclick="setMode('select')" title="Chọn">
+                <i class="fa-solid fa-arrow-pointer"></i> Chọn
+            </button>
+            <button class="btn" id="btnErase" onclick="setMode('erase')" title="Xóa mờ văn bản gốc">
+                <i class="fa-solid fa-eraser"></i> Xóa mờ (Vẽ khối)
+            </button>
+            <button class="btn" id="btnDuplicate" onclick="duplicateSelected()" title="Nhân đôi đối tượng đang chọn">
+                <i class="fa-solid fa-clone"></i> Nhân bản
+            </button>
+            <div style="display: flex; align-items: center; gap: 5px; margin-left: 5px;">
+                <label style="font-size:0.8rem; color:var(--text-muted)">Màu khối:</label>
+                <input type="color" id="eraseColorPicker" value="#ffffff" title="Chọn màu xóa">
+            </div>
+        </div>
+
+        <div class="tools-group text-controls" id="textTools" style="opacity: 0.5; pointer-events: none;">
+            <button class="btn" id="btnAddText" onclick="addText()">
+                <i class="fa-solid fa-t"></i> Thêm Text
+            </button>
+
+            <select id="fontFamily" onchange="updateTextFormatting()" style="max-width:160px;">
+                <option value="Inter">Inter</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Open Sans">Open Sans</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Poppins">Poppins</option>
+                <option value="Lato">Lato</option>
+                <option value="Nunito">Nunito</option>
+                <option value="Noto Sans">Noto Sans</option>
+                <option value="Raleway">Raleway</option>
+                <option value="Oswald">Oswald</option>
+                <option value="Playfair Display">Playfair Display</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="Dancing Script">Dancing Script</option>
+                <option value="Pacifico">Pacifico</option>
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+            </select>
+
+            <input type="number" id="fontSize" value="24" min="8" max="150" onchange="updateTextFormatting()"
+                title="Cỡ chữ">
+
+            <button class="btn" id="btnBold" onclick="toggleBold()" title="Bật Bold"
+                style="padding: 0.4rem 0.5rem; font-weight:700;">
+                <b>B</b>
+            </button>
+            <button class="btn" id="btnItalic" onclick="toggleItalic()" title="In nghiêng"
+                style="padding: 0.4rem 0.5rem; font-style:italic;">
+                <i>I</i>
+            </button>
+            <button class="btn" id="btnUnderline" onclick="toggleUnderline()" title="Gạch chân"
+                style="padding: 0.4rem 0.5rem; text-decoration:underline;">
+                U
+            </button>
+            <button class="btn" id="btnUppercase" onclick="toggleUppercase()" title="Viết hoa"
+                style="padding: 0.4rem 0.5rem; font-size:0.7rem; font-weight:700;">
+                AA
+            </button>
+
+            <span style="width:1px; background:var(--border); align-self:stretch; margin:0 4px;"></span>
+
+            <button class="btn" id="btnAlignLeft" onclick="setAlign('left')" title="Căn trái"
+                style="padding:0.4rem 0.5rem;">
+                <i class="fa-solid fa-align-left"></i>
+            </button>
+            <button class="btn" id="btnAlignCenter" onclick="setAlign('center')" title="Căn giữa"
+                style="padding:0.4rem 0.5rem;">
+                <i class="fa-solid fa-align-center"></i>
+            </button>
+            <button class="btn" id="btnAlignRight" onclick="setAlign('right')" title="Căn phải"
+                style="padding:0.4rem 0.5rem;">
+                <i class="fa-solid fa-align-right"></i>
+            </button>
+            <button class="btn" id="btnAlignJustify" onclick="setAlign('justify')" title="Căn đều 2 bên"
+                style="padding:0.4rem 0.5rem;">
+                <i class="fa-solid fa-align-justify"></i>
+            </button>
+
+            <span style="width:1px; background:var(--border); align-self:stretch; margin:0 4px;"></span>
+
+            <input type="color" id="textColor" value="#000000" onchange="updateTextFormatting()" title="Màu chữ">
+        </div>
+
+        <div class="tools-group" style="margin-left:auto; border-right:none;">
+            <button class="btn btn-primary" id="btnDownload" onclick="downloadImage()" disabled>
+                <i class="fa-solid fa-download"></i> Tải ảnh xuống
+            </button>
+        </div>
+    </div>
+
+    <div class="app-body">
+        <!-- Canvas Workspace -->
+        <div class="workspace" id="workspace">
+            <div class="empty-upload-state" id="emptyState">
+                <i class="fa-solid fa-image" style="font-size: 3rem; margin-bottom: 1rem; color: #cbd5e1;"></i>
+                <p>Kéo thả hoặc tải ảnh lên để bắt đầu chỉnh sửa</p>
+            </div>
+
+            <div class="canvas-container-wrap" id="canvasWrap" style="display: none;">
+                <canvas id="editorCanvas"></canvas>
+            </div>
+
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <p id="loadingMsg">Đang phân tích và dịch ảnh...</p>
+            </div>
+        </div>
+
+        <!-- Sidebar (Translation Results) -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Cấu hình API Dịch</h2>
+                <div class="api-input-group">
+                    <label style="font-size: 0.85rem; font-weight: 500;">Chọn loại AI:</label>
+                    <select id="aiProvider" onchange="toggleApiInputs()"
+                        style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 0.5rem;">
+                        <option value="gemini">Google Gemini (1.5 Flash)</option>
+                        <option value="openai">OpenAI (GPT-4o)</option>
+                    </select>
+
+                    <div id="geminiInputWrapper">
+                        <input type="password" id="geminiApiKey" placeholder="Nhập Gemini API Key..."
+                            style="width: 100%;">
+                    </div>
+                    <div id="openaiInputWrapper" style="display: none;">
+                        <input type="password" id="openaiApiKey" placeholder="Nhập OpenAI API Key (sk-...)"
+                            style="width: 100%;">
+                    </div>
+
+                    <label style="font-size: 0.85rem; font-weight: 500; margin-top: 0.5rem;">Ngôn ngữ đích:</label>
+                    <select id="targetLanguage"
+                        style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 0.5rem;">
+                        <option value="tiếng Việt">🇻🇳 Tiếng Việt</option>
+                        <option value="Filipino (Tagalog)">🇵🇭 Filipino (Tagalog)</option>
+                        <option value="tiếng Anh (English)">🇬🇧 English</option>
+                        <option value="tiếng Nhật (Japanese)">🇯🇵 Tiếng Nhật</option>
+                        <option value="tiếng Hàn (Korean)">🇰🇷 Tiếng Hàn</option>
+                        <option value="tiếng Trung (Chinese)">🇨🇳 Tiếng Trung</option>
+                    </select>
+
+                    <button class="btn btn-primary" style="justify-content: center; margin-top: 0.5rem;"
+                        onclick="processImageAPI()" id="btnTranslate">
+                        <i class="fa-solid fa-language"></i> Bắt đầu Dịch
+                    </button>
+                </div>
+            </div>
+
+            <div class="translation-list" id="transList">
+                <div style="text-align: center; color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">
+                    Kết quả dịch sẽ hiển thị ở đây.
+                </div>
+                <!-- Template Card -->
+                <!--
+                <div class="trans-card">
+                    <div class="trans-ori">Original Text...</div>
+                    <div class="trans-res">Translated Text...</div>
+                    <div class="trans-actions">
+                        <button class="btn-sm"><i class="fa-solid fa-copy"></i> Copy</button>
+                    </div>
+                </div>
+                -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Fabric.js Initialization ---
+        let canvas = new fabric.Canvas('editorCanvas', {
+            isDrawingMode: false,
+            preserveObjectStacking: true // Keep objects in order when selected
+        });
+
+        let currentMode = 'select'; // select, erase
+        let bgImgDataUrl = null;
+        let isDrawingErase = false;
+        let eraseRect;
+
+        // Base Settings for Erase Tool
+        const eraseColorInput = document.getElementById('eraseColorPicker');
+
+        // Setup Canvas Events
+        canvas.on('selection:created', onObjectSelected);
+        canvas.on('selection:updated', onObjectSelected);
+        canvas.on('selection:cleared', onObjectCleared);
+
+        // Custom Erase drawing mode logic (since drawing solid rects is manual in Fabric if not free drawing)
+        canvas.on('mouse:down', function (o) {
+            if (currentMode !== 'erase') return;
+            isDrawingErase = true;
+            let pointer = canvas.getPointer(o.e);
+            let origX = pointer.x;
+            let origY = pointer.y;
+
+            eraseRect = new fabric.Rect({
+                left: origX,
+                top: origY,
+                originX: 'left',
+                originY: 'top',
+                width: pointer.x - origX,
+                height: pointer.y - origY,
+                fill: eraseColorInput.value,
+                transparentCorners: false,
+                selectable: true // can move it later if needed
+            });
+            canvas.add(eraseRect);
+        });
+
+        canvas.on('mouse:move', function (o) {
+            if (!isDrawingErase) return;
+            let pointer = canvas.getPointer(o.e);
+
+            if (origX > pointer.x) {
+                eraseRect.set({ left: Math.abs(pointer.x) });
+            }
+            if (origY > pointer.y) {
+                eraseRect.set({ top: Math.abs(pointer.y) });
+            }
+
+            eraseRect.set({ width: Math.abs(origX - pointer.x) });
+            eraseRect.set({ height: Math.abs(origY - pointer.y) });
+
+            canvas.renderAll();
+        });
+
+        canvas.on('mouse:up', function (o) {
+            if (currentMode !== 'erase') return;
+            isDrawingErase = false;
+            if (eraseRect && (eraseRect.width < 5 || eraseRect.height < 5)) {
+                canvas.remove(eraseRect);
+            } else if (eraseRect) {
+                // Auto switch back to select so user can move/delete the block immediately
+                setMode('select');
+                canvas.setActiveObject(eraseRect);
+                canvas.renderAll();
+            }
+        });
+
+        let origX, origY; // Scope fix for mouse:move
+        canvas.on('mouse:down', function (o) {
+            if (currentMode === 'erase') {
+                let pointer = canvas.getPointer(o.e);
+                origX = pointer.x;
+                origY = pointer.y;
+            }
+        });
+
+
+        // --- UI Interactions ---
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (f) {
+                bgImgDataUrl = f.target.result;
+
+                fabric.Image.fromURL(bgImgDataUrl, function (img) {
+                    // Set canvas size to image size
+                    canvas.setWidth(img.width);
+                    canvas.setHeight(img.height);
+
+                    // Set Background
+                    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+                        originX: 'left',
+                        originY: 'top'
+                    });
+
+                    // Update UI
+                    document.getElementById('emptyState').style.display = 'none';
+                    document.getElementById('canvasWrap').style.display = 'block';
+                    document.getElementById('canvasTools').style.opacity = '1';
+                    document.getElementById('canvasTools').style.pointerEvents = 'auto';
+                    document.getElementById('textTools').style.opacity = '1';
+                    document.getElementById('textTools').style.pointerEvents = 'auto';
+                    document.getElementById('btnDownload').disabled = false;
+
+                    // Scale workspace
+                    scaleWorkspace();
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function scaleWorkspace() {
+            const wrap = document.getElementById('canvasWrap');
+            const ws = document.getElementById('workspace');
+            // Basic scaling CSS logic if image is huge (Optional MVP just scroll)
+            // wrap.style.transform = `scale(0.8)`;
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('btnSelect').classList.remove('active');
+            document.getElementById('btnErase').classList.remove('active');
+
+            if (mode === 'select') {
+                document.getElementById('btnSelect').classList.add('active');
+                canvas.selection = true;
+                canvas.defaultCursor = 'default';
+                canvas.forEachObject(o => o.selectable = true);
+            } else if (mode === 'erase') {
+                document.getElementById('btnErase').classList.add('active');
+                canvas.selection = false;
+                canvas.defaultCursor = 'crosshair';
+                canvas.discardActiveObject();
+                canvas.renderAll();
+                // prevent dragging while drawing
+                canvas.forEachObject(o => o.selectable = false);
+            }
+        }
+
+        function addText() {
+            setMode('select'); // force select mode
+            const tFont = document.getElementById('fontFamily').value;
+            const tSize = parseInt(document.getElementById('fontSize').value);
+            const tColor = document.getElementById('textColor').value;
+            const isBold = document.getElementById('btnBold').classList.contains('active') ? 'bold' : 'normal';
+
+            const itext = new fabric.IText('Nhấp đúp hoặc Paste chữ', {
+                left: 100,
+                top: 100,
+                fontFamily: tFont,
+                fontSize: tSize,
+                fill: tColor,
+                fontWeight: isBold,
+                editable: true
+            });
+            canvas.add(itext);
+            canvas.setActiveObject(itext);
+        }
+
+        // --- Text Formatting logic ---
+
+        function onObjectSelected(e) {
+            const obj = e.selected[0];
+            if (obj && obj.type === 'i-text') {
+                document.getElementById('fontFamily').value = obj.fontFamily || 'Inter';
+                document.getElementById('fontSize').value = obj.fontSize || 24;
+                document.getElementById('textColor').value = obj.fill || '#000000';
+
+                document.getElementById('btnBold').classList.toggle('active', obj.fontWeight === 'bold');
+                document.getElementById('btnItalic').classList.toggle('active', obj.fontStyle === 'italic');
+                document.getElementById('btnUnderline').classList.toggle('active', !!obj.underline);
+                document.getElementById('btnUppercase').classList.toggle('active', !!obj._isUppercase);
+
+                const align = obj.textAlign || 'left';
+                ['Left', 'Center', 'Right', 'Justify'].forEach(a => {
+                    document.getElementById('btnAlign' + a).classList.toggle('active', align === a.toLowerCase());
+                });
+            }
+        }
+
+        function onObjectCleared() {
+            // Reset to defaults or leave as last used
+        }
+
+        function updateTextFormatting() {
+            const obj = canvas.getActiveObject();
+            if (obj && obj.type === 'i-text') {
+                obj.set({
+                    fontFamily: document.getElementById('fontFamily').value,
+                    fontSize: parseInt(document.getElementById('fontSize').value),
+                    fill: document.getElementById('textColor').value
+                });
+                canvas.renderAll();
+            }
+        }
+
+        function toggleBold() {
+            const btn = document.getElementById('btnBold');
+            btn.classList.toggle('active');
+            const obj = canvas.getActiveObject();
+            if (obj && obj.type === 'i-text') {
+                obj.set({ fontWeight: btn.classList.contains('active') ? 'bold' : 'normal' });
+                canvas.renderAll();
+            }
+        }
+
+        function duplicateSelected() {
+            const obj = canvas.getActiveObject();
+            if (!obj) { return; }
+            obj.clone(function (cloned) {
+                cloned.set({
+                    left: obj.left + 20,
+                    top: obj.top + 20,
+                    evented: true,
+                });
+                canvas.add(cloned);
+                canvas.setActiveObject(cloned);
+                canvas.renderAll();
+            });
+        }
+
+        function toggleItalic() {
+            const btn = document.getElementById('btnItalic');
+            btn.classList.toggle('active');
+            const obj = canvas.getActiveObject();
+            if (obj && obj.type === 'i-text') {
+                obj.set({ fontStyle: btn.classList.contains('active') ? 'italic' : 'normal' });
+                canvas.renderAll();
+            }
+        }
+
+        function toggleUnderline() {
+            const btn = document.getElementById('btnUnderline');
+            btn.classList.toggle('active');
+            const obj = canvas.getActiveObject();
+            if (obj && obj.type === 'i-text') {
+                obj.set({ underline: btn.classList.contains('active') });
+                canvas.renderAll();
+            }
+        }
+
+        // Uppercase: lưu text gốc để restore
+        function toggleUppercase() {
+            const btn = document.getElementById('btnUppercase');
+            btn.classList.toggle('active');
+            const obj = canvas.getActiveObject();
+            if (obj && obj.type === 'i-text') {
+                if (btn.classList.contains('active')) {
+                    obj._originalText = obj.text;
+                    obj._isUppercase = true;
+                    obj.set({ text: obj.text.toUpperCase() });
+                } else {
+                    obj._isUppercase = false;
+                    if (obj._originalText !== undefined) obj.set({ text: obj._originalText });
+                }
+                canvas.renderAll();
+            }
+        }
+
+        function setAlign(align) {
+            ['Left', 'Center', 'Right', 'Justify'].forEach(a => {
+                document.getElementById('btnAlign' + a).classList.remove('active');
+            });
+            document.getElementById('btnAlign' + align.charAt(0).toUpperCase() + align.slice(1)).classList.add('active');
+            const obj = canvas.getActiveObject();
+            if (obj && obj.type === 'i-text') {
+                obj.set({ textAlign: align });
+                canvas.renderAll();
+            }
+        }
+
+        // Delete key to remove active object (text AND erase blocks)
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'Delete') {
+                const activeObj = canvas.getActiveObject();
+                if (activeObj) {
+                    if (activeObj.type === 'i-text' && activeObj.isEditing) return;
+                    canvas.remove(activeObj);
+                    canvas.renderAll();
+                }
+            }
+        });
+
+
+        // --- API Logic (Gemini & OpenAI) ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedProvider = localStorage.getItem('ai_provider') || 'gemini';
+            document.getElementById('aiProvider').value = savedProvider;
+
+            const savedGemini = localStorage.getItem('gemini_api_key');
+            if (savedGemini) document.getElementById('geminiApiKey').value = savedGemini;
+
+            const savedOpenAI = localStorage.getItem('openai_api_key');
+            if (savedOpenAI) document.getElementById('openaiApiKey').value = savedOpenAI;
+
+            toggleApiInputs();
+        });
+
+        function toggleApiInputs() {
+            const provider = document.getElementById('aiProvider').value;
+            localStorage.setItem('ai_provider', provider);
+
+            if (provider === 'gemini') {
+                document.getElementById('geminiInputWrapper').style.display = 'block';
+                document.getElementById('openaiInputWrapper').style.display = 'none';
+            } else {
+                document.getElementById('geminiInputWrapper').style.display = 'none';
+                document.getElementById('openaiInputWrapper').style.display = 'block';
+            }
+        }
+
+        async function processImageAPI() {
+            if (!bgImgDataUrl) {
+                alert('Vui lòng tải ảnh lên trước!');
+                return;
+            }
+
+            const provider = document.getElementById('aiProvider').value;
+            let apiKey = '';
+
+            if (provider === 'gemini') {
+                apiKey = document.getElementById('geminiApiKey').value.trim();
+                if (!apiKey) { alert('Vui lòng nhập Gemini API Key!'); return; }
+                localStorage.setItem('gemini_api_key', apiKey);
+            } else {
+                apiKey = document.getElementById('openaiApiKey').value.trim();
+                if (!apiKey) { alert('Vui lòng nhập OpenAI API Key!'); return; }
+                localStorage.setItem('openai_api_key', apiKey);
+            }
+
+            document.getElementById('loadingOverlay').classList.add('show');
+
+            try {
+                if (provider === 'gemini') {
+                    await callGeminiAPI(apiKey);
+                } else {
+                    await callOpenAIAPI(apiKey);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Lỗi: ' + err.message);
+            } finally {
+                document.getElementById('loadingOverlay').classList.remove('show');
+            }
+        }
+
+        // ---------- GEMINI API ----------
+        async function callGeminiAPI(apiKey) {
+            const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+            const base64Data = bgImgDataUrl.split(',')[1];
+            const targetLang = document.getElementById('targetLanguage').value;
+
+            const prompt = `Trích xuất toàn bộ văn bản có trong ảnh này và dịch sang ngôn ngữ đích: ${targetLang}. 
+            Trả về CHỈ một mảng JSON array, KHÔNG FORMAT MARKDOWN, định dạng:
+            [ 
+              {"o": "Văn bản gốc 1", "t": "Bản dịch ${targetLang} 1"},
+              {"o": "Văn bản gốc 2", "t": "Bản dịch ${targetLang} 2"}
+            ]`;
+
+            const response = await fetch(`${API_URL}?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            { text: prompt },
+                            { inline_data: { mime_type: "image/jpeg", data: base64Data } }
+                        ]
+                    }],
+                    generationConfig: { temperature: 0.2 }
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error.message || 'Lỗi từ Gemini API');
+            }
+
+            const data = await response.json();
+            let rawText = data.candidates[0].content.parts[0].text;
+
+            rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+
+            let parsed = [];
+            try {
+                parsed = JSON.parse(rawText);
+            } catch (e) {
+                throw new Error("Không thể parse dữ liệu JSON từ API.");
+            }
+
+            renderTranslations(parsed);
+        }
+
+        // ---------- OPENAI API ----------
+        async function callOpenAIAPI(apiKey) {
+            const API_URL = "https://api.openai.com/v1/chat/completions";
+            const targetLang = document.getElementById('targetLanguage').value;
+
+            const prompt = `Trích xuất toàn bộ văn bản có trong ảnh này và dịch sang ngôn ngữ đích: ${targetLang}. 
+            Trả về CHỈ một object JSON, với DUY NHẤT một key là "translations", giá trị của nó là một mảng các object theo định dạng:
+            {
+              "translations": [
+                {"o": "Văn bản gốc 1", "t": "Bản dịch ${targetLang} 1"},
+                {"o": "Văn bản gốc 2", "t": "Bản dịch ${targetLang} 2"}
+              ]
+            }`;
+
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: "gpt-4o",
+                    response_format: { type: "json_object" },
+                    messages: [
+                        {
+                            role: "user",
+                            content: [
+                                { type: "text", text: prompt },
+                                { type: "image_url", image_url: { url: bgImgDataUrl } }
+                            ]
+                        }
+                    ],
+                    temperature: 0.2
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || 'Lỗi từ OpenAI API');
+            }
+
+            const data = await response.json();
+            const content = data.choices[0].message.content;
+
+            let parsed = [];
+            try {
+                const jsonObj = JSON.parse(content);
+                parsed = jsonObj.translations || [];
+            } catch (e) {
+                throw new Error("Không thể parse dữ liệu JSON từ OpenAI.");
+            }
+
+            renderTranslations(parsed);
+        }
+
+        function renderTranslations(list) {
+            const container = document.getElementById('transList');
+            container.innerHTML = '';
+
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: var(--text-muted); margin-top: 2rem;">Không tìm thấy văn bản nào.</div>';
+                return;
+            }
+
+            list.forEach((item, idx) => {
+                const ori = item.o || 'N/A';
+                const trans = item.t || 'N/A';
+
+                const card = document.createElement('div');
+                card.className = 'trans-card';
+                card.innerHTML = `
+                    <div class="trans-ori">${ori}</div>
+                    <div class="trans-res" id="res-${idx}">${trans}</div>
+                    <div class="trans-actions" style="gap:0.4rem;">
+                        <button class="btn-sm" onclick="insertTranslationOnCanvas('res-${idx}', this)" style="background:#eff6ff; color:#3b82f6; border-color:#bfdbfe;">
+                            <i class="fa-solid fa-arrow-up-right-dots"></i> Chèn lên ảnh
+                        </button>
+                        <button class="btn-sm" onclick="copyText('res-${idx}', this)">
+                            <i class="fa-solid fa-copy"></i> Copy
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function insertTranslationOnCanvas(elementId, btn) {
+            const text = document.getElementById(elementId).innerText;
+            if (!text) return;
+
+            const tFont = document.getElementById('fontFamily').value;
+            const tSize = parseInt(document.getElementById('fontSize').value) || 24;
+            const tColor = document.getElementById('textColor').value || '#000000';
+            const isBold = document.getElementById('btnBold').classList.contains('active') ? 'bold' : 'normal';
+            const isItalic = document.getElementById('btnItalic').classList.contains('active') ? 'italic' : 'normal';
+            const isUnderline = document.getElementById('btnUnderline').classList.contains('active');
+            const align = ['Left', 'Center', 'Right', 'Justify'].reduce((acc, a) => {
+                return document.getElementById('btnAlign' + a).classList.contains('active') ? a.toLowerCase() : acc;
+            }, 'left');
+
+            // Stagger position based on number of existing text objects so they don't stack perfectly
+            const textObjs = canvas.getObjects('i-text');
+            const offset = textObjs.length * 30;
+
+            const itext = new fabric.IText(text, {
+                left: 80 + offset,
+                top: 80 + offset,
+                fontFamily: tFont,
+                fontSize: tSize,
+                fill: tColor,
+                fontWeight: isBold,
+                fontStyle: isItalic,
+                underline: isUnderline,
+                textAlign: align,
+                editable: true
+            });
+            canvas.add(itext);
+            canvas.setActiveObject(itext);
+            canvas.renderAll();
+            setMode('select');
+
+            // Flash feedback
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check" style="color:#10b981"></i> Đã chèn!';
+            setTimeout(() => { btn.innerHTML = orig; }, 1500);
+        }
+
+        function copyText(elementId, btnVar) {
+            const textToCopy = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const origHTML = btnVar.innerHTML;
+                btnVar.innerHTML = '<i class="fa-solid fa-check" style="color:var(--success)"></i> Copied!';
+                setTimeout(() => { btnVar.innerHTML = origHTML; }, 2000);
+            }).catch(err => {
+                console.error('Copy failed: ', err);
+            });
+        }
+
+        // --- Download Image ---
+        function downloadImage() {
+            setMode('select'); // Ensure editing is finished
+            canvas.discardActiveObject(); // deselect before rendering
+            canvas.renderAll();
+
+            const dataURL = canvas.toDataURL({
+                format: 'jpeg',
+                quality: 0.95
+            });
+
+            const link = document.createElement('a');
+            link.download = 'translated_image.jpg';
+            link.href = dataURL;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+    </script>
+</body>
+
+</html>

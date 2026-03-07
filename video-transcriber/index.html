@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TS Global | Video Transcriber V2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --panel-bg: #161b22;
+            --panel-bg2: #1c2431;
+            --border-color: #30363d;
+            --primary: #c01a0a;
+            --primary-hover: #9e1508;
+            --primary-glow: rgba(192, 26, 10, 0.3);
+            --accent: #e05a47;
+            --tts-color: #2563eb;
+            --tts-hover: #1d4ed8;
+            --tts-glow: rgba(37, 99, 235, 0.3);
+            --green: #22c55e;
+            --text-dark: #e6edf3;
+            --text-muted: #7d8590;
+            --text-sub: #a0aec0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--panel-bg);
+            padding: 0.85rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-box {
+            background: var(--primary);
+            color: #fff;
+            padding: 0.2rem 0.65rem;
+            border-radius: 5px;
+            font-weight: 900;
+            font-size: 1.15rem;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .brand-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-name span.red {
+            color: var(--primary);
+        }
+
+        .brand-name span.sub {
+            font-weight: 300;
+            font-size: 0.78em;
+            color: var(--text-muted);
+            margin-left: 0.5rem;
+        }
+
+        .nav-badges {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .badge-version {
+            background: linear-gradient(135deg, var(--primary), #ff6b4a);
+            color: white;
+        }
+
+        .badge-ready {
+            background: #14532d;
+            color: #4ade80;
+            border: 1px solid #166534;
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            padding: 1.25rem;
+            gap: 1.25rem;
+        }
+
+        /* Left Panel */
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-color);
+            flex: 1;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: #111820;
+        }
+
+        .upload-zone i {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 12px var(--primary-glow));
+        }
+
+        .upload-zone h3 {
+            font-size: 1.05rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .upload-zone p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .video-container {
+            display: none;
+            width: 100%;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            flex: 1;
+            min-height: 200px;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .controls {
+            display: none;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        select {
+            flex: 1;
+            padding: 0.65rem 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            background: var(--panel-bg);
+            color: var(--text-dark);
+        }
+
+        button {
+            padding: 0.65rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .btn-primary:disabled {
+            background: #374151;
+            border-color: #374151;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-sub);
+            border-color: var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-muted);
+            color: var(--text-dark);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 5px;
+            background: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #ff6b4a);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .stats {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            display: none;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: 46%;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--panel-bg2);
+        }
+
+        .panel-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.85rem;
+        }
+
+        .panel-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .api-key-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .api-key-row input {
+            flex: 1;
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-color);
+            color: var(--text-dark);
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .api-key-row input:focus {
+            border-color: var(--primary);
+        }
+
+        .gemini-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1rem;
+            background: var(--panel-bg2);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        /* TTS Panel */
+        .tts-panel {
+            border-top: 1px solid var(--border-color);
+            background: #111827;
+            padding: 1rem 1.25rem;
+        }
+
+        .tts-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .tts-header i {
+            color: var(--tts-color);
+        }
+
+        .tts-header span {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .tts-badge {
+            background: #1e3a8a;
+            color: #93c5fd;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: auto;
+        }
+
+        .tts-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .tts-row {
+            display: flex;
+            gap: 0.65rem;
+            align-items: center;
+        }
+
+        .tts-row label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            min-width: 60px;
+        }
+
+        .tts-row select {
+            flex: 1;
+            padding: 0.45rem 0.7rem;
+            font-size: 0.82rem;
+        }
+
+        .tts-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .tts-slider-container input[type="range"] {
+            flex: 1;
+            accent-color: var(--tts-color);
+        }
+
+        .tts-slider-container span {
+            font-size: 0.78rem;
+            color: var(--text-sub);
+            min-width: 28px;
+            text-align: right;
+        }
+
+        .tts-action-row {
+            display: flex;
+            gap: 0.65rem;
+            margin-top: 0.25rem;
+        }
+
+        .btn-tts {
+            background: var(--tts-color);
+            color: white;
+            border-color: var(--tts-color);
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-tts:hover {
+            background: var(--tts-hover);
+            border-color: var(--tts-hover);
+        }
+
+        .btn-tts:disabled {
+            background: #374151;
+            border-color: #374151;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .btn-tts-stop {
+            background: transparent;
+            color: #f87171;
+            border-color: #f87171;
+        }
+
+        .btn-tts-stop:hover {
+            background: #7f1d1d;
+        }
+
+        .btn-tts-stop.hidden {
+            display: none;
+        }
+
+        .btn-tts-download {
+            background: transparent;
+            color: #4ade80;
+            border-color: #4ade80;
+            display: none;
+        }
+
+        .btn-tts-download:hover {
+            background: #14532d;
+        }
+
+        .btn-tts-download.downloading {
+            color: #86efac;
+            border-color: #86efac;
+            cursor: wait;
+        }
+
+        .tts-progress {
+            height: 3px;
+            background: var(--border-color);
+            border-radius: 2px;
+            overflow: hidden;
+            display: none;
+            margin-top: 0.25rem;
+        }
+
+        .tts-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--tts-color), #60a5fa);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .tts-status {
+            font-size: 0.75rem;
+            color: var(--tts-color);
+            display: none;
+            margin-top: 0.2rem;
+        }
+
+        /* Transcript */
+        .transcript-container {
+            flex: 1;
+            padding: 1.25rem;
+            overflow-y: auto;
+            position: relative;
+            min-height: 120px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+
+        .transcript-container::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .transcript-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .transcript-line {
+            padding: 0.7rem 0.9rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            background: var(--panel-bg2);
+            border: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .transcript-line:hover {
+            background: #1f2d3d;
+        }
+
+        .ts-text {
+            color: var(--text-dark);
+            line-height: 1.6;
+            font-size: 0.92rem;
+            white-space: pre-wrap;
+        }
+
+        .empty-transcript {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .empty-transcript i {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+            opacity: 0.4;
+        }
+
+        /* ===== PASTE PANEL ===== */
+        .paste-panel {
+            display: flex;
+            flex-direction: column;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+        }
+
+        .paste-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.55rem 0.9rem;
+            background: var(--panel-bg2);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        #ttsInputText {
+            width: 100%;
+            min-height: 200px;
+            max-height: 45vh;
+            padding: 0.9rem 1rem;
+            background: var(--panel-bg);
+            color: var(--text-dark);
+            border: none;
+            outline: none;
+            resize: vertical;
+            font-family: var(--font-main);
+            font-size: 0.9rem;
+            line-height: 1.65;
+            box-sizing: border-box;
+        }
+
+        #ttsInputText::placeholder {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        .paste-char-count {
+            padding: 0.25rem 0.9rem;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            background: var(--panel-bg2);
+            border-top: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--panel-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 0.85rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .footer-brand {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Speaking animation */
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.3);
+                opacity: 0;
+            }
+        }
+
+        .speaking-icon {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--tts-color);
+            border-radius: 50%;
+            margin-right: 4px;
+            position: relative;
+        }
+
+        .speaking-icon::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            background: var(--tts-color);
+            animation: pulse-ring 1s ease-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 800px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .right-panel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="nav-brand">
+            <div class="logo-box">TS</div>
+            <div class="brand-name">
+                <span class="red">TS GLOBAL</span>
+                <span class="sub">| Video Transcriber</span>
+            </div>
+        </div>
+        <div class="nav-badges">
+            <span class="badge badge-version"><i class="fa-solid fa-rocket"></i> V2.0</span>
+            <span class="badge badge-ready"><i class="fa-solid fa-circle-check"></i> PRO Edition</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <h3>Tải lên Video hoặc Audio</h3>
+                <p>Hỗ trợ MP4, WEBM, MOV, MP3, WAV, M4A...</p>
+                <input type="file" id="fileInput" accept="video/*,audio/*">
+            </div>
+
+            <div class="video-container" id="videoContainer">
+                <video id="mediaPlayer" controls></video>
+            </div>
+
+            <!-- Gemini API Key + Bóc băng (luôn hiển thị) -->
+            <div class="gemini-bar">
+                <div class="api-key-row" style="flex:1; margin:0; background:transparent; border:none; padding:0;">
+                    <i class="fa-brands fa-google" style="color:var(--primary); font-size:0.85rem;"></i>
+                    <input type="password" id="geminiApiKey" placeholder="Gemini API Key (bắt buộc)...">
+                </div>
+                <button class="btn-primary" id="btnProcess" disabled onclick="startProcessing()"
+                    style="white-space:nowrap; flex-shrink:0; padding:0.55rem 0.9rem; font-size:0.82rem;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Bóc băng
+                </button>
+            </div>
+
+            <div class="controls" id="controls">
+                <div class="controls-row">
+                    <select id="languageSelect">
+                        <option value="zh">🇨🇳 Tiếng Trung (Chinese)</option>
+                        <option value="fil">🇵🇭 Tiếng Philippines</option>
+                        <option value="en">🇬🇧 Tiếng Anh (English)</option>
+                        <option value="vi">🇻🇳 Tiếng Việt (Vietnamese)</option>
+                        <option value="ja">🇯🇵 Tiếng Nhật (Japanese)</option>
+                        <option value="ko">🇰🇷 Tiếng Hàn (Korean)</option>
+                    </select>
+                    <select id="taskSelect">
+                        <option value="transcribe">Chép lời (Giữ nguyên ngôn ngữ gốc)</option>
+                        <option value="translate_vi">Dịch → Tiếng Việt</option>
+                        <option value="translate_en">Dịch → Tiếng Anh</option>
+                        <option value="translate_fil">Dịch → Tiếng Philippines</option>
+                    </select>
+                </div>
+                <div class="progress-bar-container" id="progressBarContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="stats" id="statsDisplay">Chuẩn bị xử lý...</div>
+            </div>
+
+            <!-- Transcript Output -->
+            <div class="transcript-container" id="transcriptBox" style="flex:1; min-height:120px;">
+                <div class="empty-transcript" id="emptyTranscript">
+                    <i class="fa-regular fa-comment-dots"></i>
+                    <p>Kết quả bóc băng sẽ xuất hiện ở đây.</p>
+                    <p style="font-size:0.78rem; margin-top:0.4rem; color:#4b5563;">Copy rồi dán sang ô bên phải để TTS
+                        đọc.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Paste text + TTS -->
+        <div class="right-panel">
+
+            <!-- Textarea dán/gõ text -->
+            <div class="paste-panel">
+                <div class="paste-panel-header">
+                    <span><i class="fa-solid fa-align-left" style="color:var(--primary);"></i>&nbsp; Văn bản cần
+                        đọc</span>
+                    <div style="display:flex; gap:0.4rem;">
+                        <button class="btn-secondary" style="padding:0.28rem 0.6rem; font-size:0.76rem;"
+                            onclick="pasteFromClipboard()" title="Dán từ clipboard">
+                            <i class="fa-solid fa-clipboard"></i> Dán
+                        </button>
+                        <button class="btn-secondary"
+                            style="padding:0.28rem 0.6rem; font-size:0.76rem; color:var(--primary); border-color:var(--primary);"
+                            onclick="copyTranscriptToTTS()" title="Copy kết quả bóc băng vào đây">
+                            <i class="fa-solid fa-arrow-right"></i> Lấy từ bóc băng
+                        </button>
+                        <button class="btn-secondary" style="padding:0.28rem 0.6rem; font-size:0.76rem;"
+                            onclick="clearTTSText()" title="Xóa">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <textarea id="ttsInputText" placeholder="Dán hoặc gõ văn bản vào đây để TTS đọc..."></textarea>
+                <div class="paste-char-count" id="pasteCharCount">0 ký tự</div>
+            </div>
+
+            <!-- ===== TTS PANEL ===== -->
+            <div class="tts-panel">
+                <div class="tts-header">
+                    <i class="fa-solid fa-volume-high"></i>
+                    <span>Text-to-Speech</span>
+                    <span class="tts-badge">TTSFree + Google + Browser</span>
+                </div>
+
+                <div class="tts-controls">
+                    <div class="tts-row" id="voiceRssKeyRow">
+                        <label><i class="fa-solid fa-key"></i> TTSFree</label>
+                        <input type="password" id="voiceRssKey" placeholder="TTSFree.com API Key..."
+                            style="flex:1; padding:0.45rem 0.7rem; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-color); color:var(--text-dark); font-size:0.82rem; outline:none;">
+                    </div>
+                    <div class="tts-row">
+                        <label><i class="fa-solid fa-globe"></i> Giọng</label>
+                        <select id="voiceSelect">
+                            <option value="">⏳ Đang tải danh sách giọng...</option>
+                        </select>
+                    </div>
+
+                    <div class="tts-row">
+                        <label><i class="fa-solid fa-gauge"></i> Tốc độ</label>
+                        <div class="tts-slider-container">
+                            <input type="range" id="ttsRate" min="0.5" max="2" step="0.1" value="1"
+                                oninput="document.getElementById('rateVal').innerText = this.value + 'x'">
+                            <span id="rateVal">1x</span>
+                        </div>
+                        <label style="margin-left:0.5rem;"><i class="fa-solid fa-music"></i> Cao</label>
+                        <div class="tts-slider-container">
+                            <input type="range" id="ttsPitch" min="0.5" max="2" step="0.1" value="1"
+                                oninput="document.getElementById('pitchVal').innerText = this.value">
+                            <span id="pitchVal">1</span>
+                        </div>
+                    </div>
+
+                    <div class="tts-action-row">
+                        <button class="btn-tts" id="btnTTS" onclick="speakTranscript()" disabled>
+                            <i class="fa-solid fa-play"></i> Đọc Văn Bản
+                        </button>
+                        <button class="btn-tts-stop hidden" id="btnTTSStop" onclick="stopSpeaking()">
+                            <i class="fa-solid fa-stop"></i> Dừng
+                        </button>
+                        <button class="btn-secondary" id="btnTTSPause" onclick="pauseResumeSpeaking()"
+                            style="display:none; padding:0.65rem 0.9rem;">
+                            <i class="fa-solid fa-pause" id="pauseIcon"></i>
+                        </button>
+                        <button class="btn-tts-download" id="btnTTSDownload" onclick="downloadTTSAudio()"
+                            title="Tải về file audio">
+                            <i class="fa-solid fa-download"></i> Tải MP3
+                        </button>
+                    </div>
+
+                    <div class="tts-progress" id="ttsProgress">
+                        <div class="tts-progress-bar" id="ttsProgressBar"></div>
+                    </div>
+                    <div class="tts-status" id="ttsStatus">
+                        <span class="speaking-icon"></span> Đang đọc...
+                    </div>
+                </div>
+            </div>
+            <!-- ===== END TTS PANEL ===== -->
+        </div>
+    </div>
+
+    <footer>
+        <div>Phần mềm được thiết kế và phát triển bởi <span class="footer-brand">Sếp Sơn</span></div>
+        <div style="color: var(--border-color)">|</div>
+        <div>&copy; 2026 <span style="font-weight: 600;">TS GLobal Group</span></div>
+    </footer>
+
+    <script>
+        // ========== ELEMENTS ==========
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const videoContainer = document.getElementById('videoContainer');
+        const mediaPlayer = document.getElementById('mediaPlayer');
+        const controls = document.getElementById('controls');
+        const btnProcess = document.getElementById('btnProcess');
+        const progressBarContainer = document.getElementById('progressBarContainer');
+        const progressBar = document.getElementById('progressBar');
+        const statsDisplay = document.getElementById('statsDisplay');
+        const transcriptBox = document.getElementById('transcriptBox');
+        const emptyTranscript = document.getElementById('emptyTranscript');
+
+        let processing = false;
+        let currentFile = null;
+        let fileUri = null;
+        let transcriptText = ''; // kết quả bóc băng từ Gemini (lưu để dùng btn "Lấy từ bóc băng")
+
+        // ===== TEXTAREA PASTE PANEL HELPERS =====
+        function onTTSTextInput(val) {
+            const len = val.length;
+            document.getElementById('pasteCharCount').textContent = len + ' ký tự';
+            document.getElementById('btnTTS').disabled = (len === 0);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('ttsInputText').addEventListener('input', function () {
+                onTTSTextInput(this.value);
+            });
+        });
+
+        window.pasteFromClipboard = async function () {
+            try {
+                const text = await navigator.clipboard.readText();
+                const ta = document.getElementById('ttsInputText');
+                ta.value = text;
+                onTTSTextInput(text);
+            } catch (e) {
+                alert('Không thể đọc clipboard. Hãy dán thủ công bằng Ctrl+V.');
+            }
+        };
+
+        window.clearTTSText = function () {
+            const ta = document.getElementById('ttsInputText');
+            ta.value = '';
+            onTTSTextInput('');
+            stopSpeaking();
+        };
+
+        window.copyTranscriptToTTS = function () {
+            if (!transcriptText) { alert('Chưa có kết quả bóc băng. Hãy bóc băng video trước.'); return; }
+            const ta = document.getElementById('ttsInputText');
+            ta.value = transcriptText;
+            onTTSTextInput(transcriptText);
+            ta.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // ========== INIT ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('gemini_api_key');
+            if (savedKey) document.getElementById('geminiApiKey').value = savedKey;
+            initTTS();
+        });
+
+        // ========== FILE UPLOAD ==========
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            currentFile = file;
+
+            uploadZone.style.display = 'none';
+            videoContainer.style.display = 'block';
+            controls.style.display = 'flex';
+            statsDisplay.style.display = 'block';
+            statsDisplay.innerText = `✅ Đã tải: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB). Nhấn "Bắt đầu Bóc băng".`;
+            btnProcess.disabled = false;
+
+            mediaPlayer.src = URL.createObjectURL(file);
+        });
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = 'var(--primary)';
+        });
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.style.borderColor = 'var(--border-color)';
+        });
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = 'var(--border-color)';
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // ========== TRANSCRIBE ==========
+        function addTranscriptLine(text) {
+            transcriptText = text;
+            emptyTranscript.style.display = 'none';
+
+            const div = document.createElement('div');
+            div.className = 'transcript-line';
+            const textSpan = document.createElement('div');
+            textSpan.className = 'ts-text';
+            textSpan.innerText = text;
+            div.appendChild(textSpan);
+            transcriptBox.appendChild(div);
+            transcriptBox.scrollTop = transcriptBox.scrollHeight;
+
+            // Enable TTS when text is ready
+            document.getElementById('btnTTS').disabled = false;
+        }
+
+        window.startProcessing = async function () {
+            if (!currentFile) { alert("Vui lòng tải lên một video hoặc audio!"); return; }
+
+            const apiKey = document.getElementById('geminiApiKey').value.trim();
+            if (!apiKey) { alert("Vui lòng nhập Gemini API Key!"); return; }
+            localStorage.setItem('gemini_api_key', apiKey);
+
+            if (processing) return;
+            processing = true;
+
+            // Reset
+            transcriptText = '';
+            document.getElementById('btnTTS').disabled = true;
+            btnProcess.disabled = true;
+            btnProcess.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
+            progressBarContainer.style.display = 'block';
+            progressBar.style.width = '8%';
+            statsDisplay.style.display = 'block';
+            emptyTranscript.style.display = 'none';
+            transcriptBox.innerHTML = '';
+            transcriptBox.appendChild(emptyTranscript);
+            emptyTranscript.style.display = 'block';
+
+            try {
+                // Step 1: Upload
+                statsDisplay.innerText = '📤 Bước 1/3: Đang tải Video lên Gemini Cloud...';
+                const fileMime = currentFile.type || 'video/mp4';
+                const uploadRes = await fetch(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Goog-Upload-Protocol': 'raw',
+                        'X-Goog-Upload-Command': 'upload',
+                        'X-Goog-Upload-File-Data-Length': currentFile.size,
+                        'X-Goog-Upload-Header-Content-Type': fileMime,
+                        'Content-Type': fileMime
+                    },
+                    body: currentFile
+                });
+
+                if (!uploadRes.ok) throw new Error("Lỗi khi tải video lên Gemini API.");
+                const uploadData = await uploadRes.json();
+                fileUri = uploadData.file.uri;
+                const fileName = uploadData.file.name;
+
+                progressBar.style.width = '40%';
+                statsDisplay.innerText = '⚙️ Bước 2/3: AI đang phân tích video...';
+
+                // Step 2: Poll status
+                let isReady = false;
+                while (!isReady) {
+                    await new Promise(r => setTimeout(r, 3000));
+                    const statusRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/${fileName}?key=${apiKey}`);
+                    const statusData = await statusRes.json();
+                    if (statusData.state === 'ACTIVE') isReady = true;
+                    else if (statusData.state === 'FAILED') throw new Error("Gemini API không thể đọc video này.");
+                }
+
+                progressBar.style.width = '70%';
+                statsDisplay.innerText = '🔤 Bước 3/3: Đang nhận diện và chuyển văn bản...';
+
+                // Step 3: Generate
+                const language = document.getElementById('languageSelect').selectedOptions[0].text;
+                const task = document.getElementById('taskSelect').value;
+
+                let prompt = '';
+                if (task === 'transcribe') {
+                    prompt = `Lắng nghe và viết toàn bộ lời nói, chữ xuất hiện trong video. Ngôn ngữ nguồn: ${language}. Trả về văn bản thô, chia đoạn hợp lý. Không thêm giải thích.`;
+                } else if (task === 'translate_en') {
+                    prompt = `Dịch toàn bộ nội dung video sang tiếng Anh. Ngôn ngữ nguồn: ${language}. Trả về văn bản thô, chia đoạn hợp lý. Không thêm giải thích.`;
+                } else if (task === 'translate_vi') {
+                    prompt = `Dịch toàn bộ nội dung video sang tiếng Việt. Ngôn ngữ nguồn: ${language}. Trả về văn bản thô, chia đoạn hợp lý. Không thêm giải thích.`;
+                } else if (task === 'translate_fil') {
+                    prompt = `Translate all spoken content in this video into Filipino (Tagalog). Source language: ${language}. Return plain text only, with natural paragraph breaks. Do not add any explanations or notes.`;
+                }
+
+                const generateRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { file_data: { file_uri: fileUri, mime_type: fileMime } },
+                                { text: prompt }
+                            ]
+                        }]
+                    })
+                });
+
+                if (!generateRes.ok) {
+                    const errorData = await generateRes.json();
+                    throw new Error(errorData.error?.message || "Lỗi Generate API.");
+                }
+
+                const generateData = await generateRes.json();
+                const resultText = generateData.candidates[0].content.parts[0].text;
+
+                progressBar.style.width = '100%';
+                statsDisplay.innerText = '✅ Hoàn thành! Bạn có thể Copy hoặc nhấn "Đọc Văn Bản" để nghe.';
+
+                emptyTranscript.style.display = 'none';
+                addTranscriptLine(resultText);
+
+            } catch (err) {
+                console.error(err);
+                statsDisplay.innerText = '❌ Lỗi: ' + err.message;
+                alert('Lỗi: ' + err.message);
+            } finally {
+                btnProcess.disabled = false;
+                btnProcess.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Bắt đầu Bóc băng';
+                processing = false;
+            }
+        };
+
+        window.copyTranscript = function () {
+            if (!transcriptText) { alert('Chưa có text để copy!'); return; }
+            navigator.clipboard.writeText(transcriptText).then(() => {
+                alert('✅ Đã copy bản transcript!');
+            });
+        };
+
+        // ========== TEXT-TO-SPEECH ENGINE ==========
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let voices = [];
+        let isSpeaking = false;
+        let isPaused = false;
+        let lastVoiceMode = ''; // track last used mode for download
+
+        // ----  CONSTANTS ----
+        const GOOGLE_TTS_MODE = 'GOOGLE_TTS_FIL';
+        const VOICERSS_PREFIX = 'VRS:';
+
+        // TTSFree Voice list (voiceID = exact ID from ttsfree.com/api/v1/voice, servicebin engine)
+        const VOICERSS_VOICES = [
+            // === ƯUTIÊN: Ngôn ngữ Châu Á ===
+            { label: '🇵🇭 Filipino · Angelo (Nam)', voiceID: 'fil-PH' },
+            { label: '�� Filipino · Blessica (Nữ)', voiceID: 'fil-PH2' },
+            { label: '�🇳 Tiếng Việt · HoaiMy (Nữ)', voiceID: 'vi-VN' },
+            { label: '�🇳 Tiếng Việt · NamMinh (Nam)', voiceID: 'vi-VN2' },
+            { label: '🇨🇳 中文 普通话 · Xiaoxiao (Nữ)', voiceID: 'zh-CN' },
+            { label: '�� 中文 普通话 · Yunxi (Nam)', voiceID: 'zh-CN4' },
+            { label: '�� 中文 普通话 · Yunyang (Nam)', voiceID: 'zh-CN6' },
+            { label: '�� 粵語 HongKong · HiuGaai (Nữ)', voiceID: 'zh-HK' },
+            { label: '�� 粵語 HongKong · WanLung (Nam)', voiceID: 'zh-HK3' },
+            { label: '�� 中文 Taiwan · HsiaoChen (Nữ)', voiceID: 'zh-TW' },
+            { label: '�� 日本語 · Nanami (Nữ)', voiceID: 'ja-JP2' },
+            { label: '�� 日本語 · Keita (Nam)', voiceID: 'ja-JP' },
+            { label: '�� 한국어 · SunHi (Nữ)', voiceID: 'ko-KR2' },
+            { label: '�� 한국어 · InJoon (Nam)', voiceID: 'ko-KR' },
+            { label: '�� ภาษาไทย · Premwadee (Nữ)', voiceID: 'th-TH2' },
+            { label: '�� Bahasa Indonesia · Gadis (Nữ)', voiceID: 'id-ID2' },
+            { label: '�� Bahasa Melayu · Yasmin (Nữ)', voiceID: 'ms-MY2' },
+            { label: '�� हिन्दी · Swara (Nữ)', voiceID: 'hi-IN2' },
+            // === English ===
+            { label: '�� English US · Aria (Nữ)', voiceID: 'en-US' },
+            { label: '�� English US · Jenny (Nữ)', voiceID: 'en-US6' },
+            { label: '�� English US · Guy (Nam)', voiceID: 'en-US5' },
+            { label: '🇺🇸 English US · Christopher (Nam)', voiceID: 'en-US3' },
+            { label: '🇬🇧 English UK · Libby (Nữ)', voiceID: 'en-GB' },
+            { label: '�� English UK · Ryan (Nam)', voiceID: 'en-GB3' },
+            { label: '�� English Australia · Natasha (Nữ)', voiceID: 'en-AU' },
+            { label: '�� English India · Neerja (Nữ)', voiceID: 'en-IN' },
+            { label: '�� English Philippines · Rosa (Nữ)', voiceID: 'en-PH2' },
+            // === Châu Âu ===
+            { label: '🇫🇷 Français · Denise (Nữ)', voiceID: 'fr-FR' },
+            { label: '�� Français · Henri (Nam)', voiceID: 'fr-FR3' },
+            { label: '🇩🇪 Deutsch · Amala (Nữ)', voiceID: 'de-DE' },
+            { label: '�� Deutsch · Conrad (Nam)', voiceID: 'de-DE2' },
+            { label: '�� Español España · Elvira (Nữ)', voiceID: 'es-ES2' },
+            { label: '�� Español México · Dalia (Nữ)', voiceID: 'es-MX' },
+            { label: '�� Português Brasil · Francisca (Nữ)', voiceID: 'pt-BR2' },
+            { label: '�� Русский · Svetlana (Nữ)', voiceID: 'ru-RU2' },
+            { label: '🇮🇹 Italiano · Elsa (Nữ)', voiceID: 'it-IT2' },
+            { label: '🇳� Nederlands · Colette (Nữ)', voiceID: 'nl-NL' },
+            { label: '🇵🇱 Polski · Zofia (Nữ)', voiceID: 'pl-PL2' },
+            { label: '�� Svenska · Sofie (Nữ)', voiceID: 'sv-SE2' },
+            { label: '🇹🇷 Türkçe · Emel (Nữ)', voiceID: 'tr-TR2' },
+            { label: '�� Ελληνικά · Athina (Nữ)', voiceID: 'el-GR' },
+            // === Trung Đông & Khác ===
+            { label: '�� العربية · Zariyah (Nữ)', voiceID: 'ar-SA2' },
+            { label: '🇮� עברית · Hila (Nữ)', voiceID: 'he-IL2' },
+            { label: '�� Українська · Polina (Nữ)', voiceID: 'uk-UA2' },
+        ];
+
+        // Google TTS state
+        let gttsAudio = null;
+        let gttsChunkIndex = 0;
+
+        // VoiceRSS state
+        let vrsAudio = null;
+
+        const DEFAULT_VRS_KEY = 'B50uZJ81UhWGLrlwkPXxvqtKyTw7bqTa';
+
+        function initTTS() {
+            // Load saved TTSFree key (or use default)
+            const savedKey = localStorage.getItem('ttsfree_api_key') || DEFAULT_VRS_KEY;
+            document.getElementById('voiceRssKey').value = savedKey;
+
+            function loadVoices() {
+                voices = synth.getVoices();
+                populateVoiceList();
+            }
+            loadVoices();
+            if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+        }
+
+        function populateVoiceList() {
+            const voiceSelect = document.getElementById('voiceSelect');
+            voiceSelect.innerHTML = '';
+
+            // ── Group 1: TTSFree voices ──
+            const grp1 = document.createElement('optgroup');
+            grp1.label = '🎤 TTSFree API (140+ ngôn ngữ, AI Neural, Tải MP3)';
+            VOICERSS_VOICES.forEach((vr) => {
+                const opt = document.createElement('option');
+                opt.value = VOICERSS_PREFIX + vr.voiceID;
+                opt.text = vr.label;
+                grp1.appendChild(opt);
+            });
+            voiceSelect.appendChild(grp1);
+
+            // ── Group 2: Google Translate TTS ──
+            const grp2 = document.createElement('optgroup');
+            grp2.label = '🌐 Google Translate TTS (Miễn phí)';
+            const filOpt = document.createElement('option');
+            filOpt.value = GOOGLE_TTS_MODE;
+            filOpt.text = '🇵🇭 Filipino / Tagalog';
+            grp2.appendChild(filOpt);
+            voiceSelect.appendChild(grp2);
+
+            // ── Group 3: Browser voices ──
+            if (voices.length > 0) {
+                const grp3 = document.createElement('optgroup');
+                grp3.label = '🖥️ Giọng trình duyệt (Browser)';
+                const langOrder = ['vi', 'zh', 'en', 'ja', 'ko'];
+                const prioritized = [], others = [];
+                voices.forEach((voice, i) => {
+                    const lc = voice.lang.toLowerCase().split('-')[0];
+                    (langOrder.includes(lc) ? prioritized : others).push({ voice, i });
+                });
+                prioritized.sort((a, b) =>
+                    langOrder.indexOf(a.voice.lang.toLowerCase().split('-')[0]) -
+                    langOrder.indexOf(b.voice.lang.toLowerCase().split('-')[0])
+                );
+                [...prioritized, ...others].forEach(({ voice, i }) => {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.text = `${voice.name} (${voice.lang})${voice.default ? ' ★' : ''}`;
+                    grp3.appendChild(opt);
+                });
+                voiceSelect.appendChild(grp3);
+            }
+
+            // Default: first TTSFree = Filipino Angelo
+            voiceSelect.value = VOICERSS_PREFIX + 'fil-PH';
+        }
+
+        // ---- Shared text chunker ----
+        function chunkText(text, maxLen) {
+            const sentences = text.split(/(?<=[.!?\n。！？，,])/g);
+            const chunks = [];
+            let current = '';
+            for (const s of sentences) {
+                const t = s.trim();
+                if (!t) continue;
+                if ((current + ' ' + t).trim().length <= maxLen) {
+                    current = (current + ' ' + t).trim();
+                } else {
+                    if (current) chunks.push(current);
+                    if (t.length > maxLen) {
+                        const words = t.split(/\s+/);
+                        let part = '';
+                        for (const w of words) {
+                            if ((part + ' ' + w).trim().length <= maxLen) { part = (part + ' ' + w).trim(); }
+                            else { if (part) chunks.push(part); part = w; }
+                        }
+                        if (part) chunks.push(part);
+                        current = '';
+                    } else { current = t; }
+                }
+            }
+            if (current) chunks.push(current);
+            return chunks.filter(c => c.trim().length > 0);
+        }
+
+        // ---- TTSFree.com API helpers ----
+        function parseTTSF(val) {
+            // val format: 'VRS:fil-PH' -> voiceID = 'fil-PH'
+            return { voiceID: val.replace(VOICERSS_PREFIX, '') };
+        }
+
+        async function ttsFreeRequest(text, voiceID, key, speed) {
+            // speed slider: 0.5-2 -> TTSFree voiceSpeed: -5 to 5 (0=normal)
+            const voiceSpeed = Math.round((speed - 1) * 5).toString();
+            const res = await fetch('https://ttsfree.com/api/v1/tts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': key },
+                body: JSON.stringify({ text, voiceService: 'servicebin', voiceID, voiceSpeed })
+            });
+            const data = await res.json();
+            if (data.status !== 'success') throw new Error(data.mess || 'TTSFree error');
+            // Decode base64 to blob URL
+            const binary = atob(data.audioData);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+            return URL.createObjectURL(new Blob([bytes], { type: 'audio/mpeg' }));
+        }
+
+        async function playTTSFreeChunks(chunks, voiceID, key, speed, index = 0) {
+            if (!isSpeaking || index >= chunks.length) {
+                if (isSpeaking) onTTSDone();
+                return;
+            }
+            const chunkBase = Math.round((index / chunks.length) * 100);
+            const chunkEnd = Math.round(((index + 1) / chunks.length) * 100);
+            document.getElementById('ttsStatus').innerHTML =
+                `<span class="speaking-icon"></span> Đang xử lý ${index + 1}/${chunks.length}...`;
+
+            try {
+                const blobUrl = await ttsFreeRequest(chunks[index], voiceID, key, speed);
+                if (!isSpeaking) { URL.revokeObjectURL(blobUrl); return; }
+
+                vrsAudio = new Audio(blobUrl);
+                vrsAudio.playbackRate = Math.min(speed, 4);
+
+                // Realtime progress bar
+                vrsAudio.ontimeupdate = () => {
+                    if (vrsAudio.duration) {
+                        const within = (vrsAudio.currentTime / vrsAudio.duration) * (chunkEnd - chunkBase);
+                        document.getElementById('ttsProgressBar').style.width = (chunkBase + within) + '%';
+                    }
+                };
+                document.getElementById('ttsStatus').innerHTML =
+                    `<span class="speaking-icon"></span> Đang đọc ${index + 1}/${chunks.length}...`;
+
+                vrsAudio.onended = () => {
+                    URL.revokeObjectURL(blobUrl);
+                    if (isSpeaking) playTTSFreeChunks(chunks, voiceID, key, speed, index + 1);
+                };
+                vrsAudio.onerror = () => {
+                    URL.revokeObjectURL(blobUrl);
+                    if (isSpeaking) playTTSFreeChunks(chunks, voiceID, key, speed, index + 1);
+                };
+                await vrsAudio.play();
+            } catch (err) {
+                console.error('TTSFree error:', err);
+                if (isSpeaking) playTTSFreeChunks(chunks, voiceID, key, speed, index + 1);
+            }
+        }
+
+        // ---- Google Translate TTS helpers ----
+        function googleTTSUrl(text, lang, speed) {
+            const ttsspeed = speed <= 0.8 ? '0.24' : '1';
+            return `https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=gtx&ttsspeed=${ttsspeed}`;
+        }
+
+        function playGoogleTTSChunks(chunks, lang, speed, index = 0) {
+            if (!isSpeaking || index >= chunks.length) {
+                if (isSpeaking) onTTSDone();
+                return;
+            }
+            gttsChunkIndex = index;
+            document.getElementById('ttsProgressBar').style.width = Math.round((index / chunks.length) * 100) + '%';
+            gttsAudio = new Audio(googleTTSUrl(chunks[index], lang, speed));
+            gttsAudio.playbackRate = Math.min(speed, 4);
+            gttsAudio.onended = () => { if (isSpeaking) playGoogleTTSChunks(chunks, lang, speed, index + 1); };
+            gttsAudio.onerror = () => { if (isSpeaking) playGoogleTTSChunks(chunks, lang, speed, index + 1); };
+            gttsAudio.play().catch(() => onTTSDone());
+        }
+
+        window.speakTranscript = function () {
+            const ttsText = document.getElementById('ttsInputText').value.trim();
+            if (!ttsText) {
+                alert('Chưa có văn bản! Hãy dán text vào ô phía trên hoặc lấy kết quả bóc băng.');
+                return;
+            }
+
+            stopSpeaking(); // Stop any existing speech
+
+            const rate = parseFloat(document.getElementById('ttsRate').value);
+            const pitch = parseFloat(document.getElementById('ttsPitch').value);
+            const voiceIndex = document.getElementById('voiceSelect').value;
+
+            // Show controls
+            isSpeaking = true;
+            isPaused = false;
+            document.getElementById('btnTTS').style.display = 'none';
+            document.getElementById('btnTTSStop').classList.remove('hidden');
+            document.getElementById('ttsProgress').style.display = 'block';
+            document.getElementById('ttsStatus').style.display = 'block';
+            document.getElementById('ttsStatus').innerHTML = '<span class="speaking-icon"></span> Đang đọc...';
+
+            // ---- ROUTE: TTSFree API ----
+            if (voiceIndex.startsWith(VOICERSS_PREFIX)) {
+                lastVoiceMode = 'VOICERSS';
+                const ttsKey = document.getElementById('voiceRssKey').value.trim();
+                if (!ttsKey) {
+                    isSpeaking = false; onTTSDone();
+                    alert('⚠️ Vui lòng nhập API Key TTSFree.com vào ô phía trên!');
+                    return;
+                }
+                localStorage.setItem('ttsfree_api_key', ttsKey);
+                const { voiceID } = parseTTSF(voiceIndex);
+                document.getElementById('btnTTSPause').style.display = 'none';
+                document.getElementById('btnTTSDownload').style.display = 'none';
+                const chunks = chunkText(ttsText, 350);
+                if (chunks.length === 0) { onTTSDone(); return; }
+                playTTSFreeChunks(chunks, voiceID, ttsKey, rate, 0);
+                return;
+            }
+
+            // ---- ROUTE: Google Translate TTS (Filipino) ----
+            if (voiceIndex === GOOGLE_TTS_MODE) {
+                lastVoiceMode = GOOGLE_TTS_MODE;
+                document.getElementById('btnTTSPause').style.display = 'none';
+                document.getElementById('btnTTSDownload').style.display = 'none';
+                const chunks = chunkText(ttsText, 180);
+                gttsChunkIndex = 0;
+                if (chunks.length === 0) { onTTSDone(); return; }
+                playGoogleTTSChunks(chunks, 'tl', rate, 0);
+                return;
+            }
+
+            // ---- ROUTE: Web Speech API ----
+            lastVoiceMode = 'WEB_SPEECH';
+            document.getElementById('btnTTSPause').style.display = 'flex';
+            document.getElementById('btnTTSDownload').style.display = 'none';
+
+            currentUtterance = new SpeechSynthesisUtterance(ttsText);
+            currentUtterance.rate = rate;
+            currentUtterance.pitch = pitch;
+            currentUtterance.volume = 1;
+
+            if (voiceIndex !== '' && voices[voiceIndex]) {
+                currentUtterance.voice = voices[parseInt(voiceIndex)];
+                currentUtterance.lang = voices[parseInt(voiceIndex)].lang;
+            }
+
+            currentUtterance.onstart = () => { animateTTSProgress(); };
+            currentUtterance.onend = () => { onTTSDone(); };
+            currentUtterance.onerror = (e) => { console.error('TTS error:', e); onTTSDone(); };
+            currentUtterance.onboundary = (e) => {
+                if (e.name === 'word' && ttsText.length > 0) {
+                    const pct = Math.min(100, Math.round((e.charIndex / ttsText.length) * 100));
+                    document.getElementById('ttsProgressBar').style.width = pct + '%';
+                }
+            };
+
+            synth.speak(currentUtterance);
+        };
+
+        function animateTTSProgress() {
+            // Fallback animation if onboundary not fired
+            let pct = 0;
+            const interval = setInterval(() => {
+                if (!isSpeaking || isPaused) { clearInterval(interval); return; }
+                if (!synth.speaking) { clearInterval(interval); return; }
+                pct = Math.min(pct + 0.3, 95);
+                const currentBar = document.getElementById('ttsProgressBar');
+                // Only animate if progress wasn't set by onboundary
+                if (parseFloat(currentBar.style.width) < pct) {
+                    currentBar.style.width = pct + '%';
+                }
+            }, 300);
+        }
+
+        function onTTSDone() {
+            isSpeaking = false;
+            isPaused = false;
+            document.getElementById('btnTTS').style.display = 'flex';
+            const ttsHasText = document.getElementById('ttsInputText').value.trim().length > 0;
+            document.getElementById('btnTTS').disabled = !ttsHasText;
+            document.getElementById('btnTTSStop').classList.add('hidden');
+            document.getElementById('btnTTSPause').style.display = 'none';
+            document.getElementById('ttsProgress').style.display = 'none';
+            document.getElementById('ttsProgressBar').style.width = '0%';
+            document.getElementById('pauseIcon').className = 'fa-solid fa-pause';
+
+            const dlBtn = document.getElementById('btnTTSDownload');
+            const statusEl = document.getElementById('ttsStatus');
+            if (transcriptText) {
+                const canDownload = (lastVoiceMode === 'VOICERSS' || lastVoiceMode === GOOGLE_TTS_MODE);
+                dlBtn.style.display = canDownload ? 'flex' : 'none';
+                statusEl.style.display = 'block';
+                statusEl.innerHTML = canDownload
+                    ? '<i class="fa-solid fa-circle-check" style="color:#4ade80"></i> Hoàn thành! Nhấn <b>Tải MP3</b> để lưu file.'
+                    : '<i class="fa-solid fa-circle-check" style="color:#4ade80"></i> Hoàn thành! (Giọng trình duyệt không hỗ trợ tải file)';
+            } else {
+                dlBtn.style.display = 'none';
+                statusEl.style.display = 'none';
+            }
+        }
+
+        window.stopSpeaking = function () {
+            synth.cancel();
+            [gttsAudio, vrsAudio].forEach(a => { if (a) { a.pause(); a.src = ''; } });
+            gttsAudio = null; vrsAudio = null;
+            isSpeaking = false;
+            onTTSDone();
+        };
+
+        window.pauseResumeSpeaking = function () {
+            if (!isSpeaking) return;
+
+            if (!isPaused) {
+                synth.pause();
+                isPaused = true;
+                document.getElementById('pauseIcon').className = 'fa-solid fa-play';
+                document.getElementById('ttsStatus').innerHTML = '<i class="fa-solid fa-pause"></i> Đã tạm dừng';
+            } else {
+                synth.resume();
+                isPaused = false;
+                document.getElementById('pauseIcon').className = 'fa-solid fa-pause';
+                document.getElementById('ttsStatus').innerHTML = '<span class="speaking-icon"></span> Đang đọc...';
+            }
+        };
+
+        // ========== DOWNLOAD TTS AUDIO ==========
+        window.downloadTTSAudio = async function () {
+            const curText = document.getElementById('ttsInputText').value.trim();
+            if (!curText) { alert('Chưa có văn bản để tải!'); return; }
+
+            const dlBtn = document.getElementById('btnTTSDownload');
+            dlBtn.classList.add('downloading');
+            dlBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tải...';
+            dlBtn.disabled = true;
+
+            try {
+                const rate = parseFloat(document.getElementById('ttsRate').value);
+                const voiceIndex = document.getElementById('voiceSelect').value;
+                const ttsKey = document.getElementById('voiceRssKey').value.trim();
+                let chunks, filename;
+                let fetchFn;
+
+                if (lastVoiceMode === 'VOICERSS') {
+                    if (!ttsKey) throw new Error('Chưa nhập API Key TTSFree!');
+                    const { voiceID } = parseTTSF(voiceIndex);
+                    chunks = chunkText(curText, 350);
+                    filename = `tts_${voiceID}.mp3`;
+                    fetchFn = async (text, idx) => {
+                        dlBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${idx + 1}/${chunks.length}...`;
+                        return await ttsFreeRequest(text, voiceID, ttsKey, rate);
+                    };
+                } else if (lastVoiceMode === GOOGLE_TTS_MODE) {
+                    chunks = chunkText(curText, 180);
+                    filename = 'tts_filipino.mp3';
+                    fetchFn = async (text, idx) => {
+                        dlBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${idx + 1}/${chunks.length}...`;
+                        const url = googleTTSUrl(text, 'tl', rate);
+                        const res = await fetch(url);
+                        if (!res.ok) throw new Error(`Chunk ${idx + 1} lỗi`);
+                        return URL.createObjectURL(await res.blob());
+                    };
+                } else {
+                    throw new Error('Chỉ hỗ trợ tải cho TTSFree và Google TTS.');
+                }
+
+                if (chunks.length === 0) throw new Error('Không có nội dung.');
+
+                const blobs = [];
+                for (let i = 0; i < chunks.length; i++) {
+                    const blobUrl = await fetchFn(chunks[i], i);
+                    const res2 = await fetch(blobUrl);
+                    blobs.push(await res2.blob());
+                    URL.revokeObjectURL(blobUrl);
+                }
+
+                const combined = new Blob(blobs, { type: 'audio/mpeg' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(combined);
+                a.download = filename;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+
+                document.getElementById('ttsStatus').innerHTML = '<i class="fa-solid fa-circle-check" style="color:#4ade80"></i> Đã tải file MP3 thành công!';
+
+            } catch (err) {
+                console.error(err);
+                alert('❌ Lỗi: ' + err.message);
+            } finally {
+                dlBtn.classList.remove('downloading');
+                dlBtn.innerHTML = '<i class="fa-solid fa-download"></i> Tải MP3';
+                dlBtn.disabled = false;
+            }
+        };
+
+    </script>
+</body>
+
+</html>
