@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chấm Điểm & Set Giá · TS Global</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #e63946;
+            --primary-dark: #c1121f;
+            --primary-glow: rgba(230, 57, 70, 0.18);
+            --bg: #0f1117;
+            --bg2: #161920;
+            --bg3: #1c2030;
+            --card: #1a1d28;
+            --card2: #20243a;
+            --border: rgba(255, 255, 255, 0.08);
+            --border2: rgba(255, 255, 255, 0.13);
+            --text: #eef0f8;
+            --text-sub: #9aa0bc;
+            --text-muted: #5a6080;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .hdr {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: .7rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .logo {
+            width: 34px;
+            height: 34px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: .85rem;
+            color: #fff;
+            box-shadow: 0 0 14px var(--primary-glow);
+        }
+
+        .hdr h1 {
+            font-size: .95rem;
+            font-weight: 700;
+        }
+
+        .hdr-badge {
+            margin-left: auto;
+            background: rgba(230, 57, 70, 0.12);
+            border: 1px solid rgba(230, 57, 70, 0.3);
+            color: var(--primary);
+            font-size: .68rem;
+            font-weight: 700;
+            padding: .25rem .7rem;
+            border-radius: 20px;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+        }
+
+        /* MAIN WRAP */
+        .wrap {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        /* INPUT CARD */
+        .input-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .card-hdr {
+            padding: .8rem 1.2rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg2);
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .card-hdr-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+        }
+
+        .icon-blue {
+            background: rgba(59, 130, 246, .15);
+            color: var(--info);
+        }
+
+        .icon-purple {
+            background: rgba(139, 92, 246, .15);
+            color: var(--purple);
+        }
+
+        .icon-orange {
+            background: rgba(245, 158, 11, .15);
+            color: var(--warning);
+        }
+
+        .icon-green {
+            background: rgba(16, 185, 129, .15);
+            color: var(--success);
+        }
+
+        .card-hdr h3 {
+            font-size: .88rem;
+            font-weight: 700;
+        }
+
+        .card-hdr small {
+            font-size: .72rem;
+            color: var(--text-sub);
+        }
+
+        .card-body {
+            padding: 1.1rem 1.2rem;
+        }
+
+        /* FORM GRID */
+        .fg-name {
+            display: grid;
+            grid-template-columns: 1fr;
+            margin-bottom: .75rem;
+        }
+
+        .fg-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: .65rem;
+            margin-bottom: .65rem;
+        }
+
+        .fg-row-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: .65rem;
+            margin-bottom: .65rem;
+        }
+
+        .fg {
+            display: flex;
+            flex-direction: column;
+            gap: .28rem;
+        }
+
+        .lbl {
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+        }
+
+        .score-tag {
+            background: rgba(139, 92, 246, .12);
+            color: var(--purple);
+            border: 1px solid rgba(139, 92, 246, .2);
+            font-size: .6rem;
+            padding: .08rem .35rem;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .inp,
+        .sel {
+            background: var(--bg3);
+            border: 1px solid var(--border2);
+            border-radius: 7px;
+            padding: .5rem .7rem;
+            color: var(--text);
+            font-size: .82rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color .18s;
+            width: 100%;
+        }
+
+        .inp:focus,
+        .sel:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+
+        .sel option {
+            background: #1c2030;
+        }
+
+        /* BANNED BANNER */
+        .banned {
+            display: none;
+            background: rgba(239, 68, 68, .1);
+            border: 1px solid rgba(239, 68, 68, .3);
+            border-radius: 7px;
+            padding: .6rem .9rem;
+            color: var(--danger);
+            font-size: .82rem;
+            font-weight: 600;
+            align-items: center;
+            gap: .5rem;
+            margin-bottom: .5rem;
+        }
+
+        .banned.show {
+            display: flex;
+        }
+
+        /* CALC BTN */
+        .btn-calc {
+            width: 100%;
+            padding: .8rem;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            font-size: .95rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            box-shadow: 0 4px 16px rgba(230, 57, 70, .35);
+            margin-top: .2rem;
+        }
+
+        .btn-calc:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(230, 57, 70, .45);
+        }
+
+        /* RESULTS GRID */
+        .results {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+
+        .results.show {
+            display: grid;
+        }
+
+        /* GAUGE */
+        .gauge-wrap {
+            text-align: center;
+            padding: 1.2rem .5rem .6rem;
+        }
+
+        .gauge-sub {
+            font-size: .7rem;
+            color: var(--text-muted);
+            margin-bottom: .4rem;
+        }
+
+        .gauge-ring {
+            position: relative;
+            width: 160px;
+            height: 80px;
+            margin: 0 auto .4rem;
+            overflow: hidden;
+        }
+
+        .gauge-ring svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .gauge-num {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .gauge-lbl {
+            font-size: .82rem;
+            font-weight: 700;
+            margin-top: .2rem;
+        }
+
+        /* BREAKDOWN */
+        .sec-lbl {
+            font-size: .67rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            margin-bottom: .6rem;
+        }
+
+        .bd-list {
+            display: flex;
+            flex-direction: column;
+            gap: .45rem;
+        }
+
+        .bd-row {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .bd-name {
+            font-size: .74rem;
+            color: var(--text-sub);
+            width: 155px;
+            flex-shrink: 0;
+        }
+
+        .bd-bar-wrap {
+            flex: 1;
+            height: 5px;
+            background: var(--bg3);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .bd-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width .8s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .bd-score {
+            font-size: .74rem;
+            font-weight: 700;
+            width: 30px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* VERDICT */
+        .verdict {
+            border-radius: 9px;
+            padding: .85rem;
+            display: flex;
+            align-items: flex-start;
+            gap: .6rem;
+        }
+
+        .verdict-title {
+            font-size: .88rem;
+            font-weight: 700;
+            margin-bottom: .2rem;
+        }
+
+        .verdict-desc {
+            font-size: .77rem;
+            line-height: 1.55;
+            color: var(--text-sub);
+        }
+
+        /* PRICE */
+        .price-big {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.9rem;
+            font-weight: 800;
+        }
+
+        .price-range-bar {
+            background: var(--bg3);
+            border-radius: 7px;
+            height: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .price-range-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--warning));
+            border-radius: 7px;
+            transition: width .8s ease;
+        }
+
+        .price-range-lbl {
+            display: flex;
+            justify-content: space-between;
+            font-size: .7rem;
+            color: var(--text-muted);
+            margin-top: .3rem;
+        }
+
+        .pt {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .pt td {
+            padding: .4rem .2rem;
+            font-size: .78rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pt td:first-child {
+            color: var(--text-sub);
+        }
+
+        .pt td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .pt tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* TEMPLATE BOX */
+        .template-box {
+            background: var(--bg3);
+            border: 1px solid var(--border2);
+            border-radius: 9px;
+            padding: .9rem 1rem;
+            position: relative;
+        }
+
+        .template-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .78rem;
+            line-height: 1.7;
+            color: #e0e6ff;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: .6rem;
+            right: .6rem;
+            background: rgba(59, 130, 246, .15);
+            border: 1px solid rgba(59, 130, 246, .25);
+            color: var(--info);
+            font-size: .7rem;
+            font-weight: 700;
+            padding: .25rem .6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all .18s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(59, 130, 246, .3);
+        }
+
+        /* DIVIDER */
+        .div {
+            height: 1px;
+            background: var(--border);
+            margin: .7rem 0;
+        }
+
+        /* TIPS */
+        .tips {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+        }
+
+        .tip {
+            display: flex;
+            align-items: flex-start;
+            gap: .5rem;
+            font-size: .77rem;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+
+        .tip i {
+            color: var(--primary);
+            margin-top: .1rem;
+            flex-shrink: 0;
+        }
+
+        /* empty state */
+        .empty {
+            text-align: center;
+            padding: 2rem .5rem;
+            color: var(--text-muted);
+        }
+
+        .empty i {
+            font-size: 1.8rem;
+            opacity: .35;
+            display: block;
+            margin-bottom: .6rem;
+        }
+
+        .empty p {
+            font-size: .82rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .results.show {
+            animation: slideIn .3s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hdr">
+        <div class="logo">TS</div>
+        <h1>Chấm Điểm & Set Giá Sản Phẩm</h1>
+        <div class="hdr-badge"><i class="fa-solid fa-star"></i> Facebook Tool</div>
+    </div>
+
+    <div class="wrap">
+
+        <!-- INPUT CARD -->
+        <div class="input-card">
+            <div class="card-hdr">
+                <div class="card-hdr-icon icon-blue"><i class="fa-solid fa-clipboard-list"></i></div>
+                <div>
+                    <h3>Nhập Thông Số Sản Phẩm</h3><small>Điền đủ 8 chỉ số để chấm điểm chính xác</small>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <!-- Tên SP -->
+                <div class="fg-name">
+                    <div class="fg">
+                        <label class="lbl"><i class="fa-solid fa-box"></i> Tên Sản Phẩm</label>
+                        <input type="text" id="iName" class="inp" placeholder="Nhập tên sản phẩm...">
+                    </div>
+                </div>
+
+                <!-- Row 1: 4 inputs -->
+                <div class="fg-row">
+                    <div class="fg">
+                        <label class="lbl"><i class="fa-solid fa-peso-sign"></i> Giá Nhập (PHP) <span
+                                class="score-tag">10đ</span></label>
+                        <input type="number" id="iPrice" class="inp" placeholder="127">
+                    </div>
+                    <div class="fg">
+                        <label class="lbl"><i class="fa-solid fa-weight-hanging"></i> Cân Nặng (g) <span
+                                class="score-tag">10đ</span></label>
+                        <input type="number" id="iWeight" class="inp" placeholder="500">
+                    </div>
+                    <div class="fg">
+                        <label class="lbl"><i class="fa-brands fa-tiktok"></i> Video Douyin >3K views <span
+                                class="score-tag">15đ</span></label>
+                        <select id="iDouyin" class="sel">
+                            <option value="none">Không tìm thấy</option>
+                            <option value="few">1-3 video</option>
+                            <option value="many">&gt;3 video &gt;3000 views</option>
+                        </select>
+                    </div>
+                    <div class="fg">
+                        <label class="lbl"><i class="fa-solid fa-truck"></i> Vận Chuyển <span
+                                class="score-tag">10đ</span></label>
+                        <select id="iShip" class="sel">
+                            <option value="Sea">Sea (Đường biển)</option>
+                            <option value="Air">Air (Hàng không)</option>
+                            <option value="Local Sup">Local Sup (Địa phương)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 2: 5 inputs -->
+                <div class="fg-row-5">
+                    <div class="fg">
+                        <label class="lbl"><i class="fa-solid fa-store"></i> Lượt bán 1688 <span
+                                class="score-tag">15đ</span></label>
+                        <input type="number" id="i1688" class="inp" placeholder="Shop >1 vạn" min="0">
+                    </div>
+                    <div class="fg">
+                        <label class="lbl"><i class="fa-solid fa-shop"></i> Lượt bán Shopee PH <span
+                                class="score-tag">15đ</span></label>
+                        <input type="number" id="iShopee" class="inp" placeholder="Shop >1000" min="0">
+                    </div>
+                    <div class="fg">
+                        <label class="lbl"><i class="fa-solid fa-list-check"></i> Số Công Dụng <span
+                                class="score-tag">10đ</span></label>
+                        <input type="number" id="iUses" class="inp" placeholder="3" min="1" max="20">
+                    </div>
+                    <div class="fg">
+                        <label class="lbl"><i class="fa-solid fa-tags"></i> Ngành Hàng <span
+                                class="score-tag">15đ</span></label>
+                        <select id="iCat" class="sel" onchange="checkBanned()">
+                            <option value="Gia dụng">Gia dụng (15đ)</option>
+                            <option value="Quà tặng">Quà tặng (10đ)</option>
+                            <option value="Thời trang">Thời trang (8đ)</option>
+                            <option value="Mẹ và bé">Mẹ & Bé (5đ)</option>
+                            <option value="Sức khỏe">Sức khỏe (5đ)</option>
+                            <option value="Điện tử">Điện tử (5đ)</option>
+                            <option value="Thể thao">Thể thao (5đ)</option>
+                            <option value="Hình săm">⛔ Hình Săm</option>
+                            <option value="Thuốc lá">⛔ Thuốc Lá</option>
+                            <option value="Trang sức">⛔ Trang Sức</option>
+                            <option value="Đèn">⛔ Đèn</option>
+                        </select>
+                    </div>
+                    <div class="fg">
+                        <label class="lbl"><i class="fa-solid fa-arrow-right-arrow-left"></i> Tỷ giá 1 PHP</label>
+                        <input type="number" id="iEx" class="inp" value="450" min="100">
+                    </div>
+                </div>
+
+                <div class="banned" id="bannedBanner">
+                    <i class="fa-solid fa-ban"></i> Ngành hàng <strong>&nbsp;bị cấm&nbsp;</strong> — không đủ điều kiện
+                    đăng bán!
+                </div>
+
+                <button class="btn-calc" onclick="calculate()">
+                    <i class="fa-solid fa-calculator"></i> Tính Điểm & Gợi Ý Giá
+                </button>
+            </div>
+        </div>
+
+        <!-- RESULTS (2 columns) -->
+        <div class="results" id="results">
+
+            <!-- LEFT: SCORE -->
+            <div class="input-card">
+                <div class="card-hdr">
+                    <div class="card-hdr-icon icon-purple"><i class="fa-solid fa-star"></i></div>
+                    <div>
+                        <h3>Chấm Điểm Sản Phẩm</h3><small>Tổng điểm / 100</small>
+                    </div>
+                </div>
+                <div class="card-body" style="padding:0.8rem 1.2rem;">
+
+                    <div class="gauge-wrap">
+                        <div class="gauge-sub">TỔNG ĐIỂM</div>
+                        <div class="gauge-ring">
+                            <svg width="160" height="80" viewBox="0 0 160 80">
+                                <path d="M 10 80 A 70 70 0 0 1 150 80" fill="none" stroke="#1c2030" stroke-width="12"
+                                    stroke-linecap="round" />
+                                <path id="gaugeArc" d="M 10 80 A 70 70 0 0 1 150 80" fill="none" stroke="#8b5cf6"
+                                    stroke-width="12" stroke-linecap="round" stroke-dasharray="220"
+                                    stroke-dashoffset="220" style="transition:stroke-dashoffset 1s ease,stroke .5s" />
+                            </svg>
+                            <div class="gauge-num" id="gaugeNum">0</div>
+                        </div>
+                        <div class="gauge-lbl" id="gaugeLbl"></div>
+                    </div>
+
+                    <div class="div"></div>
+                    <div class="sec-lbl">Chi tiết từng tiêu chí</div>
+                    <div class="bd-list" id="bdList"></div>
+                    <div class="div"></div>
+                    <div class="verdict" id="verdictBox"></div>
+                </div>
+            </div>
+
+            <!-- RIGHT: PRICE -->
+            <div class="input-card">
+                <div class="card-hdr">
+                    <div class="card-hdr-icon icon-orange"><i class="fa-solid fa-tag"></i></div>
+                    <div>
+                        <h3>Gợi Ý Giá & Công Thức Bán</h3><small>Facebook Philippines</small>
+                    </div>
+                </div>
+                <div class="card-body" style="padding:0.8rem 1.2rem;">
+
+                    <div style="display:flex;gap:1.2rem;align-items:flex-end;margin-bottom:.7rem;">
+                        <div>
+                            <div class="sec-lbl">GIÁ GỢI Ý / PC</div>
+                            <div class="price-big" id="pSuggest" style="color:var(--warning)">₱0</div>
+                        </div>
+                        <div style="flex:1">
+                            <div class="price-range-bar">
+                                <div class="price-range-fill" id="pRangeBar" style="width:0%"></div>
+                            </div>
+                            <div class="price-range-lbl">
+                                <span id="pMin">Min</span><span id="pMax">Max</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="pt" id="priceTable"></table>
+                    <div class="div"></div>
+
+                    <div style="margin-bottom:.5rem;">
+                        <div class="sec-lbl">Tương Đương VND</div>
+                        <div style="font-size:1.15rem;font-weight:800;color:var(--success)" id="pVND"></div>
+                    </div>
+                    <div class="div"></div>
+
+                    <!-- PRICING TEMPLATE -->
+                    <div class="sec-lbl">📋 Công Thức Đăng Bán Facebook</div>
+                    <div class="template-box">
+                        <button class="copy-btn" onclick="copyTemplate()"><i class="fa-solid fa-copy"></i> Copy</button>
+                        <pre class="template-text" id="templateText">–</pre>
+                    </div>
+
+                    <div class="div"></div>
+                    <div class="sec-lbl">Lời Khuyên</div>
+                    <div class="tips" id="tips"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // PRICING TEMPLATES: 100 entries, index 0=₱1 import … index 99=₱100 import
+        // Hardcoded 1:1 from user's pricing sheet
+        const T = (ep, txt) => ({ effectiveUnitPrice: ep, text: txt });
+        const PRICING_TEMPLATES = [
+/*₱1 */T(5.6, `Buy 30 only 169P + 100P shipping 🔥\nBuy 40 only 299P + 30P shipping 🔥\nBuy 60 only 399P + freeshipping 🔥\nBuy 80 only 499P + freeshipping 🔥\nBuy 100 only 599P + freeshipping 🔥`),
+/*₱2 */T(14.1, `Buy 12 only 169P + 100P shipping 🔥\nBuy 20 only 299P + 30P shipping 🔥\nBuy 28 only 399P + freeshipping 🔥\nBuy 36 only 499P + freeshipping 🔥\nBuy 44 only 599P + freeshipping 🔥`),
+/*₱3 */T(16.9, `Buy 10 only 169P + 100P shipping 🔥\nBuy 15 only 299P + 30P shipping 🔥\nBuy 20 only 399P + freeshipping 🔥\nBuy 25 only 499P + freeshipping 🔥\nBuy 30 only 599P + freeshipping 🔥`),
+/*₱4 */T(33.8, `Buy 5 only 169P + 100P shipping 🔥\nBuy 9 only 299P + free shipping 🔥\nBuy 14 only 399P + freeshipping 🔥\nBuy 19 only 499P + freeshipping 🔥\nBuy 24 only 599P + freeshipping 🔥`),
+/*₱5 */T(33.8, `Buy 5 only 169P + 100P shipping 🔥\nBuy 8 only 299P + 30P shipping 🔥\nBuy 11 only 399P + freeshipping 🔥\nBuy 14 only 499P + freeshipping 🔥\nBuy 17 only 599P + freeshipping 🔥`),
+/*₱6 */T(33.8, `Buy 5 only 169P + 100P shipping 🔥\nBuy 8 only 299P + 30P shipping 🔥\nBuy 11 only 399P + freeshipping 🔥\nBuy 14 only 499P + freeshipping 🔥\nBuy 17 only 599P + freeshipping 🔥`),
+/*₱7 */T(42.25, `Buy 4 only 169P + 100P shipping 🔥\nBuy 6 only 299P + 30P shipping 🔥\nBuy 9 only 399P + freeshipping 🔥\nBuy 11 only 499P + freeshipping 🔥\nBuy 14 only 599P + freeshipping 🔥`),
+/*₱8 */T(42.25, `Buy 4 only 169P + 100P shipping 🔥\nBuy 6 only 299P + 30P shipping 🔥\nBuy 8 only 399P + freeshipping 🔥\nBuy 10 only 499P + freeshipping 🔥\nBuy 12 only 599P + freeshipping 🔥`),
+/*₱9 */T(56.3, `Buy 3 only 169P + 100P shipping 🔥\nBuy 4 only 299P + freeshipping 🔥\nBuy 6 only 399P + freeshipping 🔥\nBuy 8 only 499P + freeshipping 🔥\nBuy 10 only 599P + freeshipping 🔥`),
+/*₱10*/T(56.3, `Buy 3 only 169P + 100P shipping 🔥\nBuy 4 only 299P + free shipping 🔥\nBuy 6 only 399P + freeshipping 🔥\nBuy 8 only 499P + freeshipping 🔥\nBuy 10 only 599P + freeshipping 🔥`),
+/*₱11*/T(56.3, `Buy 3 only 169P + 100P shipping 🔥\nBuy 4 only 299P + free shipping 🔥\nBuy 5 only 399P + freeshipping 🔥\nBuy 6 only 499P + freeshipping 🔥\nBuy 7 only 599P + freeshipping 🔥`),
+/*₱12*/T(56.3, `Buy 3 only 169P + 100P shipping 🔥\nBuy 4 only 299P + free shipping 🔥\nBuy 5 only 399P + freeshipping 🔥\nBuy 6 only 499P + freeshipping 🔥\nBuy 7 only 599P + freeshipping 🔥`),
+/*₱13*/T(84.5, `Buy 2 only 169P + 100P shipping 🔥\nBuy 3 only 299P + 30P shipping 🔥\nBuy 4 only 399P + freeshipping 🔥\nBuy 5 only 499P + freeshipping 🔥\nBuy 6 only 599P + freeshipping 🔥`),
+/*₱14*/T(84.5, `Buy 2 only 169P + 100P shipping 🔥\nBuy 3 only 299P + 30P shipping 🔥\nBuy 4 only 399P + freeshipping 🔥\nBuy 5 only 499P + freeshipping 🔥\nBuy 6 only 599P + freeshipping 🔥`),
+/*₱15*/T(84.5, `Buy 2 only 169P + 100P shipping 🔥\nBuy 3 only 299P + 30P shipping 🔥\nBuy 4 only 399P + freeshipping 🔥\nBuy 5 only 499P + freeshipping 🔥\nBuy 6 only 599P + freeshipping 🔥`),
+/*₱16*/T(84.5, `Buy 2 only 169P + 100P shipping 🔥\nBuy 3 only 299P + 30P shipping 🔥\nBuy 4 only 399P + freeshipping 🔥\nBuy 5 only 499P + freeshipping 🔥\nBuy 6 only 599P + freeshipping 🔥`),
+/*₱17*/T(84.5, `Buy 2 only 169P + 100P shipping 🔥\nBuy 3 only 299P + 30P shipping 🔥\nBuy 4 only 449P + freeshipping 🔥\nBuy 5 only 549P + freeshipping 🔥`),
+/*₱18*/T(84.5, `Buy 2 only 169P + 100P shipping 🔥\nBuy 3 only 299P + 30P shipping 🔥\nBuy 4 only 449P + freeshipping 🔥\nBuy 5 only 549P + freeshipping 🔥`),
+/*₱19*/T(89.5, `Buy 2 only 179P + 100P shipping 🔥\nBuy 3 only 359P + free shipping 🔥\nBuy 4 only 459P + freeshipping 🔥\nBuy 5 only 559P + freeshipping 🔥`),
+/*₱20*/T(159, `Buy 1 only 159P + 100P shipping 🔥\nBuy 2 only 299P + free shipping 🔥\nBuy 3 only 399P + free shipping 🔥\nBuy 4 only 499P + freeshipping 🔥\nBuy 5 only 599P + freeshipping 🔥`),
+/*₱21*/T(159, `Buy 1 only 159P + 100P shipping 🔥\nBuy 2 only 299P + free shipping 🔥\nBuy 3 only 399P + free shipping 🔥\nBuy 4 only 499P + freeshipping 🔥\nBuy 5 only 599P + freeshipping 🔥`),
+/*₱22*/T(169, `Buy 1 only 169P + 100P shipping 🔥\nBuy 2 only 299P + 30P shipping 🔥\nBuy 3 only 399P + freeshipping 🔥\nBuy 4 only 499P + freeshipping 🔥`),
+/*₱23*/T(169, `Buy 1 only 169P + 100P shipping 🔥\nBuy 2 only 299P + 30P shipping 🔥\nBuy 3 only 449P + freeshipping 🔥\nBuy 4 only 559P + freeshipping 🔥`),
+/*₱24*/T(169, `Buy 1 only 169P + 100P shipping 🔥\nBuy 2 only 330P + free shipping 🔥\nBuy 3 only 440P + freeshipping 🔥\nBuy 4 only 550P + freeshipping 🔥`),
+/*₱25*/T(169, `Buy 1 only 169P + 100P shipping 🔥\nBuy 2 only 330P + free shipping 🔥\nBuy 3 only 450P + freeshipping 🔥\nBuy 4 only 570P + freeshipping 🔥`),
+/*₱26*/T(169, `Buy 1 only 169P + 100P shipping 🔥\nBuy 2 only 299P + 30P shipping 🔥\nBuy 3 only 499P + freeshipping 🔥\nBuy 4 only 599P + freeshipping 🔥`),
+/*₱27*/T(169, `Buy 1 only 169P + 100P shipping 🔥\nBuy 2 only 299P + 30P shipping 🔥\nBuy 3 only 499P + freeshipping 🔥\nBuy 4 only 599P + freeshipping 🔥`),
+/*₱28*/T(199, `Buy 1 only 199P + 70P shipping 🔥\nBuy 2 only 379P + free shipping 🔥\nBuy 3 only 549P + freeshipping 🔥\nBuy 4 only 649P + freeshipping 🔥`),
+/*₱29*/T(199, `Buy 1 only 199P + 70P shipping 🔥\nBuy 2 only 399P + free shipping 🔥\nBuy 3 only 549P + freeshipping 🔥\nBuy 4 only 649P + freeshipping 🔥`),
+/*₱30*/T(199, `Buy 1 only 199P + 70P shipping 🔥\nBuy 2 only 399P + free shipping 🔥\nBuy 3 only 549P + freeshipping 🔥\nBuy 4 only 649P + freeshipping 🔥`),
+/*₱31*/T(199, `Buy 1 only 199P + 70P shipping 🔥\nBuy 2 only 399P + free shipping 🔥\nBuy 3 only 549P + freeshipping 🔥\nBuy 4 only 699P + freeshipping 🔥`),
+/*₱32*/T(199, `Buy 1 only 199P + 70P shipping 🔥\nBuy 2 only 399P + free shipping 🔥\nBuy 3 only 550P + freeshipping 🔥\nBuy 4 only 750P + freeshipping 🔥`),
+/*₱33*/T(199, `Buy 1 only 199P + 70P shipping 🔥\nBuy 2 only 399P + free shipping 🔥\nBuy 3 only 590P + freeshipping 🔥\nBuy 4 only 790P + freeshipping 🔥`),
+/*₱34*/T(199, `Buy 1 only 199P + 70P shipping 🔥\nBuy 2 only 399P + 30P shipping 🔥\nBuy 3 only 590P + freeshipping 🔥\nBuy 4 only 790P + freeshipping 🔥`),
+/*₱35*/T(199, `Buy 1 only 199P + 70P shipping 🔥\nBuy 2 only 399P + 30P shipping 🔥\nBuy 3 only 599P + freeshipping 🔥\nBuy 4 only 799P + freeshipping 🔥`),
+/*₱36*/T(199, `Buy 1 only 199P + 70P shipping 🔥\nBuy 2 only 399P + 30P shipping 🔥\nBuy 3 only 599P + freeshipping 🔥\nBuy 4 only 799P + freeshipping 🔥`),
+/*₱37*/T(229, `Buy 1 only 229P + 50P shipping 🔥\nBuy 2 only 449P + free shipping 🔥\nBuy 3 only 649P + freeshipping 🔥\nBuy 4 only 849P + freeshipping 🔥`),
+/*₱38*/T(229, `Buy 1 only 229P + 50P shipping 🔥\nBuy 2 only 449P + free shipping 🔥\nBuy 3 only 649P + freeshipping 🔥\nBuy 4 only 849P + freeshipping 🔥`),
+/*₱39*/T(249, `Buy 1 only 249P + 50P shipping 🔥\nBuy 2 only 499P + free shipping 🔥\nBuy 3 only 699P + freeshipping 🔥\nBuy 4 only 899P + freeshipping 🔥`),
+/*₱40*/T(249, `Buy 1 only 249P + 50P shipping 🔥\nBuy 2 only 499P + free shipping 🔥\nBuy 3 only 699P + freeshipping 🔥\nBuy 4 only 899P + freeshipping 🔥`),
+/*₱41*/T(249, `Buy 1 only 249P + 50P shipping 🔥\nBuy 2 only 499P + free shipping 🔥\nBuy 3 only 699P + freeshipping 🔥\nBuy 4 only 899P + freeshipping 🔥`),
+/*₱42*/T(249, `Buy 1 only 249P + 50P shipping 🔥\nBuy 2 only 499P + free shipping 🔥\nBuy 3 only 699P + freeshipping 🔥\nBuy 4 only 899P + freeshipping 🔥`),
+/*₱43*/T(249, `Buy 1 only 249P + 50P shipping 🔥\nBuy 2 only 490P + free shipping 🔥\nBuy 3 only 690P + freeshipping 🔥\nBuy 4 only 890P + freeshipping 🔥`),
+/*₱44*/T(299, `Buy 1 only 299P + 30P shipping 🔥\nBuy 2 only 549P + free shipping 🔥\nBuy 3 only 749P + freeshipping 🔥\nBuy 4 only 949P + freeshipping 🔥`),
+/*₱45*/T(299, `Buy 1 only 299P + 30P shipping 🔥\nBuy 2 only 549P + free shipping 🔥\nBuy 3 only 749P + freeshipping 🔥\nBuy 4 only 949P + freeshipping 🔥`),
+/*₱46*/T(299, `Buy 1 only 299P + 50P shipping 🔥\nBuy 2 only 549P + free shipping 🔥\nBuy 3 only 749P + freeshipping 🔥`),
+/*₱47*/T(299, `Buy 1 only 299P + 50P shipping 🔥\nBuy 2 only 550P + free shipping 🔥\nBuy 3 only 770P + freeshipping 🔥\nBuy 4 only 990P + freeshipping 🔥`),
+/*₱48*/T(299, `Buy 1 only 299P + 50P shipping 🔥\nBuy 2 only 590P + free shipping 🔥\nBuy 3 only 790P + freeshipping 🔥`),
+/*₱49*/T(299, `Buy 1 only 299P + 50P shipping 🔥\nBuy 2 only 590P + free shipping 🔥\nBuy 3 only 790P + freeshipping 🔥`),
+/*₱50*/T(299, `Buy 1 only 299P + 50P shipping 🔥\nBuy 2 only 590P + free shipping 🔥\nBuy 3 only 790P + freeshipping 🔥\nBuy 4 only 990P + freeshipping 🔥`),
+/*₱51*/T(299, `Buy 1 only 299P + 50P shipping 🔥\nBuy 2 only 590P + free shipping 🔥\nBuy 3 only 790P + freeshipping 🔥\nBuy 4 only 990P + freeshipping 🔥`),
+/*₱52*/T(299, `Buy 1 only 299P + 50P shipping 🔥\nBuy 2 only 590P + free shipping 🔥\nBuy 3 only 790P + freeshipping 🔥`),
+/*₱53*/T(339, `Buy 1 only 339P + 50P shipping 🔥\nBuy 2 only 650P + free shipping 🔥\nBuy 3 only 850P + freeshipping 🔥`),
+/*₱54*/T(339, `Buy 1 only 339P + 50P shipping 🔥\nBuy 2 only 650P + free shipping 🔥\nBuy 3 only 850P + freeshipping 🔥`),
+/*₱55*/T(299, `Buy 1 only 299P + 50P shipping 🔥\nBuy 2 only 650P + free shipping 🔥\nBuy 3 only 850P + freeshipping 🔥`),
+/*₱56*/T(339, `Buy 1 only 339P + 50P shipping 🔥\nBuy 2 only 650P + free shipping 🔥\nBuy 3 only 850P + freeshipping 🔥`),
+/*₱57*/T(349, `Buy 1 only 349P + 50P shipping 🔥\nBuy 2 only 690P + free shipping 🔥\nBuy 3 only 890P + freeshipping 🔥`),
+/*₱58*/T(349, `Buy 1 only 349P + 50P shipping 🔥\nBuy 2 only 690P + free shipping 🔥\nBuy 3 only 890P + freeshipping 🔥`),
+/*₱59*/T(349, `Buy 1 only 349P + 50P shipping 🔥\nBuy 2 only 690P + free shipping 🔥\nBuy 3 only 890P + freeshipping 🔥`),
+/*₱60*/T(349, `Buy 1 only 349P + 50P shipping 🔥\nBuy 2 only 690P + free shipping 🔥\nBuy 3 only 890P + freeshipping 🔥`),
+/*₱61*/T(349, `Buy 1 only 349P + 50P shipping 🔥\nBuy 2 only 690P + free shipping 🔥\nBuy 3 only 990P + freeshipping 🔥`),
+/*₱62*/T(349, `Buy 1 only 349P + 50P shipping 🔥\nBuy 2 only 690P + free shipping 🔥\nBuy 3 only 990P + freeshipping 🔥`),
+/*₱63*/T(349, `Buy 1 only 349P + 50P shipping 🔥\nBuy 2 only 699P + free shipping 🔥\nBuy 3 only 999P + freeshipping 🔥`),
+/*₱64*/T(399, `Buy 1 only 399P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥\nBuy 3 only 999P + freeshipping 🔥`),
+/*₱65*/T(399, `Buy 1 only 399P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥\nBuy 3 only 999P + freeshipping 🔥`),
+/*₱66*/T(399, `Buy 1 only 399P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥\nBuy 3 only 999P + freeshipping 🔥`),
+/*₱67*/T(399, `Buy 1 only 399P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥\nBuy 3 only 999P + freeshipping 🔥`),
+/*₱68*/T(399, `Buy 1 only 399P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥\nBuy 3 only 999P + freeshipping 🔥`),
+/*₱69*/T(399, `Buy 1 only 399P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥\nBuy 3 only 999P + freeshipping 🔥`),
+/*₱70*/T(399, `Buy 1 only 399P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥\nBuy 3 only 1099P + freeshipping 🔥`),
+/*₱71*/T(399, `Buy 1 only 399P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥\nBuy 3 only 1099P + freeshipping 🔥`),
+/*₱72*/T(399, `Buy 1 only 399P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥\nBuy 3 only 1099P + freeshipping 🔥`),
+/*₱73*/T(399, `Buy 1 only 399P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥\nBuy 3 only 1099P + freeshipping 🔥`),
+/*₱74*/T(399, `Buy 1 only 399P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥\nBuy 3 only 1099P + freeshipping 🔥`),
+/*₱75*/T(449, `Buy 1 only 449P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥`),
+/*₱76*/T(449, `Buy 1 only 449P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥`),
+/*₱77*/T(449, `Buy 1 only 449P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥`),
+/*₱78*/T(449, `Buy 1 only 449P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥`),
+/*₱79*/T(449, `Buy 1 only 449P + 50P shipping 🔥\nBuy 2 only 799P + free shipping 🔥`),
+/*₱80*/T(449, `Buy 1 only 449P + 50P shipping 🔥\nBuy 2 only 849P + free shipping 🔥`),
+/*₱81*/T(449, `Buy 1 only 449P + 50P shipping 🔥\nBuy 2 only 849P + free shipping 🔥`),
+/*₱82*/T(449, `Buy 1 only 449P + 50P shipping 🔥\nBuy 2 only 849P + free shipping 🔥`),
+/*₱83*/T(449, `Buy 1 only 449P + 50P shipping 🔥\nBuy 2 only 849P + free shipping 🔥`),
+/*₱84*/T(449, `Buy 1 only 449P + 50P shipping 🔥\nBuy 2 only 899P + free shipping 🔥`),
+/*₱85*/T(499, `Buy 1 only 499P + 50P shipping 🔥\nBuy 2 only 899P + free shipping 🔥`),
+/*₱86*/T(499, `Buy 1 only 499P + 50P shipping 🔥\nBuy 2 only 899P + free shipping 🔥`),
+/*₱87*/T(499, `Buy 1 only 499P + 50P shipping 🔥\nBuy 2 only 899P + free shipping 🔥`),
+/*₱88*/T(499, `Buy 1 only 499P + 50P shipping 🔥\nBuy 2 only 899P + free shipping 🔥`),
+/*₱89*/T(499, `Buy 1 only 499P + 50P shipping 🔥\nBuy 2 only 899P + free shipping 🔥`),
+/*₱90*/T(499, `Buy 1 only 499P + 50P shipping 🔥\nBuy 2 only 899P + free shipping 🔥`),
+/*₱91*/T(599, `Buy 1 only 599P + free shipping 🔥\nBuy 2 only 999P + free shipping 🔥`),
+/*₱92*/T(599, `Buy 1 only 599P + free shipping 🔥\nBuy 2 only 999P + free shipping 🔥`),
+/*₱93*/T(599, `Buy 1 only 599P + free shipping 🔥\nBuy 2 only 999P + free shipping 🔥`),
+/*₱94*/T(599, `Buy 1 only 599P + free shipping 🔥\nBuy 2 only 999P + free shipping 🔥`),
+/*₱95*/T(599, `Buy 1 only 599P + free shipping 🔥\nBuy 2 only 999P + free shipping 🔥`),
+/*₱96*/T(599, `Buy 1 only 599P + free shipping 🔥\nBuy 2 only 999P + free shipping 🔥`),
+/*₱97*/T(599, `Buy 1 only 599P + free shipping 🔥\nBuy 2 only 999P + free shipping 🔥`),
+/*₱98*/T(599, `Buy 1 only 599P + free shipping 🔥\nBuy 2 only 999P + free shipping 🔥`),
+/*₱99*/T(649, `Buy 1 only 649P + free shipping 🔥\nBuy 2 only 1049P + free shipping 🔥`),
+/*₱100*/T(649, `Buy 1 only 649P + free shipping 🔥\nBuy 2 only 1049P + free shipping 🔥`),
+        ];
+
+        // Pick template: import ₱1 → index 0, ₱100 → index 99
+        function pickTemplate(importPrice) {
+            const idx = Math.min(Math.max(0, Math.round(importPrice) - 1), PRICING_TEMPLATES.length - 1);
+            return PRICING_TEMPLATES[idx];
+        }
+
+        // Auto shorten product name to 2-3 meaningful words
+        const STOP_WORDS = new Set(['a', 'an', 'the', 'of', 'for', 'to', 'in', 'on', 'at', 'by', 'with',
+            'set', 'kit', 'pack', 'lot', 'pcs', 'pc', 'piece', 'pieces', 'buy', 'only']);
+        function shortenName(name) {
+            if (!name || name.trim() === '') return 'item';
+            const words = name.trim().split(/\s+/);
+            // Filter stop words, keep max 3 meaningful words
+            const meaningful = words.filter(w => !STOP_WORDS.has(w.toLowerCase()));
+            const picked = meaningful.slice(0, 3);
+            if (picked.length === 0) return words.slice(0, 2).join(' ');
+            // Title case
+            return picked.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
+        // Inject product short name into template text replacing the quantity number context
+        // "Buy 30 only" → "Buy 30 [ShortName] only"
+        function buildTemplateText(tmplText, shortName) {
+            return tmplText.replace(/Buy (\d+) only/g, `Buy $1 ${shortName} only`);
+        }
+
+        // ===================== SCORING =====================
+        const BANNED = ['Hình săm', 'Thuốc lá', 'Trang sức', 'Đèn'];
+        const SHIP_COST_KG = { Sea: 8, Air: 18, 'Local Sup': 5 };
+
+        function checkBanned() {
+            document.getElementById('bannedBanner').classList.toggle('show', BANNED.includes(document.getElementById('iCat').value));
+        }
+
+        function sPrice(v) { return v <= 100 ? 10 : v <= 200 ? 8 : v <= 300 ? 6 : v <= 400 ? 4 : 2; }
+        function sWeight(v) { return v <= 200 ? 10 : v <= 500 ? 8 : v <= 1000 ? 5 : 2; }
+        function sDouyin(v) { return v === 'none' ? 0 : v === 'few' ? 5 : 15; }
+        function sShip(v) { return v === 'Sea' ? 5 : v === 'Air' ? 7 : 10; }
+        function sSales(v) { return v >= 5 ? 15 : v >= 3 ? 10 : v >= 1 ? 5 : 0; }
+        function sUses(v) { return v >= 5 ? 10 : v >= 3 ? 7 : v >= 2 ? 5 : 2; }
+        function sCat(v) { return v === 'Gia dụng' ? 15 : v === 'Quà tặng' ? 10 : v === 'Thời trang' ? 8 : 5; }
+
+        function getColor(s) { return s >= 75 ? '#10b981' : s >= 55 ? '#f59e0b' : s >= 35 ? '#8b5cf6' : '#ef4444'; }
+        function getVerdict(s) {
+            if (s >= 75) return { e: '🚀', c: 'rgba(16,185,129,.1)', b: 'rgba(16,185,129,.25)', t: '#10b981', title: 'Tiềm Năng Cao!', desc: 'Điểm rất tốt. Nên nhập hàng và ưu tiên ngân sách quảng cáo.' };
+            if (s >= 55) return { e: '👍', c: 'rgba(245,158,11,.1)', b: 'rgba(245,158,11,.25)', t: '#f59e0b', title: 'Khá Ổn', desc: 'Điểm trung bình khá. Thử nghiệm số lượng nhỏ trước.' };
+            if (s >= 35) return { e: '⚠️', c: 'rgba(139,92,246,.1)', b: 'rgba(139,92,246,.25)', t: '#8b5cf6', title: 'Cần Cân Nhắc', desc: 'Điểm thấp — xem lại các tiêu chí yếu trước khi nhập.' };
+            return { e: '❌', c: 'rgba(239,68,68,.1)', b: 'rgba(239,68,68,.25)', t: '#ef4444', title: 'Không Nên Nhập', desc: 'Điểm quá thấp — tìm sản phẩm khác thay thế.' };
+        }
+
+        function calculate() {
+            const price = parseFloat(document.getElementById('iPrice').value) || 0;
+            const weight = parseFloat(document.getElementById('iWeight').value) || 0;
+            const douyin = document.getElementById('iDouyin').value;
+            const ship = document.getElementById('iShip').value;
+            const s1688 = parseInt(document.getElementById('i1688').value) || 0;
+            const sShopee = parseInt(document.getElementById('iShopee').value) || 0;
+            const uses = parseInt(document.getElementById('iUses').value) || 0;
+            const cat = document.getElementById('iCat').value;
+            const ex = parseFloat(document.getElementById('iEx').value) || 450;
+            const productName = document.getElementById('iName').value.trim();
+            const isBanned = BANNED.includes(cat);
+
+            const sc = {
+                price: isBanned ? 0 : sPrice(price),
+                weight: isBanned ? 0 : sWeight(weight),
+                douyin: isBanned ? 0 : sDouyin(douyin),
+                ship: isBanned ? 0 : sShip(ship),
+                s1688: isBanned ? 0 : sSales(s1688),
+                shopee: isBanned ? 0 : sSales(sShopee),
+                uses: isBanned ? 0 : sUses(uses),
+                cat: isBanned ? 0 : sCat(cat)
+            };
+            const mx = { price: 10, weight: 10, douyin: 15, ship: 10, s1688: 15, shopee: 15, uses: 10, cat: 15 };
+            const total = isBanned ? 0 : Object.values(sc).reduce((a, b) => a + b, 0);
+
+            // COST BASE
+            const wKg = Math.max(0.1, weight / 1000);
+            const shipCost = wKg * (SHIP_COST_KG[ship] || 8);
+            const base = price + shipCost;
+
+            // PICK TEMPLATE based on the import price (price input field)
+            const tmpl = pickTemplate(price);
+
+            // DERIVE displayed price FROM template's effective unit price (actual sell price)
+            const tmplUnitPrice = tmpl.effectiveUnitPrice;
+            const actualMult = base > 0 ? (tmplUnitPrice / base).toFixed(2) : '–';
+            const fee = tmplUnitPrice * 0.12;
+            const profit = tmplUnitPrice - base - fee;
+            const margin = tmplUnitPrice > 0 ? ((profit / tmplUnitPrice) * 100).toFixed(0) : 0;
+            const pMin = Math.ceil(tmplUnitPrice * 0.88 / 5) * 5;
+            const pMax = Math.ceil(tmplUnitPrice * 1.2 / 5) * 5;
+
+            // Short product name for template
+            const shortName = shortenName(productName);
+
+            // === RENDER SCORE ===
+            document.getElementById('results').classList.add('show');
+            const color = getColor(total);
+            const arc = document.getElementById('gaugeArc');
+            arc.style.stroke = color;
+            setTimeout(() => { arc.style.strokeDashoffset = 220 - (total / 100) * 220; }, 50);
+
+            const numEl = document.getElementById('gaugeNum');
+            numEl.style.color = color;
+            let cur = 0;
+            const timer = setInterval(() => { cur = Math.min(cur + 2, total); numEl.textContent = cur; if (cur >= total) clearInterval(timer); }, 20);
+
+            const vd = getVerdict(total);
+            document.getElementById('gaugeLbl').innerHTML = `<span style="color:${vd.t};font-weight:700">${vd.title}</span>`;
+
+            const bdData = [
+                { n: 'Giá Nhập (PHP)', s: sc.price, m: mx.price, c: '#3b82f6' },
+                { n: 'Cân Nặng (g)', s: sc.weight, m: mx.weight, c: '#8b5cf6' },
+                { n: 'Video Douyin', s: sc.douyin, m: mx.douyin, c: '#ec4899' },
+                { n: 'Vận Chuyển', s: sc.ship, m: mx.ship, c: '#f59e0b' },
+                { n: 'Lượt Bán 1688', s: sc.s1688, m: mx.s1688, c: '#10b981' },
+                { n: 'Lượt Bán Shopee PH', s: sc.shopee, m: mx.shopee, c: '#10b981' },
+                { n: 'Số Công Dụng', s: sc.uses, m: mx.uses, c: '#06b6d4' },
+                { n: 'Ngành Hàng', s: sc.cat, m: mx.cat, c: '#e63946' }
+            ];
+            document.getElementById('bdList').innerHTML = bdData.map(d => `
+        <div class="bd-row">
+            <span class="bd-name">${d.n}</span>
+            <div class="bd-bar-wrap"><div class="bd-bar" style="width:${(d.s / d.m * 100).toFixed(0)}%;background:${d.c}"></div></div>
+            <span class="bd-score" style="color:${d.c}">${d.s}/${d.m}</span>
+        </div>`).join('');
+
+            const vb = document.getElementById('verdictBox');
+            vb.style.background = vd.c; vb.style.border = `1px solid ${vd.b}`;
+            vb.innerHTML = `<span style="font-size:1.2rem">${vd.e}</span><div><div class="verdict-title" style="color:${vd.t}">${vd.title}</div><div class="verdict-desc">${vd.desc}</div></div>`;
+
+            // === RENDER PRICE (from template) ===
+            document.getElementById('pSuggest').textContent = `₱${tmplUnitPrice.toLocaleString()}`;
+            document.getElementById('pMin').textContent = `₱${pMin.toLocaleString()} (Thấp)`;
+            document.getElementById('pMax').textContent = `₱${pMax.toLocaleString()} (Cao)`;
+            document.getElementById('pRangeBar').style.width = '60%';
+            document.getElementById('pVND').innerHTML = `${(tmplUnitPrice * ex).toLocaleString('vi-VN')} <span style="font-size:.8rem;font-weight:500;color:var(--text-sub)">VNĐ</span>`;
+
+            document.getElementById('priceTable').innerHTML = `
+        <tr><td>Giá nhập</td><td>₱${price.toFixed(0)}</td></tr>
+        <tr><td>Ship/kg (${ship})</td><td>₱${shipCost.toFixed(1)}</td></tr>
+        <tr><td>Giá vốn tổng</td><td><strong>₱${base.toFixed(1)}</strong></td></tr>
+        <tr><td>Giá theo template (x${actualMult})</td><td>₱${tmplUnitPrice.toFixed(0)}</td></tr>
+                <tr><td>Phí Facebook 12%</td><td style="color:var(--danger)">-₱${fee.toFixed(0)}</td></tr>
+        <tr><td><strong>Lợi nhuận ước tính</strong></td><td style="color:${profit > 0 ? 'var(--success)' : 'var(--danger)'};font-weight:800">₱${profit.toFixed(0)} (~${margin}%)</td></tr>`;
+
+            // Template with product name injected
+            const finalTemplate = buildTemplateText(tmpl.text, shortName);
+            document.getElementById('templateText').textContent = finalTemplate;
+
+            // Tips
+            const tips = [];
+            if (sc.douyin === 0) tips.push('Tìm thêm video TikTok/Douyin về sản phẩm để xác nhận xu hướng.');
+            if (ship === 'Air') tips.push('Air shipping tốn hơn Sea — giá bán cần bù đủ chi phí vận chuyển.');
+            if (sc.shopee === 0) tips.push('Chưa có shop Facebook PH bán tốt — thị trường còn mở hoặc demand chưa rõ.');
+            if (profit < 0) tips.push('⚠️ Lợi nhuận âm! Giá vốn quá cao cho template này — xém xét nghị phương thức ship rẻ hơn hoặc tìm hàng giá tốt hơn.');
+            if (total >= 75) tips.push('Điểm cao — ưu tiên test nhỏ trước khi bulk order.');
+            if (tips.length === 0) tips.push('Theo dõi đối thủ cùng ngành trên Facebook PH để điều chỉnh giá phù hợp.');
+            tips.push(`Áp dụng công thức: ${tmpl.label} — tên gợi: "${shortName}"`);
+            document.getElementById('tips').innerHTML = tips.map(t => `<div class="tip"><i class="fa-solid fa-lightbulb"></i><span>${t}</span></div>`).join('');
+
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function copyTemplate() {
+            const text = document.getElementById('templateText').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                btn.style.color = 'var(--success)';
+                setTimeout(() => { btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy'; btn.style.color = ''; }, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
