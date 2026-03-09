@@ -453,6 +453,23 @@ function refreshDashboard() {
     const approved = data.filter(e => e.leader_confirmation === 'Approved').length;
     document.getElementById('stat-approved-pct').textContent = (data.length ? Math.round(approved / data.length * 100) : 0) + '%';
 
+    // OT Earnings: weekday 40,000/hr, Sunday 50,000/hr
+    const OT_RATE_WEEKDAY = 40000;
+    const OT_RATE_SUNDAY = 50000;
+    const BASE_SALARY = 6000000;
+    let totalEarnings = 0;
+    data.forEach(e => {
+        if (!e.date || !e.total_hours) return;
+        const dayOfWeek = new Date(e.date + 'T00:00:00').getDay(); // 0 = Sunday
+        const rate = dayOfWeek === 0 ? OT_RATE_SUNDAY : OT_RATE_WEEKDAY;
+        totalEarnings += e.total_hours * rate;
+    });
+    const fmtVND = (n) => n.toLocaleString('vi-VN') + 'đ';
+    document.getElementById('stat-ot-earnings').textContent = fmtVND(totalEarnings);
+    const monthlyIncome = BASE_SALARY + totalEarnings;
+    document.getElementById('stat-monthly-income').textContent = fmtVND(monthlyIncome);
+    document.getElementById('stat-income-detail').textContent = `6tr + ${fmtVND(totalEarnings)} OT`;
+
     const mh = {};
     data.forEach(e => { mh[e.marketer_name] = (mh[e.marketer_name] || 0) + (e.total_hours || 0); });
     const sorted = Object.entries(mh).sort((a, b) => b[1] - a[1]);
