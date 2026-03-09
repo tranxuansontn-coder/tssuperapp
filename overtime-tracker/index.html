@@ -255,17 +255,20 @@
                                         <div class="error-msg" id="err-date"></div>
                                     </div>
                                     <div class="form-group"><label for="f-start">Start Time</label><input type="time"
-                                            id="f-start" min="17:00" max="21:00" required>
+                                            id="f-start" required>
                                         <div class="error-msg" id="err-start"></div>
                                     </div>
                                     <div class="form-group"><label for="f-end">End Time</label><input type="time"
-                                            id="f-end" min="17:00" max="21:00" required>
+                                            id="f-end" required>
                                         <div class="error-msg" id="err-end"></div>
                                     </div>
                                     <div class="form-group"><label for="f-total">Total Hours</label><input type="text"
                                             id="f-total" readonly placeholder="Auto-calculated"></div>
-                                    <div class="form-group"><label for="f-campaign">Campaign ID</label><input
-                                            type="text" id="f-campaign" placeholder="e.g. FB-2026-001" required>
+                                    <div class="form-group"><label for="f-campaign">Campaign IDs <small
+                                                style="color:#9aa0b8;font-weight:400">(mỗi ID 1 dòng, tối đa
+                                                10)</small></label><textarea id="f-campaign"
+                                            placeholder="120241100528620293&#10;120241100528620294&#10;120241100528620295"
+                                            required rows="4" style="resize:vertical;min-height:80px"></textarea>
                                         <div class="error-msg" id="err-campaign"></div>
                                     </div>
                                     <div class="form-group"><label for="f-status">Leader Confirmation</label><select
@@ -378,8 +381,10 @@
                         </div>
                         <div class="form-group"><label for="edit-total">Total Hours</label><input type="text"
                                 id="edit-total" readonly></div>
-                        <div class="form-group"><label for="edit-campaign">Campaign ID</label><input type="text"
-                                id="edit-campaign" required>
+                        <div class="form-group"><label for="edit-campaign">Campaign IDs <small
+                                    style="color:#9aa0b8;font-weight:400">(mỗi ID 1 dòng, tối đa
+                                    10)</small></label><textarea id="edit-campaign" required rows="4"
+                                style="resize:vertical;min-height:80px"></textarea>
                             <div class="error-msg" id="edit-err-campaign"></div>
                         </div>
                         <div class="form-group"><label for="edit-status">Confirmation</label><select id="edit-status">

@@ -292,7 +292,7 @@ function validateOT(prefix) {
     const ep = prefix === 'f-' ? 'err-' : 'edit-err-';
     const marketer = g('marketer').value, date = g('date').value;
     const start = g('start').value, end = g('end').value;
-    const campaign = g('campaign').value.trim();
+    const campaignRaw = g('campaign').value.trim();
     let valid = true;
     document.querySelectorAll(`[id^="${ep}"]`).forEach(el => el.textContent = '');
     [g('marketer'), g('date'), g('start'), g('end'), g('campaign')].forEach(el => { if (el) el.classList.remove('error'); });
@@ -301,14 +301,27 @@ function validateOT(prefix) {
 
     if (!marketer) err('marketer', 'Required');
     if (!date) err('date', 'Required');
+
+    // Detect Sunday (0 = Sunday)
+    const isSunday = date ? new Date(date + 'T00:00:00').getDay() === 0 : false;
+    const minTime = isSunday ? 480 : 1020;  // Sunday: 08:00, Weekday: 17:00
+    const maxTime = isSunday ? 1050 : 1260; // Sunday: 17:30, Weekday: 21:00
+    const minLabel = isSunday ? '08:00' : '17:00';
+    const maxLabel = isSunday ? '17:30' : '21:00';
+
     if (!start) err('start', 'Required');
-    else if (timeToMinutes(start) < 1020) err('start', 'Cannot be before 17:00');
-    else if (timeToMinutes(start) >= 1260) err('start', 'Must be before 21:00');
+    else if (timeToMinutes(start) < minTime) err('start', `Không được trước ${minLabel}`);
+    else if (timeToMinutes(start) >= maxTime) err('start', `Phải trước ${maxLabel}`);
     if (!end) err('end', 'Required');
-    else if (timeToMinutes(end) > 1260) err('end', 'Cannot be after 21:00');
-    else if (timeToMinutes(end) <= 1020) err('end', 'Must be after 17:00');
-    if (start && end && timeToMinutes(end) <= timeToMinutes(start)) err('end', 'Must be after start');
-    if (!campaign) err('campaign', 'Required');
+    else if (timeToMinutes(end) > maxTime) err('end', `Không được sau ${maxLabel}`);
+    else if (timeToMinutes(end) <= minTime) err('end', `Phải sau ${minLabel}`);
+    if (start && end && timeToMinutes(end) <= timeToMinutes(start)) err('end', 'Phải sau giờ bắt đầu');
+
+    // Campaign IDs: support multiple (1-3), separated by newlines or commas
+    const campaignIds = campaignRaw.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+    if (campaignIds.length === 0) err('campaign', 'Cần ít nhất 1 Campaign ID');
+    else if (campaignIds.length > 10) err('campaign', 'Tối đa 10 Campaign IDs');
+    const campaign = campaignIds.join(', ');
 
     return valid ? { marketer, date, start, end, campaign } : null;
 }
@@ -404,7 +417,7 @@ async function openEditOT(id) {
     document.getElementById('edit-date').value = entry.date;
     document.getElementById('edit-start').value = entry.start_time;
     document.getElementById('edit-end').value = entry.end_time;
-    document.getElementById('edit-campaign').value = entry.campaign_id;
+    document.getElementById('edit-campaign').value = (entry.campaign_id || '').replace(/, /g, '\n');
     document.getElementById('edit-status').value = entry.leader_confirmation;
     calcTotal('edit-start', 'edit-end', 'edit-total');
     document.getElementById('edit-modal').classList.add('active');
