@@ -226,13 +226,15 @@
                                         <tr>
                                             <th>Rank</th>
                                             <th>Marketer</th>
-                                            <th>Total Hours</th>
-                                            <th>Entries</th>
+                                            <th>Tổng giờ</th>
+                                            <th>Số lần</th>
+                                            <th>Thu nhập OT</th>
                                         </tr>
                                     </thead>
                                     <tbody id="ranking-body"></tbody>
                                 </table>
                             </div>
+                            <div id="ranking-detail" style="margin-top:12px"></div>
                         </div>
                     </div>
                 </section>
@@ -441,6 +443,7 @@
     <!-- TOAST -->
     <div class="toast-container" id="toast-container"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="app.js"></script>

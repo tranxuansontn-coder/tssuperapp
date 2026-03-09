@@ -24,6 +24,56 @@ function isLeaderOrAdmin() { return hasRole('admin', 'leader'); }
 function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
 // ============================================================
+// TEAM STRUCTURE
+// ============================================================
+const TEAMS = {
+    'Hoàng Thanh Huyền': { leader: 'Hoàng Thanh Huyền', members: ['Hoàng Thanh Huyền', 'Phạm Văn Đức', 'Trần Thị Thao', 'van nguyen', 'Trần Ngọc Quyên'] },
+    'Cao Sơn': { leader: 'Cao Sơn', members: ['Cao Sơn', 'TÔ MAI TOÀN', 'Huân', 'Bình Minh', 'Chí', 'Tùng'] },
+    'Dũng': { leader: 'Dũng', members: ['Hoàng', 'Nghĩa', 'Dũng', 'Tú'] }
+};
+
+function getTeamByLeader(leaderName) {
+    for (const [, team] of Object.entries(TEAMS)) {
+        if (team.members.some(m => m.toLowerCase() === leaderName.toLowerCase())) {
+            if (team.leader.toLowerCase() === leaderName.toLowerCase()) return team;
+        }
+    }
+    return null;
+}
+
+function getTeamMembers(userName) {
+    // Admin sees everyone
+    const user = currentUser();
+    if (user && user.role === 'admin') return null; // null = no filter
+    // Leader sees only their team
+    const team = getTeamByLeader(userName);
+    return team ? team.members : null;
+}
+
+function canApprove(marketerName) {
+    const user = currentUser();
+    if (!user) return false;
+    if (user.role === 'admin') return true;
+    if (user.role !== 'leader') return false;
+    // Leader can approve their team members (not themselves)
+    const team = getTeamByLeader(user.full_name);
+    if (!team) return false;
+    return team.members.some(m => m.toLowerCase() === marketerName.toLowerCase()) && user.full_name.toLowerCase() !== marketerName.toLowerCase();
+}
+
+async function quickApprove(entryId, status) {
+    try {
+        await updateLog(entryId, { leader_confirmation: status });
+        showToast(status === 'Approved' ? '✅ Đã duyệt!' : '❌ Đã từ chối!', status === 'Approved' ? 'success' : 'warning');
+        refreshHistory();
+        refreshDashboard();
+    } catch (err) {
+        showToast('Lỗi cập nhật', 'error');
+        console.error(err);
+    }
+}
+
+// ============================================================
 // DATA LAYER — FIRESTORE
 // ============================================================
 async function getActiveUsers() {
@@ -62,7 +112,12 @@ async function getFilteredLogs(filters = {}) {
     const snap = await db.collection('ot_logs').get();
     let data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     const user = currentUser();
-    if (user && user.role === 'staff') data = data.filter(e => e.marketer_name === user.full_name);
+    if (user && user.role === 'staff') {
+        data = data.filter(e => e.marketer_name === user.full_name);
+    } else if (user && user.role === 'leader') {
+        const teamMembers = getTeamMembers(user.full_name);
+        if (teamMembers) data = data.filter(e => teamMembers.some(m => m.toLowerCase() === (e.marketer_name || '').toLowerCase()));
+    }
     if (filters.month) data = data.filter(e => e.date && e.date.startsWith(filters.month));
     if (filters.marketer) data = data.filter(e => e.marketer_name === filters.marketer);
     if (filters.status) data = data.filter(e => e.leader_confirmation === filters.status);
@@ -381,18 +436,31 @@ async function refreshHistory() {
             body.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📭</div><h4>No records found</h4><p>Try adjusting filters or add a new entry.</p></div></td></tr>`;
             return;
         }
-        body.innerHTML = data.map(e => `<tr>
+        body.innerHTML = data.map(e => {
+            const showApproval = canApprove(e.marketer_name);
+            const statusCell = e.leader_confirmation === 'Approved'
+                ? `<span class="badge badge-approved">✅ Approved</span>`
+                : showApproval
+                    ? `<span class="badge badge-pending">⏳ Pending</span>
+                       <div style="display:flex;gap:4px;margin-top:4px">
+                           <button onclick="quickApprove('${e.id}','Approved')" style="background:#10b981;color:#fff;border:none;padding:3px 10px;border-radius:6px;font-size:.7rem;cursor:pointer;font-weight:600">✅ Duyệt</button>
+                           <button onclick="quickApprove('${e.id}','Rejected')" style="background:#ef4444;color:#fff;border:none;padding:3px 10px;border-radius:6px;font-size:.7rem;cursor:pointer;font-weight:600">❌ Từ chối</button>
+                       </div>`
+                    : `<span class="badge badge-${e.leader_confirmation.toLowerCase()}">${e.leader_confirmation}</span>`;
+            const canEditRow = isLeaderOrAdmin();
+            return `<tr>
             <td>${formatDate(e.date)}</td>
             <td><strong>${e.marketer_name}</strong></td>
             <td><code style="background:#f0f2f5;padding:2px 7px;border-radius:4px;font-size:.8rem">${e.campaign_id}</code></td>
             <td>${e.start_time}</td><td>${e.end_time}</td>
             <td><strong>${e.total_hours}h</strong></td>
-            <td><span class="badge badge-${e.leader_confirmation.toLowerCase()}">${e.leader_confirmation}</span></td>
-            <td>${canEdit ? `<div class="actions-cell">
+            <td>${statusCell}</td>
+            <td>${canEditRow ? `<div class="actions-cell">
                 <button class="btn-icon edit" title="Edit" onclick="openEditOT('${e.id}')">✏️</button>
                 <button class="btn-icon danger" title="Delete" onclick="confirmDeleteOT('${e.id}')">🗑️</button>
             </div>` : '—'}</td>
-        </tr>`).join('');
+        </tr>`;
+        }).join('');
     } catch (err) {
         body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:red">❌ Lỗi tải dữ liệu</td></tr>';
         console.error(err);
@@ -489,24 +557,35 @@ async function refreshDashboard() {
         });
         const fmtVND = n => n.toLocaleString('vi-VN') + 'đ';
         document.getElementById('stat-ot-earnings').textContent = fmtVND(totalEarnings);
-        document.getElementById('stat-monthly-income').textContent = fmtVND(BASE_SALARY + totalEarnings);
-        document.getElementById('stat-income-detail').textContent = `6tr + ${fmtVND(totalEarnings)} OT`;
 
         const mh = {};
         data.forEach(e => { mh[e.marketer_name] = (mh[e.marketer_name] || 0) + (e.total_hours || 0); });
         const sorted = Object.entries(mh).sort((a, b) => b[1] - a[1]);
         document.getElementById('stat-top-marketer').textContent = sorted.length ? sorted[0][0].split(' ').pop() : '—';
 
-        // Ranking
+        // Ranking with OT earnings + detail
+        const OT_RATE_WEEKDAY_R = 40000, OT_RATE_SUNDAY_R = 50000;
         const rb = document.getElementById('ranking-body');
+        const rd = document.getElementById('ranking-detail');
         if (!sorted.length) {
-            rb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-light);padding:24px">No data</td></tr>';
+            rb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-light);padding:24px">Chưa có dữ liệu</td></tr>';
+            rd.innerHTML = '';
         } else {
             rb.innerHTML = sorted.map(([name, hrs], i) => {
+                const entries = data.filter(e => e.marketer_name === name);
+                const earnings = entries.reduce((s, e) => {
+                    const dow = new Date(e.date + 'T00:00:00').getDay();
+                    return s + (e.total_hours || 0) * (dow === 0 ? OT_RATE_SUNDAY_R : OT_RATE_WEEKDAY_R);
+                }, 0);
                 const rc = i < 3 ? `rank-${i + 1}` : 'rank-default';
-                return `<tr><td><span class="rank-num ${rc}">${i + 1}</span></td><td><strong>${name}</strong></td><td>${hrs.toFixed(1)}h</td><td>${data.filter(e => e.marketer_name === name).length}</td></tr>`;
+                return `<tr style="cursor:pointer" onclick="showOTDetail('${name.replace(/'/g, "\\'")}')"><td><span class="rank-num ${rc}">${i + 1}</span></td><td><strong>${name}</strong></td><td>${hrs.toFixed(1)}h</td><td>${entries.length}</td><td style="color:#10b981;font-weight:600">${earnings.toLocaleString('vi-VN')}đ</td></tr>`;
             }).join('');
+            // Auto-show first marketer detail
+            if (sorted.length) showOTDetail(sorted[0][0]);
         }
+
+        // Store data globally for detail view
+        window._dashData = data;
 
         // Bar Chart
         const barCtx = document.getElementById('chart-bar').getContext('2d');
@@ -537,6 +616,59 @@ async function refreshDashboard() {
 ['dash-filter-month', 'dash-filter-marketer', 'dash-filter-status'].forEach(id => {
     document.getElementById(id).addEventListener('change', refreshDashboard);
 });
+
+// Detail view for a marketer's OT entries
+function showOTDetail(marketerName) {
+    const data = window._dashData || [];
+    const entries = data.filter(e => e.marketer_name === marketerName).sort((a, b) => a.date.localeCompare(b.date));
+    const rd = document.getElementById('ranking-detail');
+    if (!rd || !entries.length) return;
+
+    const OT_WD = 40000, OT_SU = 50000;
+    const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    let totalHrs = 0, totalEarn = 0;
+
+    const rows = entries.map(e => {
+        const dow = new Date(e.date + 'T00:00:00').getDay();
+        const rate = dow === 0 ? OT_SU : OT_WD;
+        const earn = (e.total_hours || 0) * rate;
+        totalHrs += (e.total_hours || 0);
+        totalEarn += earn;
+        const dayLabel = dayNames[dow];
+        const isSunday = dow === 0;
+        const dateFmt = new Date(e.date + 'T00:00:00').toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+        const statusBadge = e.leader_confirmation === 'Approved'
+            ? '<span style="color:#10b981;font-weight:600">✅ Approved</span>'
+            : '<span style="color:#f59e0b;font-weight:600">⏳ Pending</span>';
+        return `<tr>
+            <td style="white-space:nowrap"><strong>${dateFmt}</strong> <small style="color:${isSunday ? '#e63946' : '#9aa0b8'}">(${dayLabel})</small></td>
+            <td style="white-space:nowrap">${e.start_time || '—'} → ${e.end_time || '—'}</td>
+            <td style="font-weight:600">${(e.total_hours || 0).toFixed(1)}h</td>
+            <td style="font-size:.75rem;max-width:180px;word-break:break-all">${(e.campaign_id || '—').replace(/, /g, '<br>')}</td>
+            <td style="color:#10b981;font-weight:600;white-space:nowrap">${earn.toLocaleString('vi-VN')}đ <small style="color:#9aa0b8;font-weight:400">(${isSunday ? '50k' : '40k'}/h)</small></td>
+            <td>${statusBadge}</td>
+        </tr>`;
+    }).join('');
+
+    rd.innerHTML = `
+        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px;margin-top:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+                <h4 style="margin:0;font-size:.95rem;color:#e2e8f0">📋 Chi tiết OT — <span style="color:#818cf8">${marketerName}</span></h4>
+                <div style="font-size:.85rem;color:#10b981;font-weight:600">${totalHrs.toFixed(1)}h · ${totalEarn.toLocaleString('vi-VN')}đ</div>
+            </div>
+            <div class="table-wrapper" style="max-height:300px;overflow-y:auto">
+                <table style="font-size:.8rem">
+                    <thead><tr>
+                        <th>Ngày</th><th>Giờ</th><th>Số giờ</th><th>Campaign</th><th>Thu nhập</th><th>Trạng thái</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                    <tfoot><tr style="font-weight:700;border-top:2px solid rgba(255,255,255,.1)">
+                        <td>Tổng</td><td></td><td>${totalHrs.toFixed(1)}h</td><td></td><td style="color:#10b981">${totalEarn.toLocaleString('vi-VN')}đ</td><td></td>
+                    </tr></tfoot>
+                </table>
+            </div>
+        </div>`;
+}
 
 // ============================================================
 // USER MANAGEMENT
