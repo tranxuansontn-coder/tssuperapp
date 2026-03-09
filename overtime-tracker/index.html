@@ -134,6 +134,23 @@
                 </div>
             </header>
 
+            <!-- Iframe-mode quick nav (visible only inside Super App) -->
+            <nav class="iframe-nav" id="iframe-nav"
+                style="display:none;padding:8px 24px;background:rgba(30,32,44,.95);border-bottom:1px solid rgba(255,255,255,.06);gap:6px;flex-wrap:wrap">
+                <button class="iframe-nav-btn active" data-page="dashboard"
+                    style="padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(99,102,241,.15);color:#818cf8;font-size:.8rem;cursor:pointer;font-weight:500;transition:all .2s">📊
+                    Dashboard</button>
+                <button class="iframe-nav-btn" data-page="add-overtime"
+                    style="padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9aa0b8;font-size:.8rem;cursor:pointer;font-weight:500;transition:all .2s">➕
+                    Thêm OT</button>
+                <button class="iframe-nav-btn" data-page="history"
+                    style="padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9aa0b8;font-size:.8rem;cursor:pointer;font-weight:500;transition:all .2s">📋
+                    Lịch sử</button>
+                <button class="iframe-nav-btn" data-page="users" id="iframe-nav-users"
+                    style="padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9aa0b8;font-size:.8rem;cursor:pointer;font-weight:500;transition:all .2s;display:none">👥
+                    Quản lý</button>
+            </nav>
+
             <div class="content">
 
                 <!-- ====== DASHBOARD ====== -->
@@ -422,6 +439,41 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="app.js"></script>
+    <script>
+        // Initialize iframe navigation bar
+        if (window.self !== window.top) {
+            document.addEventListener('DOMContentLoaded', function () {
+                const iframeNav = document.getElementById('iframe-nav');
+                if (iframeNav) {
+                    iframeNav.style.display = 'flex';
+                    // Show Users button for admin/leader
+                    const session = JSON.parse(localStorage.getItem('otSession') || '{}');
+                    if (session.role === 'admin' || session.role === 'leader') {
+                        const usersBtn = document.getElementById('iframe-nav-users');
+                        if (usersBtn) usersBtn.style.display = '';
+                    }
+                    // Wire up button clicks
+                    iframeNav.querySelectorAll('.iframe-nav-btn').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const targetPage = this.dataset.page;
+                            // Update active button style
+                            iframeNav.querySelectorAll('.iframe-nav-btn').forEach(b => {
+                                b.style.background = 'transparent';
+                                b.style.color = '#9aa0b8';
+                                b.classList.remove('active');
+                            });
+                            this.style.background = 'rgba(99,102,241,.15)';
+                            this.style.color = '#818cf8';
+                            this.classList.add('active');
+                            // Switch page using existing sidebar nav logic
+                            const sidebarLink = document.querySelector('.sidebar-nav .nav-link[data-page="' + targetPage + '"]');
+                            if (sidebarLink) sidebarLink.click();
+                        });
+                    });
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>
