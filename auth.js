@@ -1,70 +1,98 @@
 // ============================================================
-// SUPER APP — AUTH & USER MANAGEMENT
-// Shares localStorage keys with OT Tracker for SSO
+// SUPER APP — AUTH & USER MANAGEMENT (FIREBASE FIRESTORE)
 // ============================================================
-const KEYS = { users: 'ot_users', session: 'ot_session' };
+const firebaseConfig = {
+    apiKey: "AIzaSyCC83ANMEUhotAgetLng366fRu-ub26a_0",
+    authDomain: "ts-global-super-app.firebaseapp.com",
+    projectId: "ts-global-super-app",
+    storageBucket: "ts-global-super-app.firebasestorage.app",
+    messagingSenderId: "4116358702",
+    appId: "1:4116358702:web:c13bbdaae217dd986f71ff",
+    measurementId: "G-08TGP97ME"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-function storeGet(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
-function storeSet(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
-function storeDel(key) { localStorage.removeItem(key); }
-function getUsers() { return storeGet(KEYS.users) || []; }
-function saveUsers(u) { storeSet(KEYS.users, u); }
+// Session helpers (localStorage — per-browser only)
+function getSession() { try { return JSON.parse(localStorage.getItem('ot_session')); } catch { return null; } }
+function setSession(s) { localStorage.setItem('ot_session', JSON.stringify(s)); }
+function clearSession() { localStorage.removeItem('ot_session'); }
+function currentUser() { return getSession(); }
+function isAdmin() { const u = currentUser(); return u && u.role === 'admin'; }
 function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
-// Init default admin
-(function initAdmin() {
-    if (getUsers().length === 0) {
-        saveUsers([{ id: genId(), username: 'admin', password: 'admin123', full_name: 'Sếp Sơn', role: 'admin', active: true, created_at: new Date().toISOString() }]);
+// ============================================================
+// FIRESTORE — USER OPERATIONS
+// ============================================================
+async function getUsers() {
+    const snap = await db.collection('users').get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+async function getUserByUsername(username) {
+    const snap = await db.collection('users').where('username', '==', username).get();
+    if (snap.empty) return null;
+    return { id: snap.docs[0].id, ...snap.docs[0].data() };
+}
+
+async function createUser(data) {
+    const existing = await getUserByUsername(data.username);
+    if (existing) return { error: 'Username đã tồn tại' };
+    const id = genId();
+    const user = { ...data, active: data.active !== undefined ? data.active : true, created_at: new Date().toISOString() };
+    await db.collection('users').doc(id).set(user);
+    return { id, ...user };
+}
+
+async function updateUser(id, updates) {
+    if (updates.username) {
+        const existing = await getUserByUsername(updates.username);
+        if (existing && existing.id !== id) return { error: 'Username đã tồn tại' };
     }
-})();
-
-// ---- Auth Functions ----
-function login(username, password) {
-    const user = getUsers().find(u => u.username === username && u.password === password && u.active);
-    if (!user) return null;
-    const session = { id: user.id, username: user.username, full_name: user.full_name, role: user.role };
-    storeSet(KEYS.session, session);
-    return session;
-}
-function logout() { storeDel(KEYS.session); showLoginPage(); }
-function currentUser() { return storeGet(KEYS.session); }
-function isAdmin() { const u = currentUser(); return u && u.role === 'admin'; }
-
-function registerUser(fullName, username, password) {
-    const users = getUsers();
-    if (users.find(u => u.username === username)) return { error: 'Username đã tồn tại' };
-    const user = { id: genId(), full_name: fullName, username, password, role: 'staff', active: true, created_at: new Date().toISOString() };
-    users.push(user);
-    saveUsers(users);
-    return user;
-}
-
-// ---- User CRUD (admin) ----
-function addUserAdmin(data) {
-    const users = getUsers();
-    if (users.find(u => u.username === data.username)) return { error: 'Username đã tồn tại' };
-    users.push({ id: genId(), ...data, active: true, created_at: new Date().toISOString() });
-    saveUsers(users);
+    await db.collection('users').doc(id).update(updates);
     return true;
 }
-function updateUserAdmin(id, updates) {
-    const users = getUsers();
-    const idx = users.findIndex(u => u.id === id);
-    if (idx === -1) return null;
-    if (updates.username && updates.username !== users[idx].username && users.find(u => u.username === updates.username && u.id !== id)) return { error: 'Username đã tồn tại' };
-    users[idx] = { ...users[idx], ...updates };
-    saveUsers(users);
-    return users[idx];
-}
-function toggleUserActive(id) {
-    const users = getUsers();
-    const u = users.find(u => u.id === id);
-    if (!u) return;
+
+async function toggleUserActive(id) {
+    const doc = await db.collection('users').doc(id).get();
+    if (!doc.exists) return null;
+    const u = doc.data();
     const me = currentUser();
-    if (u.id === me.id) { showToast('Không thể vô hiệu hóa tài khoản của bạn', 'error'); return; }
-    u.active = !u.active;
-    saveUsers(users);
-    return u;
+    if (id === me.id) { showToast('Không thể vô hiệu hóa tài khoản của bạn', 'error'); return null; }
+    const newActive = !u.active;
+    await db.collection('users').doc(id).update({ active: newActive });
+    return { id, ...u, active: newActive };
+}
+
+// Init default admin if no users exist
+async function initDefaultAdmin() {
+    const existing = await getUserByUsername('admin');
+    if (!existing) {
+        await createUser({
+            username: 'admin', password: 'admin123',
+            full_name: 'Sếp Sơn', role: 'admin'
+        });
+        console.log('✅ Default admin created');
+    }
+}
+
+// ============================================================
+// AUTH FUNCTIONS
+// ============================================================
+async function login(username, password) {
+    const user = await getUserByUsername(username);
+    if (!user || user.password !== password || !user.active) return null;
+    const session = { id: user.id, username: user.username, full_name: user.full_name, role: user.role };
+    setSession(session);
+    // Also sync to localStorage for OT Tracker iframe SSO
+    localStorage.setItem('ot_users', JSON.stringify(await getUsers()));
+    return session;
+}
+
+function logout() { clearSession(); showLoginPage(); }
+
+async function registerUser(fullName, username, password) {
+    return await createUser({ full_name: fullName, username, password, role: 'staff' });
 }
 
 // ============================================================
@@ -97,26 +125,33 @@ function showApp() {
     const rb = document.getElementById('sidebar-role');
     rb.textContent = user.role.toUpperCase();
     rb.className = 'role-badge role-' + user.role;
-    // Show/hide admin nav
     document.getElementById('nav-users').style.display = isAdmin() ? '' : 'none';
     navigate('home');
 }
 
 // ---- Login Form ----
-document.getElementById('login-form').addEventListener('submit', function (e) {
+document.getElementById('login-form').addEventListener('submit', async function (e) {
     e.preventDefault();
+    const btn = this.querySelector('button[type="submit"]');
     const username = document.getElementById('login-username').value.trim();
     const password = document.getElementById('login-password').value;
     if (!username || !password) { document.getElementById('login-error').textContent = 'Vui lòng nhập username và mật khẩu'; return; }
-    const session = login(username, password);
-    if (!session) { document.getElementById('login-error').textContent = 'Sai thông tin hoặc tài khoản đã bị vô hiệu hóa'; return; }
-    showApp();
-    if (session.username === 'admin' && session.role === 'admin') showToast('⚠️ Hãy đổi mật khẩu mặc định trong Quản lý nhân viên', 'warning');
+    btn.disabled = true; btn.textContent = '⏳ Đang đăng nhập...';
+    try {
+        const session = await login(username, password);
+        if (!session) { document.getElementById('login-error').textContent = 'Sai thông tin hoặc tài khoản đã bị vô hiệu hóa'; return; }
+        showApp();
+        if (session.username === 'admin' && session.role === 'admin') showToast('⚠️ Hãy đổi mật khẩu mặc định trong Quản lý nhân viên', 'warning');
+    } catch (err) {
+        document.getElementById('login-error').textContent = 'Lỗi kết nối. Thử lại sau.';
+        console.error(err);
+    } finally { btn.disabled = false; btn.textContent = '🔐 Đăng Nhập'; }
 });
 
 // ---- Register Form ----
-document.getElementById('register-form').addEventListener('submit', function (e) {
+document.getElementById('register-form').addEventListener('submit', async function (e) {
     e.preventDefault();
+    const btn = this.querySelector('button[type="submit"]');
     const fullName = document.getElementById('reg-fullname').value.trim();
     const username = document.getElementById('reg-username').value.trim();
     const password = document.getElementById('reg-password').value;
@@ -126,17 +161,23 @@ document.getElementById('register-form').addEventListener('submit', function (e)
     if (!fullName || !username || !password) { err.textContent = 'Vui lòng điền đầy đủ thông tin'; return; }
     if (password.length < 4) { err.textContent = 'Mật khẩu phải có ít nhất 4 ký tự'; return; }
     if (password !== confirm) { err.textContent = 'Mật khẩu xác nhận không khớp'; return; }
-    const result = registerUser(fullName, username, password);
-    if (result.error) { err.textContent = result.error; return; }
-    showLoginForm();
-    document.getElementById('login-username').value = username;
-    document.getElementById('login-error').style.color = '#10b981';
-    document.getElementById('login-error').textContent = '✅ Đăng ký thành công! Hãy đăng nhập.';
-    setTimeout(() => { document.getElementById('login-error').style.color = ''; }, 5000);
+    btn.disabled = true; btn.textContent = '⏳ Đang đăng ký...';
+    try {
+        const result = await registerUser(fullName, username, password);
+        if (result.error) { err.textContent = result.error; return; }
+        showLoginForm();
+        document.getElementById('login-username').value = username;
+        document.getElementById('login-error').style.color = '#10b981';
+        document.getElementById('login-error').textContent = '✅ Đăng ký thành công! Hãy đăng nhập.';
+        setTimeout(() => { document.getElementById('login-error').style.color = ''; }, 5000);
+    } catch (error) {
+        err.textContent = 'Lỗi kết nối. Thử lại sau.';
+        console.error(error);
+    } finally { btn.disabled = false; btn.textContent = '📝 Đăng Ký'; }
 });
 
 // ============================================================
-// NAVIGATION (views + sidebar)
+// NAVIGATION
 // ============================================================
 const COMING_SOON_DATA = {
     voice: { icon: '<i class="fa-solid fa-microphone-lines" style="color:#10b981"></i>', title: 'Sửa Voice', sub: 'Công cụ chỉnh sửa, cắt ghép, lọc noise file audio đang được phát triển.' },
@@ -182,7 +223,6 @@ function navigate(view, comingKey) {
         const tb = TOPBAR_LABELS[view] || TOPBAR_LABELS.home;
         document.getElementById('topbar').querySelector('.topbar-title').innerHTML = `<i class="fa-solid ${tb.icon}" style="color:var(--primary)"></i><span>${tb.label}</span>`;
         if (view === 'users') refreshUserMgmt();
-        // Reload OT Tracker iframe to pick up session (SSO)
         if (view === 'overtime') {
             const frame = document.querySelector('#view-overtime iframe');
             if (frame) frame.src = frame.src;
@@ -194,30 +234,34 @@ function navigate(view, comingKey) {
 document.querySelectorAll('.nav-group-header').forEach(header => {
     header.addEventListener('click', () => {
         header.classList.toggle('open');
-        const items = header.nextElementSibling;
-        items.classList.toggle('open');
+        header.nextElementSibling.classList.toggle('open');
     });
-    // Open by default
     header.classList.add('open');
     header.nextElementSibling.classList.add('open');
 });
 
 // ============================================================
-// USER MANAGEMENT VIEW
+// USER MANAGEMENT (ADMIN)
 // ============================================================
-function refreshUserMgmt() {
-    const users = getUsers();
+async function refreshUserMgmt() {
     const body = document.getElementById('users-mgmt-body');
-    body.innerHTML = users.map(u => `<tr>
-        <td><strong style="color:var(--text-bright)">${u.full_name}</strong></td>
-        <td><code>${u.username}</code></td>
-        <td><span class="mgmt-badge ${u.role}">${u.role.charAt(0).toUpperCase() + u.role.slice(1)}</span></td>
-        <td><span class="mgmt-badge ${u.active ? 'active' : 'inactive'}">${u.active ? 'Active' : 'Inactive'}</span></td>
-        <td><div class="actions-cell">
-            <button class="btn-mgmt-icon" title="Sửa" onclick="openEditUser('${u.id}')">✏️</button>
-            <button class="btn-mgmt-icon ${u.active ? 'danger' : ''}" title="${u.active ? 'Vô hiệu hóa' : 'Kích hoạt'}" onclick="toggleUser('${u.id}')">${u.active ? '🚫' : '✅'}</button>
-        </div></td>
-    </tr>`).join('');
+    body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-muted)">⏳ Đang tải...</td></tr>';
+    try {
+        const users = await getUsers();
+        body.innerHTML = users.map(u => `<tr>
+            <td><strong style="color:var(--text-bright)">${u.full_name}</strong></td>
+            <td><code>${u.username}</code></td>
+            <td><span class="mgmt-badge ${u.role}">${u.role.charAt(0).toUpperCase() + u.role.slice(1)}</span></td>
+            <td><span class="mgmt-badge ${u.active ? 'active' : 'inactive'}">${u.active ? 'Active' : 'Inactive'}</span></td>
+            <td><div class="actions-cell">
+                <button class="btn-mgmt-icon" title="Sửa" onclick="openEditUser('${u.id}')">✏️</button>
+                <button class="btn-mgmt-icon ${u.active ? 'danger' : ''}" title="${u.active ? 'Vô hiệu hóa' : 'Kích hoạt'}" onclick="toggleUser('${u.id}')">${u.active ? '🚫' : '✅'}</button>
+            </div></td>
+        </tr>`).join('');
+    } catch (err) {
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#e74c3c">❌ Lỗi tải dữ liệu</td></tr>';
+        console.error(err);
+    }
 }
 
 function openAddUser() {
@@ -228,9 +272,10 @@ function openAddUser() {
     document.getElementById('user-pw-hint').style.display = 'none';
     document.getElementById('user-modal').classList.add('active');
 }
-function openEditUser(id) {
-    const u = getUsers().find(u => u.id === id);
-    if (!u) return;
+async function openEditUser(id) {
+    const doc = await db.collection('users').doc(id).get();
+    if (!doc.exists) return;
+    const u = doc.data();
     document.getElementById('user-modal-title').textContent = 'Sửa nhân viên';
     document.getElementById('user-edit-id').value = id;
     document.getElementById('user-fn').value = u.full_name;
@@ -245,7 +290,8 @@ function closeUserModal() {
     document.getElementById('user-modal').classList.remove('active');
     document.getElementById('user-form-error').textContent = '';
 }
-document.getElementById('user-form').addEventListener('submit', function (e) {
+
+document.getElementById('user-form').addEventListener('submit', async function (e) {
     e.preventDefault();
     const editId = document.getElementById('user-edit-id').value;
     const fn = document.getElementById('user-fn').value.trim();
@@ -254,24 +300,33 @@ document.getElementById('user-form').addEventListener('submit', function (e) {
     const rl = document.getElementById('user-rl').value;
     const errEl = document.getElementById('user-form-error');
     if (!fn || !un) { errEl.textContent = 'Tên và username là bắt buộc'; return; }
-    if (editId) {
-        const updates = { full_name: fn, username: un, role: rl };
-        if (pw) updates.password = pw;
-        const res = updateUserAdmin(editId, updates);
-        if (res && res.error) { errEl.textContent = res.error; return; }
-        showToast('Đã cập nhật!', 'success');
-    } else {
-        if (!pw) { errEl.textContent = 'Mật khẩu là bắt buộc'; return; }
-        const res = addUserAdmin({ full_name: fn, username: un, password: pw, role: rl });
-        if (res && res.error) { errEl.textContent = res.error; return; }
-        showToast('Đã thêm nhân viên!', 'success');
+    try {
+        if (editId) {
+            const updates = { full_name: fn, username: un, role: rl };
+            if (pw) updates.password = pw;
+            const res = await updateUser(editId, updates);
+            if (res && res.error) { errEl.textContent = res.error; return; }
+            showToast('Đã cập nhật!', 'success');
+        } else {
+            if (!pw) { errEl.textContent = 'Mật khẩu là bắt buộc'; return; }
+            const res = await createUser({ full_name: fn, username: un, password: pw, role: rl });
+            if (res && res.error) { errEl.textContent = res.error; return; }
+            showToast('Đã thêm nhân viên!', 'success');
+        }
+        closeUserModal();
+        refreshUserMgmt();
+        // Sync users list to localStorage for OT Tracker
+        localStorage.setItem('ot_users', JSON.stringify(await getUsers()));
+    } catch (err) {
+        errEl.textContent = 'Lỗi lưu dữ liệu';
+        console.error(err);
     }
-    closeUserModal();
-    refreshUserMgmt();
 });
+
 document.getElementById('user-modal').addEventListener('click', function (e) { if (e.target === this) closeUserModal(); });
-function toggleUser(id) {
-    const u = toggleUserActive(id);
+
+async function toggleUser(id) {
+    const u = await toggleUserActive(id);
     if (u) { showToast(u.active ? 'Đã kích hoạt' : 'Đã vô hiệu hóa', 'info'); refreshUserMgmt(); }
 }
 
@@ -291,12 +346,21 @@ function showToast(msg, type = 'success') {
 // ============================================================
 // INIT
 // ============================================================
-(function init() {
-    const user = currentUser();
-    if (user) {
-        const u = getUsers().find(u => u.id === user.id && u.active);
-        if (u) { showApp(); return; }
-        storeDel(KEYS.session);
+(async function init() {
+    try {
+        await initDefaultAdmin();
+        const session = getSession();
+        if (session) {
+            const doc = await db.collection('users').doc(session.id).get();
+            if (doc.exists && doc.data().active) {
+                showApp();
+                return;
+            }
+            clearSession();
+        }
+        showLoginPage();
+    } catch (err) {
+        console.error('Firebase init error:', err);
+        showLoginPage();
     }
-    showLoginPage();
 })();

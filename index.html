@@ -686,8 +686,37 @@
                 </li>
             </ul>
 
-            <!-- Công cụ (collapsible) -->
+            <!-- Hiệu suất & Thưởng (collapsible) -->
             <div class="nav-group-header open" style="margin-top:.3rem">
+                <i class="fa-solid fa-chart-line" style="font-size:.75rem;width:16px;text-align:center"></i>
+                <span>Hiệu suất & Thưởng</span>
+                <i class="fa-solid fa-chevron-right chevron"></i>
+            </div>
+            <div class="nav-group-items open">
+                <ul class="nav-list">
+                    <li class="nav-item"><a class="nav-link" id="nav-monthlyincome"
+                            onclick="navigate('coming','monthlyincome')" href="javascript:void(0)"><span
+                                class="nav-icon"><i class="fa-solid fa-wallet"></i></span><span class="nav-label">Thu
+                                nhập tháng</span><span class="badge-soon">Soon</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-overtime" onclick="navigate('overtime')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-clock"></i></span><span class="nav-label">OT Tracker</span><span
+                                class="badge-new">Mới</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-dailybonus"
+                            onclick="navigate('coming','dailybonus')" href="javascript:void(0)"><span
+                                class="nav-icon"><i class="fa-solid fa-gift"></i></span><span class="nav-label">Thưởng
+                                ngày</span><span class="badge-soon">Soon</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-teambonus" onclick="navigate('coming','teambonus')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-people-group"></i></span><span class="nav-label">Thưởng
+                                team</span><span class="badge-soon">Soon</span></a></li>
+                </ul>
+            </div>
+
+            <div class="nav-divider"></div>
+
+            <!-- Công cụ (collapsible) -->
+            <div class="nav-group-header open" style="margin-top:0">
                 <i class="fa-solid fa-toolbox" style="font-size:.75rem;width:16px;text-align:center"></i>
                 <span>Công cụ</span>
                 <i class="fa-solid fa-chevron-right chevron"></i>
@@ -706,35 +735,6 @@
                             href="javascript:void(0)"><span class="nav-icon"><i
                                     class="fa-solid fa-star"></i></span><span class="nav-label">Chấm Điểm & Set
                                 Giá</span><span class="badge-new">Mới</span></a></li>
-                </ul>
-            </div>
-
-            <div class="nav-divider"></div>
-
-            <!-- Hiệu suất & Thưởng (collapsible) -->
-            <div class="nav-group-header open" style="margin-top:0">
-                <i class="fa-solid fa-chart-line" style="font-size:.75rem;width:16px;text-align:center"></i>
-                <span>Hiệu suất & Thưởng</span>
-                <i class="fa-solid fa-chevron-right chevron"></i>
-            </div>
-            <div class="nav-group-items open">
-                <ul class="nav-list">
-                    <li class="nav-item"><a class="nav-link" id="nav-overtime" onclick="navigate('overtime')"
-                            href="javascript:void(0)"><span class="nav-icon"><i
-                                    class="fa-solid fa-clock"></i></span><span class="nav-label">OT Tracker</span><span
-                                class="badge-new">Mới</span></a></li>
-                    <li class="nav-item"><a class="nav-link" id="nav-dailybonus"
-                            onclick="navigate('coming','dailybonus')" href="javascript:void(0)"><span
-                                class="nav-icon"><i class="fa-solid fa-gift"></i></span><span class="nav-label">Thưởng
-                                ngày</span><span class="badge-soon">Soon</span></a></li>
-                    <li class="nav-item"><a class="nav-link" id="nav-teambonus" onclick="navigate('coming','teambonus')"
-                            href="javascript:void(0)"><span class="nav-icon"><i
-                                    class="fa-solid fa-people-group"></i></span><span class="nav-label">Thưởng
-                                team</span><span class="badge-soon">Soon</span></a></li>
-                    <li class="nav-item"><a class="nav-link" id="nav-monthlyincome"
-                            onclick="navigate('coming','monthlyincome')" href="javascript:void(0)"><span
-                                class="nav-icon"><i class="fa-solid fa-wallet"></i></span><span class="nav-label">Thu
-                                nhập tháng</span><span class="badge-soon">Soon</span></a></li>
                 </ul>
             </div>
 
@@ -809,6 +809,44 @@
                 </div>
                 <div class="apps-section">
                     <div class="section-header">
+                        <h2><i class="fa-solid fa-chart-line" style="color:var(--success);font-size:.85rem"></i> Hiệu
+                            suất & Thưởng</h2>
+                        <div class="sep"></div>
+                    </div>
+                    <div class="apps-grid">
+                        <div class="app-card disabled">
+                            <div class="app-card-icon icon-green"><i class="fa-solid fa-wallet"></i></div>
+                            <div class="app-card-title">Thu nhập tháng</div>
+                            <div class="app-card-desc">Lương cứng 6tr + Thưởng + OT — xem lương dự kiến trước KPI doanh
+                                số.</div>
+                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
+                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
+                        </div>
+                        <div class="app-card" onclick="navigate('overtime')">
+                            <div class="app-card-icon icon-green"><i class="fa-solid fa-clock"></i></div>
+                            <div class="app-card-title">OT Tracker</div>
+                            <div class="app-card-desc">Quản lý giờ tăng ca, phân quyền Admin/Leader/Staff, báo cáo thống
+                                kê.</div>
+                            <div class="app-card-footer"><button class="btn-open"><i
+                                        class="fa-solid fa-arrow-right"></i> Mở ngay</button><span
+                                    class="badge-new">Mới</span></div>
+                        </div>
+                        <div class="app-card disabled">
+                            <div class="app-card-icon icon-orange"><i class="fa-solid fa-gift"></i></div>
+                            <div class="app-card-title">Thưởng ngày</div>
+                            <div class="app-card-desc">Tính thưởng theo hiệu suất làm việc hàng ngày.</div>
+                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
+                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
+                        </div>
+                        <div class="app-card disabled">
+                            <div class="app-card-icon icon-purple"><i class="fa-solid fa-people-group"></i></div>
+                            <div class="app-card-title">Thưởng team</div>
+                            <div class="app-card-desc">Đánh giá hiệu suất nhóm, tính thưởng team.</div>
+                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
+                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
+                        </div>
+                    </div>
+                    <div class="section-header" style="margin-top:1.5rem">
                         <h2><i class="fa-solid fa-bolt" style="color:var(--primary);font-size:.85rem"></i> Công cụ đang
                             hoạt động</h2>
                         <div class="sep"></div>
@@ -842,122 +880,86 @@
                                     class="badge-new">Mới</span></div>
                         </div>
                     </div>
-                    <div class="section-header" style="margin-top:1.5rem">
-                        <h2><i class="fa-solid fa-chart-line" style="color:var(--success);font-size:.85rem"></i> Hiệu
-                            suất & Thưởng</h2>
-                        <div class="sep"></div>
-                    </div>
-                    <div class="apps-grid">
-                        <div class="app-card" onclick="navigate('overtime')">
-                            <div class="app-card-icon icon-green"><i class="fa-solid fa-clock"></i></div>
-                            <div class="app-card-title">OT Tracker</div>
-                            <div class="app-card-desc">Quản lý giờ tăng ca, phân quyền Admin/Leader/Staff, báo cáo thống
-                                kê.</div>
-                            <div class="app-card-footer"><button class="btn-open"><i
-                                        class="fa-solid fa-arrow-right"></i> Mở ngay</button><span
-                                    class="badge-new">Mới</span></div>
-                        </div>
-                        <div class="app-card disabled">
-                            <div class="app-card-icon icon-orange"><i class="fa-solid fa-gift"></i></div>
-                            <div class="app-card-title">Thưởng ngày</div>
-                            <div class="app-card-desc">Tính thưởng theo hiệu suất làm việc hàng ngày.</div>
-                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
-                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
-                        </div>
-                        <div class="app-card disabled">
-                            <div class="app-card-icon icon-purple"><i class="fa-solid fa-people-group"></i></div>
-                            <div class="app-card-title">Thưởng team</div>
-                            <div class="app-card-desc">Đánh giá hiệu suất nhóm, tính thưởng team.</div>
-                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
-                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
-                        </div>
-                        <div class="app-card disabled">
-                            <div class="app-card-icon icon-green"><i class="fa-solid fa-wallet"></i></div>
-                            <div class="app-card-title">Thu nhập tháng</div>
-                            <div class="app-card-desc">Lương cứng 6tr + Thưởng + OT — xem lương dự kiến trước KPI doanh
-                                số.</div>
-                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
-                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
-                        </div>
-                    </div>
-                    <div class="section-header" style="margin-top:1.5rem">
-                        <h2><i class="fa-solid fa-clock" style="color:var(--warning);font-size:.85rem"></i> Sắp ra mắt
-                        </h2>
-                        <div class="sep"></div>
-                    </div>
-                    <div class="apps-grid">
-                        <div class="app-card disabled">
-                            <div class="app-card-icon icon-green"><i class="fa-solid fa-microphone-lines"></i></div>
-                            <div class="app-card-title">Sửa Voice</div>
-                            <div class="app-card-desc">Chỉnh sửa, cắt, ghép file audio. Tăng/giảm tốc độ, lọc noise.
-                            </div>
-                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
-                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
-                        </div>
-                        <div class="app-card disabled">
-                            <div class="app-card-icon icon-blue"><i class="fa-brands fa-facebook"></i></div>
-                            <div class="app-card-title">Phân Tích & Đánh Giá Ads</div>
-                            <div class="app-card-desc">Kết nối Facebook Ads API, phân tích hiệu suất chiến dịch.</div>
-                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
-                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
-                        </div>
-                        <div class="app-card disabled">
-                            <div class="app-card-icon icon-pink"><i class="fa-solid fa-comments"></i></div>
-                            <div class="app-card-title">TS Forum</div>
-                            <div class="app-card-desc">Diễn đàn nội bộ TS Global Group — chia sẻ, hỏi đáp.</div>
-                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
-                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
-                        </div>
-                    </div>
                 </div>
             </div>
-
-            <!-- TOOLS (iframes) -->
-            <div class="view iframe-view" id="view-image"><iframe src="./image-translator-v2/index.html"
-                    title="Sửa ảnh & Dịch ảnh"></iframe></div>
-            <div class="view iframe-view" id="view-video"><iframe src="./video-transcriber/index.html"
-                    title="Bóc băng Video"></iframe></div>
-            <div class="view iframe-view" id="view-scorer"><iframe src="./product-scorer/index.html"
-                    title="Chấm Điểm & Set Giá"></iframe></div>
-            <div class="view iframe-view" id="view-overtime"><iframe src="./overtime-tracker/index.html"
-                    title="OT Tracker"></iframe></div>
-
-            <!-- USER MANAGEMENT -->
-            <div class="view mgmt-view" id="view-users">
-                <div class="mgmt-card">
-                    <div class="mgmt-card-header">
-                        <h3><i class="fa-solid fa-users-gear" style="color:var(--primary);margin-right:6px"></i> Quản lý
-                            nhân viên</h3>
-                        <button class="btn-mgmt primary" onclick="openAddUser()">➕ Thêm nhân viên</button>
-                    </div>
-                    <table class="mgmt-table">
-                        <thead>
-                            <tr>
-                                <th>Họ tên</th>
-                                <th>Username</th>
-                                <th>Vai trò</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-mgmt-body"></tbody>
-                    </table>
-                </div>
+            <div class="section-header" style="margin-top:1.5rem">
+                <h2><i class="fa-solid fa-clock" style="color:var(--warning);font-size:.85rem"></i> Sắp ra mắt
+                </h2>
+                <div class="sep"></div>
             </div>
-
-            <!-- COMING SOON -->
-            <div class="view coming-view" id="view-coming">
-                <div class="coming-icon" id="comingIcon"><i class="fa-solid fa-clock"></i></div>
-                <h2 class="coming-title" id="comingTitle">Sắp ra mắt</h2>
-                <p class="coming-sub" id="comingSub">Tính năng này đang được phát triển.</p>
-                <div class="coming-pill">🚧 Coming Soon — Q2 2026</div>
-                <button onclick="navigate('home')"
-                    style="margin-top:.4rem;background:transparent;border:1px solid var(--border);color:var(--text-sub);padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.8rem;transition:all .2s"
-                    onmouseover="this.style.background='var(--bg-card2)'"
-                    onmouseout="this.style.background='transparent'"><i class="fa-solid fa-house"></i> Về Tổng
-                    quan</button>
+            <div class="apps-grid">
+                <div class="app-card disabled">
+                    <div class="app-card-icon icon-green"><i class="fa-solid fa-microphone-lines"></i></div>
+                    <div class="app-card-title">Sửa Voice</div>
+                    <div class="app-card-desc">Chỉnh sửa, cắt, ghép file audio. Tăng/giảm tốc độ, lọc noise.
+                    </div>
+                    <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
+                    <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
+                </div>
+                <div class="app-card disabled">
+                    <div class="app-card-icon icon-blue"><i class="fa-brands fa-facebook"></i></div>
+                    <div class="app-card-title">Phân Tích & Đánh Giá Ads</div>
+                    <div class="app-card-desc">Kết nối Facebook Ads API, phân tích hiệu suất chiến dịch.</div>
+                    <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
+                    <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
+                </div>
+                <div class="app-card disabled">
+                    <div class="app-card-icon icon-pink"><i class="fa-solid fa-comments"></i></div>
+                    <div class="app-card-title">TS Forum</div>
+                    <div class="app-card-desc">Diễn đàn nội bộ TS Global Group — chia sẻ, hỏi đáp.</div>
+                    <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
+                    <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
+                </div>
             </div>
         </div>
+    </div>
+
+    <!-- TOOLS (iframes) -->
+    <div class="view iframe-view" id="view-image"><iframe src="./image-translator-v2/index.html"
+            title="Sửa ảnh & Dịch ảnh"></iframe></div>
+    <div class="view iframe-view" id="view-video"><iframe src="./video-transcriber/index.html"
+            title="Bóc băng Video"></iframe></div>
+    <div class="view iframe-view" id="view-scorer"><iframe src="./product-scorer/index.html"
+            title="Chấm Điểm & Set Giá"></iframe></div>
+    <div class="view iframe-view" id="view-overtime"><iframe src="./overtime-tracker/index.html"
+            title="OT Tracker"></iframe></div>
+
+    <!-- USER MANAGEMENT -->
+    <div class="view mgmt-view" id="view-users">
+        <div class="mgmt-card">
+            <div class="mgmt-card-header">
+                <h3><i class="fa-solid fa-users-gear" style="color:var(--primary);margin-right:6px"></i> Quản lý
+                    nhân viên</h3>
+                <button class="btn-mgmt primary" onclick="openAddUser()">➕ Thêm nhân viên</button>
+            </div>
+            <table class="mgmt-table">
+                <thead>
+                    <tr>
+                        <th>Họ tên</th>
+                        <th>Username</th>
+                        <th>Vai trò</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="users-mgmt-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- COMING SOON -->
+    <div class="view coming-view" id="view-coming">
+        <div class="coming-icon" id="comingIcon"><i class="fa-solid fa-clock"></i></div>
+        <h2 class="coming-title" id="comingTitle">Sắp ra mắt</h2>
+        <p class="coming-sub" id="comingSub">Tính năng này đang được phát triển.</p>
+        <div class="coming-pill">🚧 Coming Soon — Q2 2026</div>
+        <button onclick="navigate('home')"
+            style="margin-top:.4rem;background:transparent;border:1px solid var(--border);color:var(--text-sub);padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.8rem;transition:all .2s"
+            onmouseover="this.style.background='var(--bg-card2)'" onmouseout="this.style.background='transparent'"><i
+                class="fa-solid fa-house"></i> Về Tổng
+            quan</button>
+    </div>
+    </div>
     </div>
 
     <!-- USER MODAL -->
@@ -998,6 +1000,8 @@
     </div>
 
     <div class="toast-container" id="toast-container"></div>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="auth.js"></script>
 </body>
 
