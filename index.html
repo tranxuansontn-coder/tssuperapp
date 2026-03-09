@@ -1,64 +1,628 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OT Tracker — Facebook Ads Team</title>
-    <meta name="description" content="Internal overtime tracking tool for Facebook Ads marketing staff">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <title>TS Global · All-in-One Super App</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* When inside iframe (Super App), hide sidebar and login, expand main */
-        body.iframe-mode .login-page {
-            display: none !important;
+        :root {
+            --primary: #e63946;
+            --primary-dark: #c1121f;
+            --primary-glow: rgba(230, 57, 70, 0.25);
+            --sidebar-bg: #0d0f14;
+            --sidebar-hover: #1a1d26;
+            --sidebar-active: #1e2130;
+            --sidebar-border: rgba(255, 255, 255, 0.07);
+            --bg-main: #111318;
+            --bg-card: #181b24;
+            --bg-card2: #1e2130;
+            --text-bright: #f0f2f8;
+            --text-sub: #9aa0b8;
+            --text-muted: #5a6080;
+            --border: rgba(255, 255, 255, 0.08);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --sidebar-w: 240px;
+            --font: 'Inter', sans-serif;
+            --font-display: 'Outfit', sans-serif
         }
 
-        body.iframe-mode .sidebar {
-            display: none !important;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
         }
 
-        body.iframe-mode .app-wrapper {
-            display: block !important;
-            grid-template-columns: 1fr !important;
+        body {
+            font-family: var(--font);
+            background: var(--bg-main);
+            color: var(--text-bright);
+            height: 100vh;
+            overflow: hidden
         }
 
-        body.iframe-mode .main {
-            margin-left: 0 !important;
-            width: 100% !important;
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 100;
+            height: 100vh;
+            overflow-y: auto
+        }
+
+        .sidebar-logo {
+            padding: 1rem;
+            border-bottom: 1px solid var(--sidebar-border);
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            cursor: pointer;
+            text-decoration: none
+        }
+
+        .logo-box {
+            width: 34px;
+            height: 34px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: .8rem;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px var(--primary-glow)
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1
+        }
+
+        .logo-text strong {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: .85rem;
+            color: var(--text-bright)
+        }
+
+        .logo-text span {
+            font-size: .62rem;
+            color: var(--primary);
+            font-weight: 500;
+            letter-spacing: .05em;
+            text-transform: uppercase
+        }
+
+        .nav-section {
+            padding: .6rem .6rem .2rem;
+            font-size: .6rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            padding-left: 1rem
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0 .6rem
+        }
+
+        .nav-item {
+            margin-bottom: 2px
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+            padding: .55rem .8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .18s;
+            color: var(--text-sub);
+            font-size: .82rem;
+            font-weight: 500;
+            text-decoration: none;
+            position: relative
+        }
+
+        .nav-link:hover {
+            background: var(--sidebar-hover);
+            color: var(--text-bright)
+        }
+
+        .nav-link.active {
+            background: var(--sidebar-active);
+            color: var(--text-bright);
+            box-shadow: inset 3px 0 0 var(--primary)
+        }
+
+        .nav-link.active .nav-icon {
+            color: var(--primary)
+        }
+
+        .nav-icon {
+            width: 16px;
+            text-align: center;
+            font-size: .85rem;
+            flex-shrink: 0
+        }
+
+        .nav-label {
+            flex: 1
+        }
+
+        .badge-soon {
+            font-size: .55rem;
+            font-weight: 700;
+            padding: .12rem .35rem;
+            border-radius: 14px;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            background: rgba(245, 158, 11, .15);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, .3)
+        }
+
+        .badge-new {
+            font-size: .55rem;
+            font-weight: 700;
+            padding: .12rem .35rem;
+            border-radius: 14px;
+            text-transform: uppercase;
+            background: rgba(16, 185, 129, .15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, .3)
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--sidebar-border);
+            margin: .5rem .6rem
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: .8rem;
+            border-top: 1px solid var(--sidebar-border);
+            font-size: .65rem;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.5
+        }
+
+        .sidebar-footer strong {
+            color: var(--primary)
+        }
+
+        /* MAIN */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        .topbar {
+            height: 48px;
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--sidebar-border);
+            display: flex;
+            align-items: center;
+            padding: 0 1.2rem;
+            gap: .8rem;
+            flex-shrink: 0
+        }
+
+        .topbar-title {
+            font-size: .88rem;
+            font-weight: 600;
+            color: var(--text-bright);
+            display: flex;
+            align-items: center;
+            gap: .4rem
+        }
+
+        .topbar-title i {
+            color: var(--primary);
+            font-size: .8rem
+        }
+
+        .topbar-badge {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .72rem;
+            color: var(--text-muted)
+        }
+
+        .status-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 5px var(--success)
+        }
+
+        .view {
+            display: none;
+            flex: 1;
+            overflow: hidden
+        }
+
+        .view.active {
+            display: flex
+        }
+
+        .iframe-view {
+            flex-direction: column
+        }
+
+        .iframe-view iframe {
+            flex: 1;
+            border: none;
+            width: 100%;
+            height: 100%
+        }
+
+        .home-view {
+            flex-direction: column;
+            overflow-y: auto;
+            background: var(--bg-main)
+        }
+
+        .home-hero {
+            padding: 2.5rem 2.5rem 2rem;
+            background: linear-gradient(135deg, #0d0f14 0%, #151820 100%);
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden
+        }
+
+        .home-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(230, 57, 70, .1) 0%, transparent 70%);
+            pointer-events: none
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: .3rem;
+            background: rgba(230, 57, 70, .1);
+            border: 1px solid rgba(230, 57, 70, .3);
+            color: var(--primary);
+            font-size: .65rem;
+            font-weight: 600;
+            padding: .25rem .6rem;
+            border-radius: 14px;
+            margin-bottom: .8rem;
+            letter-spacing: .04em;
+            text-transform: uppercase
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: .6rem;
+            background: linear-gradient(135deg, #f0f2f8 30%, #9aa0b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .hero-title em {
+            font-style: normal;
+            -webkit-text-fill-color: var(--primary);
+            color: var(--primary)
+        }
+
+        .hero-sub {
+            color: var(--text-sub);
+            font-size: .88rem;
+            max-width: 480px;
+            line-height: 1.6;
+            margin-bottom: 1.5rem
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 1.8rem
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column
+        }
+
+        .stat-num {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-bright)
+        }
+
+        .stat-label {
+            font-size: .68rem;
+            color: var(--text-muted)
+        }
+
+        .apps-section {
+            padding: 1.5rem 2.5rem
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin-bottom: 1rem
+        }
+
+        .section-header h2 {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-bright)
+        }
+
+        .section-header .sep {
+            flex: 1;
+            height: 1px;
+            background: var(--border)
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: .8rem
+        }
+
+        .app-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.1rem;
+            cursor: pointer;
+            transition: all .2s;
+            position: relative;
+            overflow: hidden
+        }
+
+        .app-card:hover:not(.disabled) {
+            border-color: rgba(230, 57, 70, .4);
+            background: var(--bg-card2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .3)
+        }
+
+        .app-card.disabled {
+            opacity: .5;
+            cursor: default
+        }
+
+        .app-card-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            margin-bottom: .7rem
+        }
+
+        .icon-red {
+            background: rgba(230, 57, 70, .15);
+            color: var(--primary)
+        }
+
+        .icon-blue {
+            background: rgba(59, 130, 246, .15);
+            color: #3b82f6
+        }
+
+        .icon-green {
+            background: rgba(16, 185, 129, .15);
+            color: var(--success)
+        }
+
+        .icon-purple {
+            background: rgba(139, 92, 246, .15);
+            color: #8b5cf6
+        }
+
+        .icon-orange {
+            background: rgba(245, 158, 11, .15);
+            color: var(--warning)
+        }
+
+        .icon-pink {
+            background: rgba(236, 72, 153, .15);
+            color: #ec4899
+        }
+
+        .app-card-title {
+            font-size: .88rem;
+            font-weight: 700;
+            margin-bottom: .2rem;
+            color: var(--text-bright)
+        }
+
+        .app-card-desc {
+            font-size: .73rem;
+            color: var(--text-sub);
+            line-height: 1.5;
+            margin-bottom: .7rem
+        }
+
+        .app-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .btn-open {
+            font-size: .7rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: rgba(230, 57, 70, .1);
+            border: 1px solid rgba(230, 57, 70, .25);
+            padding: .3rem .7rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all .18s;
+            display: flex;
+            align-items: center;
+            gap: .3rem
+        }
+
+        .btn-open:hover {
+            background: rgba(230, 57, 70, .2)
+        }
+
+        .card-badge-soon {
+            font-size: .6rem;
+            font-weight: 700;
+            padding: .15rem .45rem;
+            border-radius: 14px;
+            background: rgba(245, 158, 11, .1);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, .2);
+            text-transform: uppercase;
+            letter-spacing: .04em
+        }
+
+        .coming-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(13, 15, 20, .4);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(1px)
+        }
+
+        .coming-label {
+            background: rgba(13, 15, 20, .85);
+            border: 1px solid rgba(245, 158, 11, .4);
+            color: var(--warning);
+            font-size: .65rem;
+            font-weight: 700;
+            padding: .35rem .8rem;
+            border-radius: 14px;
+            letter-spacing: .08em;
+            text-transform: uppercase
+        }
+
+        .coming-view {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-main);
+            gap: 1rem
+        }
+
+        .coming-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background: var(--bg-card2);
+            border: 1px solid var(--border)
+        }
+
+        .coming-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-bright)
+        }
+
+        .coming-sub {
+            color: var(--text-sub);
+            font-size: .85rem;
+            text-align: center;
+            max-width: 320px;
+            line-height: 1.6
+        }
+
+        .coming-pill {
+            background: rgba(245, 158, 11, .1);
+            border: 1px solid rgba(245, 158, 11, .3);
+            color: var(--warning);
+            padding: .35rem 1rem;
+            border-radius: 14px;
+            font-size: .75rem;
+            font-weight: 600;
+            letter-spacing: .05em;
+            text-transform: uppercase
+        }
+
+        #app-container {
+            display: flex;
+            height: 100vh
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d3a;
+            border-radius: 3px
         }
     </style>
-    <script>
-        // Detect if running inside an iframe
-        if (window.self !== window.top) {
-            document.documentElement.classList.add('iframe-mode');
-            document.addEventListener('DOMContentLoaded', function () {
-                document.body.classList.add('iframe-mode');
-            });
-        }
-    </script>
+    <link rel="stylesheet" href="style-auth.css">
 </head>
 
 <body>
 
     <!-- ===== LOGIN PAGE ===== -->
-    <div class="login-page" id="login-page">
+    <div class="login-page active" id="login-page">
         <div class="login-card">
             <div class="login-brand">
-                <h1>OT <span>Tracker</span></h1>
-                <p>Facebook Ads Team — Internal System</p>
+                <div class="logo-box-lg">TS</div>
+                <h1>TS <span>Global</span></h1>
+                <p>Super App — Đăng nhập để tiếp tục</p>
             </div>
-            <form class="login-form" id="login-form">
+            <form class="login-form" id="login-form" novalidate>
                 <div class="form-group">
                     <label for="login-username">Username</label>
-                    <input type="text" id="login-username" placeholder="Enter username" autocomplete="username">
+                    <input type="text" id="login-username" placeholder="Nhập username" autocomplete="username">
                 </div>
                 <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" placeholder="Enter password"
+                    <label for="login-password">Mật khẩu</label>
+                    <input type="password" id="login-password" placeholder="Nhập mật khẩu"
                         autocomplete="current-password">
                 </div>
                 <div class="login-error" id="login-error"></div>
@@ -84,347 +648,345 @@
                 <div class="login-error" id="register-error"></div>
                 <button type="submit" class="login-btn" style="background:var(--success)">📝 Đăng Ký</button>
             </form>
-            <div id="login-toggle"
-                style="text-align:center;margin-top:18px;font-size:.85rem;color:var(--text-secondary)">
-                Chưa có tài khoản? <a href="javascript:void(0)" onclick="showRegisterForm()"
-                    style="color:var(--primary);font-weight:600;text-decoration:none">Đăng ký ngay</a>
+            <div class="login-toggle" id="login-toggle">
+                Chưa có tài khoản? <a onclick="showRegisterForm()">Đăng ký ngay</a>
             </div>
         </div>
     </div>
 
-    <!-- ===== APP WRAPPER ===== -->
-    <div class="app-wrapper hidden" id="app-wrapper">
+    <!-- ===== APP ===== -->
+    <div id="app-container" style="display:none">
 
         <!-- SIDEBAR -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-brand">
-                <h1>OT <span>Tracker</span></h1>
-                <p>Facebook Ads Team</p>
-            </div>
+        <nav class="sidebar">
+            <a class="sidebar-logo" onclick="navigate('home')" href="javascript:void(0)">
+                <div class="logo-box">TS</div>
+                <div class="logo-text">
+                    <strong>TS GLOBAL</strong>
+                    <span>Super App</span>
+                </div>
+            </a>
+
+            <!-- User Info -->
             <div class="sidebar-user">
                 <div class="sidebar-avatar" id="sidebar-avatar">S</div>
                 <div class="sidebar-user-info">
-                    <div class="user-name" id="sidebar-username">User</div>
-                    <div class="user-role role-admin" id="sidebar-userrole">ADMIN</div>
+                    <div class="user-name" id="sidebar-uname">User</div>
+                    <span class="role-badge role-admin" id="sidebar-role">ADMIN</span>
                 </div>
             </div>
-            <ul class="sidebar-nav">
-                <li><a href="#" class="nav-link active" data-page="dashboard"><span class="nav-icon">📊</span>
-                        Dashboard</a></li>
-                <li><a href="#" class="nav-link" data-page="add-overtime"><span class="nav-icon">➕</span> Add
-                        Overtime</a></li>
-                <li><a href="#" class="nav-link" data-page="history"><span class="nav-icon">📋</span> Overtime
-                        History</a></li>
-                <li class="nav-divider" style="height:1px;background:rgba(255,255,255,.06);margin:10px 0"></li>
-                <li id="nav-users"><a href="#" class="nav-link" data-page="users"><span class="nav-icon">👥</span> User
-                        Management</a></li>
+
+            <!-- Tổng quan -->
+            <ul class="nav-list" style="padding-top:.6rem">
+                <li class="nav-item">
+                    <a class="nav-link active" id="nav-home" onclick="navigate('home')" href="javascript:void(0)">
+                        <span class="nav-icon"><i class="fa-solid fa-house"></i></span>
+                        <span class="nav-label">Tổng quan</span>
+                    </a>
+                </li>
             </ul>
-            <div class="sidebar-footer">
-                <button class="btn-logout" id="btn-logout">🚪 Logout</button>
-                <p class="sidebar-credit">Built for TS Global · Sếp Sơn</p>
+
+            <!-- Hiệu suất & Thưởng (collapsible) -->
+            <div class="nav-group-header open" style="margin-top:.3rem">
+                <i class="fa-solid fa-chart-line" style="font-size:.75rem;width:16px;text-align:center"></i>
+                <span>Hiệu suất & Thưởng</span>
+                <i class="fa-solid fa-chevron-right chevron"></i>
             </div>
-        </aside>
+            <div class="nav-group-items open">
+                <ul class="nav-list">
+                    <li class="nav-item"><a class="nav-link" id="nav-monthlyincome"
+                            onclick="navigate('coming','monthlyincome')" href="javascript:void(0)"><span
+                                class="nav-icon"><i class="fa-solid fa-wallet"></i></span><span class="nav-label">Thu
+                                nhập tháng</span><span class="badge-soon">Soon</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-overtime" onclick="navigate('overtime')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-clock"></i></span><span class="nav-label">OT Tracker</span><span
+                                class="badge-new">Mới</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-dailybonus"
+                            onclick="navigate('coming','dailybonus')" href="javascript:void(0)"><span
+                                class="nav-icon"><i class="fa-solid fa-gift"></i></span><span class="nav-label">Thưởng
+                                ngày</span><span class="badge-soon">Soon</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-teambonus" onclick="navigate('coming','teambonus')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-people-group"></i></span><span class="nav-label">Thưởng
+                                team</span><span class="badge-soon">Soon</span></a></li>
+                </ul>
+            </div>
+
+            <div class="nav-divider"></div>
+
+            <!-- Công cụ (collapsible) -->
+            <div class="nav-group-header open" style="margin-top:0">
+                <i class="fa-solid fa-toolbox" style="font-size:.75rem;width:16px;text-align:center"></i>
+                <span>Công cụ</span>
+                <i class="fa-solid fa-chevron-right chevron"></i>
+            </div>
+            <div class="nav-group-items open">
+                <ul class="nav-list">
+                    <li class="nav-item"><a class="nav-link" id="nav-image" onclick="navigate('image')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-image"></i></span><span class="nav-label">Sửa ảnh &
+                                Dịch</span><span class="badge-new">Mới</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-video" onclick="navigate('video')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-film"></i></span><span class="nav-label">Bóc băng
+                                Video</span><span class="badge-new">Mới</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-scorer" onclick="navigate('scorer')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-star"></i></span><span class="nav-label">Chấm Điểm & Set
+                                Giá</span><span class="badge-new">Mới</span></a></li>
+                </ul>
+            </div>
+
+            <div class="nav-divider"></div>
+
+            <!-- Sắp ra mắt (collapsible) -->
+            <div class="nav-group-header" style="margin-top:0">
+                <i class="fa-solid fa-clock" style="font-size:.75rem;width:16px;text-align:center"></i>
+                <span>Sắp ra mắt</span>
+                <i class="fa-solid fa-chevron-right chevron"></i>
+            </div>
+            <div class="nav-group-items">
+                <ul class="nav-list">
+                    <li class="nav-item"><a class="nav-link" id="nav-voice" onclick="navigate('coming','voice')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-microphone-lines"></i></span><span class="nav-label">Sửa
+                                Voice</span><span class="badge-soon">Soon</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-ads" onclick="navigate('coming','ads')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-brands fa-facebook"></i></span><span class="nav-label">Phân Tích
+                                Ads</span><span class="badge-soon">Soon</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-forum" onclick="navigate('coming','forum')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-comments"></i></span><span class="nav-label">TS Forum</span><span
+                                class="badge-soon">Soon</span></a></li>
+                </ul>
+            </div>
+
+            <div class="nav-divider"></div>
+
+            <!-- Quản lý (admin only) -->
+            <ul class="nav-list" id="nav-users" style="display:none">
+                <li class="nav-item">
+                    <a class="nav-link" id="nav-usermgmt" onclick="navigate('users')" href="javascript:void(0)">
+                        <span class="nav-icon"><i class="fa-solid fa-users-gear"></i></span>
+                        <span class="nav-label">Quản lý nhân viên</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">🚪 Đăng xuất</button>
+                <div style="margin-top:8px">&copy; 2026 <strong>TS GLobal Group</strong><br>Designed by <strong>Sếp
+                        Sơn</strong></div>
+            </div>
+        </nav>
 
         <!-- MAIN -->
         <div class="main">
-            <header class="topbar">
-                <h2 id="page-title">Dashboard</h2>
-                <div class="topbar-right">
-                    <span class="topbar-date" id="topbar-date"></span>
+            <div class="topbar" id="topbar">
+                <div class="topbar-title"><i class="fa-solid fa-house"></i><span>Tổng quan</span></div>
+                <div class="topbar-badge">
+                    <div class="status-dot"></div><span>TS Global · All-in-One v2.0</span>
                 </div>
-            </header>
+            </div>
 
-            <!-- Iframe-mode quick nav (visible only inside Super App) -->
-            <nav class="iframe-nav" id="iframe-nav"
-                style="display:none;padding:8px 24px;background:rgba(30,32,44,.95);border-bottom:1px solid rgba(255,255,255,.06);gap:6px;flex-wrap:wrap">
-                <button class="iframe-nav-btn active" data-page="dashboard"
-                    style="padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(99,102,241,.15);color:#818cf8;font-size:.8rem;cursor:pointer;font-weight:500;transition:all .2s">📊
-                    Dashboard</button>
-                <button class="iframe-nav-btn" data-page="add-overtime"
-                    style="padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9aa0b8;font-size:.8rem;cursor:pointer;font-weight:500;transition:all .2s">➕
-                    Thêm OT</button>
-                <button class="iframe-nav-btn" data-page="history"
-                    style="padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9aa0b8;font-size:.8rem;cursor:pointer;font-weight:500;transition:all .2s">📋
-                    Lịch sử</button>
-                <button class="iframe-nav-btn" data-page="users" id="iframe-nav-users"
-                    style="padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9aa0b8;font-size:.8rem;cursor:pointer;font-weight:500;transition:all .2s;display:none">👥
-                    Quản lý</button>
-            </nav>
+            <!-- HOME -->
+            <div class="view home-view active" id="view-home">
+                <div class="home-hero">
+                    <div class="hero-tag"><i class="fa-solid fa-rocket"></i> TS Global Super App v2.0</div>
+                    <h1 class="hero-title">Bộ công cụ <em>AI</em> toàn diện<br>cho doanh nghiệp</h1>
+                    <p class="hero-sub">Tổng hợp các công cụ AI mạnh mẽ vào một nơi — từ dịch ảnh, bóc băng video đến
+                        quản lý tăng ca. Tất cả miễn phí, chạy ngay trên trình duyệt.</p>
+                    <div class="hero-stats">
+                        <div class="stat-item"><span class="stat-num">3</span><span class="stat-label">Công cụ AI</span>
+                        </div>
+                        <div class="stat-item"><span class="stat-num">5+</span><span class="stat-label">Tool sắp ra
+                                mắt</span></div>
+                        <div class="stat-item"><span class="stat-num">100%</span><span class="stat-label">Miễn
+                                phí</span></div>
+                    </div>
+                </div>
+                <div class="apps-section">
+                    <!-- Hiệu suất & Thưởng -->
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-chart-line" style="color:var(--success);font-size:.85rem"></i> Hiệu
+                            suất & Thưởng</h2>
+                        <div class="sep"></div>
+                    </div>
+                    <div class="apps-grid">
+                        <div class="app-card disabled">
+                            <div class="app-card-icon icon-green"><i class="fa-solid fa-wallet"></i></div>
+                            <div class="app-card-title">Thu nhập tháng</div>
+                            <div class="app-card-desc">Lương cứng 6tr + Thưởng + OT — xem lương dự kiến trước KPI doanh
+                                số.</div>
+                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
+                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
+                        </div>
+                        <div class="app-card" onclick="navigate('overtime')">
+                            <div class="app-card-icon icon-green"><i class="fa-solid fa-clock"></i></div>
+                            <div class="app-card-title">OT Tracker</div>
+                            <div class="app-card-desc">Quản lý giờ tăng ca, phân quyền Admin/Leader/Staff, báo cáo thống
+                                kê.</div>
+                            <div class="app-card-footer"><button class="btn-open"><i
+                                        class="fa-solid fa-arrow-right"></i> Mở ngay</button><span
+                                    class="badge-new">Mới</span></div>
+                        </div>
+                        <div class="app-card disabled">
+                            <div class="app-card-icon icon-orange"><i class="fa-solid fa-gift"></i></div>
+                            <div class="app-card-title">Thưởng ngày</div>
+                            <div class="app-card-desc">Tính thưởng theo hiệu suất làm việc hàng ngày.</div>
+                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
+                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
+                        </div>
+                        <div class="app-card disabled">
+                            <div class="app-card-icon icon-purple"><i class="fa-solid fa-people-group"></i></div>
+                            <div class="app-card-title">Thưởng team</div>
+                            <div class="app-card-desc">Đánh giá hiệu suất nhóm, tính thưởng team.</div>
+                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
+                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
+                        </div>
+                    </div>
 
-            <div class="content">
+                    <!-- Công cụ đang hoạt động -->
+                    <div class="section-header" style="margin-top:1.5rem">
+                        <h2><i class="fa-solid fa-bolt" style="color:var(--primary);font-size:.85rem"></i> Công cụ đang
+                            hoạt động</h2>
+                        <div class="sep"></div>
+                    </div>
+                    <div class="apps-grid">
+                        <div class="app-card" onclick="navigate('image')">
+                            <div class="app-card-icon icon-blue"><i class="fa-solid fa-image"></i></div>
+                            <div class="app-card-title">Sửa ảnh & Dịch ảnh</div>
+                            <div class="app-card-desc">Tự động nhận diện văn bản trong ảnh, dịch sang tiếng Việt / Anh /
+                                Philippines.</div>
+                            <div class="app-card-footer"><button class="btn-open"><i
+                                        class="fa-solid fa-arrow-right"></i> Mở ngay</button><span
+                                    class="badge-new">Mới</span></div>
+                        </div>
+                        <div class="app-card" onclick="navigate('video')">
+                            <div class="app-card-icon icon-red"><i class="fa-solid fa-film"></i></div>
+                            <div class="app-card-title">Bóc băng Video</div>
+                            <div class="app-card-desc">Upload video/audio, Gemini AI tự động chép lời và dịch. TTS nhiều
+                                giọng nói.</div>
+                            <div class="app-card-footer"><button class="btn-open"><i
+                                        class="fa-solid fa-arrow-right"></i> Mở ngay</button><span
+                                    class="badge-new">Mới</span></div>
+                        </div>
+                        <div class="app-card" onclick="navigate('scorer')">
+                            <div class="app-card-icon icon-orange"><i class="fa-solid fa-star"></i></div>
+                            <div class="app-card-title">Chấm Điểm & Set Giá</div>
+                            <div class="app-card-desc">Nhập thông số — AI chấm điểm 0-100, gợi ý giá bán Facebook PH.
+                            </div>
+                            <div class="app-card-footer"><button class="btn-open"><i
+                                        class="fa-solid fa-arrow-right"></i> Mở ngay</button><span
+                                    class="badge-new">Mới</span></div>
+                        </div>
+                    </div>
 
-                <!-- ====== DASHBOARD ====== -->
-                <section class="page active" id="page-dashboard">
-                    <div class="filters-bar">
-                        <div class="filter-group"><label>Month</label><input type="month" id="dash-filter-month"></div>
-                        <div class="filter-group"><label>Marketer</label><select id="dash-filter-marketer">
-                                <option value="">All Marketers</option>
-                            </select></div>
-                        <div class="filter-group"><label>Status</label><select id="dash-filter-status">
-                                <option value="">All</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Approved">Approved</option>
-                            </select></div>
+                    <!-- Sắp ra mắt -->
+                    <div class="section-header" style="margin-top:1.5rem">
+                        <h2><i class="fa-solid fa-clock" style="color:var(--warning);font-size:.85rem"></i> Sắp ra mắt
+                        </h2>
+                        <div class="sep"></div>
                     </div>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon red">🕐</div>
-                            <div class="stat-info">
-                                <h3 id="stat-total-hours">0</h3>
-                                <p>Total OT Hours</p>
+                    <div class="apps-grid">
+                        <div class="app-card disabled">
+                            <div class="app-card-icon icon-green"><i class="fa-solid fa-microphone-lines"></i></div>
+                            <div class="app-card-title">Sửa Voice</div>
+                            <div class="app-card-desc">Chỉnh sửa, cắt, ghép file audio. Tăng/giảm tốc độ, lọc noise.
                             </div>
+                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
+                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-icon blue">📝</div>
-                            <div class="stat-info">
-                                <h3 id="stat-total-entries">0</h3>
-                                <p>Total Entries</p>
-                            </div>
+                        <div class="app-card disabled">
+                            <div class="app-card-icon icon-blue"><i class="fa-brands fa-facebook"></i></div>
+                            <div class="app-card-title">Phân Tích & Đánh Giá Ads</div>
+                            <div class="app-card-desc">Kết nối Facebook Ads API, phân tích hiệu suất chiến dịch.</div>
+                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
+                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-icon green">🏆</div>
-                            <div class="stat-info">
-                                <h3 id="stat-top-marketer">—</h3>
-                                <p>Top Marketer</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon orange">✅</div>
-                            <div class="stat-info">
-                                <h3 id="stat-approved-pct">0%</h3>
-                                <p>Approved Rate</p>
-                            </div>
-                        </div>
-                        <div class="stat-card" style="border-left:3px solid #10b981">
-                            <div class="stat-icon" style="background:rgba(16,185,129,.12)">💰</div>
-                            <div class="stat-info">
-                                <h3 id="stat-ot-earnings" style="color:#10b981">0đ</h3>
-                                <p>Thu nhập OT tháng</p>
-                            </div>
+                        <div class="app-card disabled">
+                            <div class="app-card-icon icon-pink"><i class="fa-solid fa-comments"></i></div>
+                            <div class="app-card-title">TS Forum</div>
+                            <div class="app-card-desc">Diễn đàn nội bộ TS Global Group — chia sẻ, hỏi đáp.</div>
+                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
+                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
                         </div>
                     </div>
-                    <div class="charts-grid">
-                        <div class="card">
-                            <div class="card-header">Monthly Overtime by Marketer</div>
-                            <div class="card-body">
-                                <div class="chart-container"><canvas id="chart-bar"></canvas></div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header">Daily Overtime Trend</div>
-                            <div class="card-body">
-                                <div class="chart-container"><canvas id="chart-line"></canvas></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card ranking-table">
-                        <div class="card-header">🏅 Top Marketers by Overtime</div>
-                        <div class="card-body">
-                            <div class="table-wrapper">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Rank</th>
-                                            <th>Marketer</th>
-                                            <th>Tổng giờ</th>
-                                            <th>Số lần</th>
-                                            <th>Thu nhập OT</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="ranking-body"></tbody>
-                                </table>
-                            </div>
-                            <div id="ranking-detail" style="margin-top:12px"></div>
-                        </div>
-                    </div>
-                </section>
+                </div>
+            </div>
 
-                <!-- ====== ADD OVERTIME ====== -->
-                <section class="page" id="page-add-overtime">
-                    <div class="card form-card">
-                        <div class="card-header">New Overtime Entry</div>
-                        <div class="card-body">
-                            <form id="ot-form" novalidate>
-                                <div class="form-grid">
-                                    <div class="form-group"><label for="f-marketer">Marketer Name</label><select
-                                            id="f-marketer" required>
-                                            <option value="">Select marketer…</option>
-                                        </select>
-                                        <div class="error-msg" id="err-marketer"></div>
-                                    </div>
-                                    <div class="form-group"><label for="f-date">Date</label><input type="date"
-                                            id="f-date" required>
-                                        <div class="error-msg" id="err-date"></div>
-                                    </div>
-                                    <div class="form-group"><label for="f-start">Start Time</label><input type="time"
-                                            id="f-start" required>
-                                        <div class="error-msg" id="err-start"></div>
-                                    </div>
-                                    <div class="form-group"><label for="f-end">End Time</label><input type="time"
-                                            id="f-end" required>
-                                        <div class="error-msg" id="err-end"></div>
-                                    </div>
-                                    <div class="form-group"><label for="f-total">Total Hours</label><input type="text"
-                                            id="f-total" readonly placeholder="Auto-calculated"></div>
-                                    <div class="form-group"><label for="f-campaign">Campaign IDs <small
-                                                style="color:#9aa0b8;font-weight:400">(mỗi ID 1 dòng, tối đa
-                                                10)</small></label><textarea id="f-campaign"
-                                            placeholder="120241100528620293&#10;120241100528620294&#10;120241100528620295"
-                                            required rows="4" style="resize:vertical;min-height:80px"></textarea>
-                                        <div class="error-msg" id="err-campaign"></div>
-                                    </div>
-                                    <div class="form-group"><label for="f-status">Leader Confirmation</label><select
-                                            id="f-status">
-                                            <option value="Pending">Pending</option>
-                                            <option value="Approved">Approved</option>
-                                        </select></div>
-                                </div>
-                                <div class="form-actions">
-                                    <button type="button" class="btn btn-secondary"
-                                        onclick="resetOTForm()">Reset</button>
-                                    <button type="submit" class="btn btn-primary">💾 Save Entry</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </section>
+            <!-- TOOLS (iframes) -->
+            <div class="view iframe-view" id="view-image"><iframe src="./image-translator-v2/index.html"
+                    title="Sửa ảnh & Dịch ảnh"></iframe></div>
+            <div class="view iframe-view" id="view-video"><iframe src="./video-transcriber/index.html"
+                    title="Bóc băng Video"></iframe></div>
+            <div class="view iframe-view" id="view-scorer"><iframe src="./product-scorer/index.html"
+                    title="Chấm Điểm & Set Giá"></iframe></div>
+            <div class="view iframe-view" id="view-overtime"><iframe src="./overtime-tracker/index.html"
+                    title="OT Tracker"></iframe></div>
 
-                <!-- ====== HISTORY ====== -->
-                <section class="page" id="page-history">
-                    <div class="filters-bar">
-                        <div class="filter-group"><label>Month</label><input type="month" id="hist-filter-month"></div>
-                        <div class="filter-group"><label>Marketer</label><select id="hist-filter-marketer">
-                                <option value="">All Marketers</option>
-                            </select></div>
-                        <div class="filter-group"><label>Status</label><select id="hist-filter-status">
-                                <option value="">All</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Approved">Approved</option>
-                            </select></div>
+            <!-- USER MANAGEMENT -->
+            <div class="view mgmt-view" id="view-users">
+                <div class="mgmt-card">
+                    <div class="mgmt-card-header">
+                        <h3><i class="fa-solid fa-users-gear" style="color:var(--primary);margin-right:6px"></i> Quản lý
+                            nhân viên</h3>
+                        <button class="btn-mgmt primary" onclick="openAddUser()">➕ Thêm nhân viên</button>
                     </div>
-                    <div class="card">
-                        <div class="card-body" style="padding:0">
-                            <div class="table-wrapper">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Marketer</th>
-                                            <th>Campaign ID</th>
-                                            <th>Start</th>
-                                            <th>End</th>
-                                            <th>Hours</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="history-body"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                    <table class="mgmt-table">
+                        <thead>
+                            <tr>
+                                <th>Họ tên</th>
+                                <th>Username</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-mgmt-body"></tbody>
+                    </table>
+                </div>
+            </div>
 
-                <!-- ====== USER MANAGEMENT ====== -->
-                <section class="page" id="page-users">
-                    <div class="card">
-                        <div class="card-header">
-                            <span>👥 All Users</span>
-                            <button class="btn btn-primary btn-sm" onclick="openAddUser()">➕ Add User</button>
-                        </div>
-                        <div class="card-body" style="padding:0">
-                            <div class="table-wrapper">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Full Name</th>
-                                            <th>Username</th>
-                                            <th>Role</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="users-body"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
+            <!-- COMING SOON -->
+            <div class="view coming-view" id="view-coming">
+                <div class="coming-icon" id="comingIcon"><i class="fa-solid fa-clock"></i></div>
+                <h2 class="coming-title" id="comingTitle">Sắp ra mắt</h2>
+                <p class="coming-sub" id="comingSub">Tính năng này đang được phát triển.</p>
+                <div class="coming-pill">🚧 Coming Soon — Q2 2026</div>
+                <button onclick="navigate('home')"
+                    style="margin-top:.4rem;background:transparent;border:1px solid var(--border);color:var(--text-sub);padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-size:.8rem;transition:all .2s"
+                    onmouseover="this.style.background='var(--bg-card2)'"
+                    onmouseout="this.style.background='transparent'"><i class="fa-solid fa-house"></i> Về Tổng
+                    quan</button>
             </div>
         </div>
     </div>
 
-    <!-- ===== EDIT OT MODAL ===== -->
-    <div class="modal-overlay" id="edit-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>Edit Overtime Entry</h3><button class="modal-close" onclick="closeEditModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <form id="edit-form" novalidate>
-                    <input type="hidden" id="edit-id">
-                    <div class="form-grid">
-                        <div class="form-group"><label for="edit-marketer">Marketer</label><select id="edit-marketer"
-                                required></select>
-                            <div class="error-msg" id="edit-err-marketer"></div>
-                        </div>
-                        <div class="form-group"><label for="edit-date">Date</label><input type="date" id="edit-date"
-                                required>
-                            <div class="error-msg" id="edit-err-date"></div>
-                        </div>
-                        <div class="form-group"><label for="edit-start">Start Time</label><input type="time"
-                                id="edit-start" required>
-                            <div class="error-msg" id="edit-err-start"></div>
-                        </div>
-                        <div class="form-group"><label for="edit-end">End Time</label><input type="time" id="edit-end"
-                                required>
-                            <div class="error-msg" id="edit-err-end"></div>
-                        </div>
-                        <div class="form-group"><label for="edit-total">Total Hours</label><input type="text"
-                                id="edit-total" readonly></div>
-                        <div class="form-group"><label for="edit-campaign">Campaign IDs <small
-                                    style="color:#9aa0b8;font-weight:400">(mỗi ID 1 dòng, tối đa
-                                    10)</small></label><textarea id="edit-campaign" required rows="4"
-                                style="resize:vertical;min-height:80px"></textarea>
-                            <div class="error-msg" id="edit-err-campaign"></div>
-                        </div>
-                        <div class="form-group"><label for="edit-status">Confirmation</label><select id="edit-status">
-                                <option value="Pending">Pending</option>
-                                <option value="Approved">Approved</option>
-                            </select></div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">💾 Update</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== USER MODAL ===== -->
+    <!-- USER MODAL -->
     <div class="modal-overlay" id="user-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="user-modal-title">Add New User</h3><button class="modal-close"
+        <div class="modal-dark">
+            <div class="modal-dark-header">
+                <h3 id="user-modal-title">Thêm nhân viên</h3><button class="modal-dark-close"
                     onclick="closeUserModal()">✕</button>
             </div>
-            <div class="modal-body">
+            <div class="modal-dark-body">
                 <form id="user-form" novalidate>
                     <input type="hidden" id="user-edit-id">
                     <div class="form-grid">
-                        <div class="form-group"><label for="user-fullname">Full Name</label><input type="text"
-                                id="user-fullname" required placeholder="e.g. Nguyễn Minh Anh"></div>
-                        <div class="form-group"><label for="user-username">Username</label><input type="text"
-                                id="user-username" required placeholder="e.g. minhanh"></div>
-                        <div class="form-group" id="user-password-group"><label
-                                for="user-password">Password</label><input type="password" id="user-password"
-                                placeholder="Enter password">
-                            <div class="error-msg" id="user-password-hint" style="color:var(--text-light);display:none">
-                                Leave blank to keep current password</div>
+                        <div class="form-group"><label for="user-fn">Họ tên</label><input type="text" id="user-fn"
+                                required placeholder="Nguyễn Minh Anh"></div>
+                        <div class="form-group"><label for="user-un">Username</label><input type="text" id="user-un"
+                                required placeholder="minhanh"></div>
+                        <div class="form-group"><label for="user-pw">Mật khẩu</label><input type="password" id="user-pw"
+                                placeholder="Nhập mật khẩu">
+                            <div class="login-error" id="user-pw-hint"
+                                style="color:var(--text-muted);display:none;font-size:.72rem;margin-top:2px">Để trống =
+                                giữ mật khẩu cũ</div>
                         </div>
-                        <div class="form-group"><label for="user-role">Role</label><select id="user-role">
+                        <div class="form-group"><label for="user-rl">Vai trò</label><select id="user-rl">
                                 <option value="staff">Staff</option>
                                 <option value="leader">Leader</option>
                                 <option value="admin">Admin</option>
@@ -432,56 +994,18 @@
                     </div>
                     <div class="login-error" id="user-form-error"></div>
                     <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">💾 Save</button>
+                        <button type="button" class="btn-cancel" onclick="closeUserModal()">Hủy</button>
+                        <button type="submit" class="login-btn" style="width:auto;padding:10px 22px">💾 Lưu</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- TOAST -->
     <div class="toast-container" id="toast-container"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="app.js"></script>
-    <script>
-        // Initialize iframe navigation bar
-        if (window.self !== window.top) {
-            document.addEventListener('DOMContentLoaded', function () {
-                const iframeNav = document.getElementById('iframe-nav');
-                if (iframeNav) {
-                    iframeNav.style.display = 'flex';
-                    // Show Users button for admin/leader
-                    const session = JSON.parse(localStorage.getItem('otSession') || '{}');
-                    if (session.role === 'admin' || session.role === 'leader') {
-                        const usersBtn = document.getElementById('iframe-nav-users');
-                        if (usersBtn) usersBtn.style.display = '';
-                    }
-                    // Wire up button clicks
-                    iframeNav.querySelectorAll('.iframe-nav-btn').forEach(btn => {
-                        btn.addEventListener('click', function () {
-                            const targetPage = this.dataset.page;
-                            // Update active button style
-                            iframeNav.querySelectorAll('.iframe-nav-btn').forEach(b => {
-                                b.style.background = 'transparent';
-                                b.style.color = '#9aa0b8';
-                                b.classList.remove('active');
-                            });
-                            this.style.background = 'rgba(99,102,241,.15)';
-                            this.style.color = '#818cf8';
-                            this.classList.add('active');
-                            // Switch page using existing sidebar nav logic
-                            const sidebarLink = document.querySelector('.sidebar-nav .nav-link[data-page="' + targetPage + '"]');
-                            if (sidebarLink) sidebarLink.click();
-                        });
-                    });
-                }
-            });
-        }
-    </script>
+    <script src="auth.js"></script>
 </body>
 
 </html>
