@@ -11,6 +11,35 @@
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* When inside iframe (Super App), hide sidebar and login, expand main */
+        body.iframe-mode .login-page {
+            display: none !important;
+        }
+
+        body.iframe-mode .sidebar {
+            display: none !important;
+        }
+
+        body.iframe-mode .app-wrapper {
+            display: block !important;
+            grid-template-columns: 1fr !important;
+        }
+
+        body.iframe-mode .main {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+    </style>
+    <script>
+        // Detect if running inside an iframe
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('iframe-mode');
+            document.addEventListener('DOMContentLoaded', function () {
+                document.body.classList.add('iframe-mode');
+            });
+        }
+    </script>
 </head>
 
 <body>
@@ -154,15 +183,6 @@
                             <div class="stat-info">
                                 <h3 id="stat-ot-earnings" style="color:#10b981">0đ</h3>
                                 <p>Thu nhập OT tháng</p>
-                            </div>
-                        </div>
-                        <div class="stat-card" style="border-left:3px solid #8b5cf6">
-                            <div class="stat-icon" style="background:rgba(139,92,246,.12)">📋</div>
-                            <div class="stat-info">
-                                <h3 id="stat-monthly-income" style="color:#8b5cf6;font-size:1rem">0đ</h3>
-                                <p>Lương dự kiến (chưa KPI)</p>
-                                <small id="stat-income-detail" style="font-size:.65rem;color:#9aa0b8">Lương cứng 6tr +
-                                    OT</small>
                             </div>
                         </div>
                     </div>
