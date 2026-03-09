@@ -143,7 +143,8 @@ const COMING_SOON_DATA = {
     ads: { icon: '<i class="fa-brands fa-facebook" style="color:#3b82f6"></i>', title: 'Phân Tích & Đánh Giá Ads', sub: 'Dashboard phân tích Facebook Ads với AI — sắp ra mắt.' },
     forum: { icon: '<i class="fa-solid fa-comments" style="color:#ec4899"></i>', title: 'TS Forum', sub: 'Diễn đàn nội bộ TS Global Group đang trong giai đoạn thiết kế.' },
     dailybonus: { icon: '<i class="fa-solid fa-gift" style="color:#f59e0b"></i>', title: 'Thưởng ngày', sub: 'Hệ thống tính thưởng theo hiệu suất làm việc hàng ngày — đang phát triển.' },
-    teambonus: { icon: '<i class="fa-solid fa-people-group" style="color:#8b5cf6"></i>', title: 'Thưởng team', sub: 'Tính thưởng theo nhóm, đánh giá hiệu suất team — đang phát triển.' }
+    teambonus: { icon: '<i class="fa-solid fa-people-group" style="color:#8b5cf6"></i>', title: 'Thưởng team', sub: 'Tính thưởng theo nhóm, đánh giá hiệu suất team — đang phát triển.' },
+    monthlyincome: { icon: '<i class="fa-solid fa-wallet" style="color:#10b981"></i>', title: 'Thu nhập tháng', sub: 'Tổng thu nhập dự kiến: Lương cứng 6tr + Thưởng + OT — giúp marketing biết được lương tháng trước khi tính KPI doanh số.' }
 };
 const TOPBAR_LABELS = {
     home: { icon: 'fa-house', label: 'Tổng quan' },
@@ -154,6 +155,7 @@ const TOPBAR_LABELS = {
     users: { icon: 'fa-users-gear', label: 'Quản lý nhân viên' },
     dailybonus: { icon: 'fa-gift', label: 'Thưởng ngày' },
     teambonus: { icon: 'fa-people-group', label: 'Thưởng team' },
+    monthlyincome: { icon: 'fa-wallet', label: 'Thu nhập tháng' },
     voice: { icon: 'fa-microphone-lines', label: 'Sửa Voice' },
     ads: { icon: 'fa-chart-line', label: 'Phân Tích Ads' },
     forum: { icon: 'fa-comments', label: 'TS Forum' }
