@@ -240,8 +240,6 @@ document.querySelectorAll('.nav-group-header').forEach(header => {
         header.classList.toggle('open');
         header.nextElementSibling.classList.toggle('open');
     });
-    header.classList.add('open');
-    header.nextElementSibling.classList.add('open');
 });
 
 // ============================================================
