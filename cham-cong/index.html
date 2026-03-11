@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chấm Công - TS Global</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg-deep: #0a0f1a;
+            --bg-card: #111827;
+            --bg-input: #1a2332;
+            --border: rgba(255, 255, 255, .06);
+            --border-hover: rgba(255, 255, 255, .12);
+            --text: #e5e7eb;
+            --text-dim: #6b7280;
+            --text-muted: #4b5563;
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, .15);
+            --green: #10b981;
+            --green-bg: rgba(16, 185, 129, .1);
+            --yellow: #f59e0b;
+            --yellow-bg: rgba(245, 158, 11, .1);
+            --red: #ef4444;
+            --red-bg: rgba(239, 68, 68, .08);
+            --blue: #3b82f6;
+            --indigo: #818cf8;
+            --orange: #f97316;
+            --radius: 12px;
+            --radius-sm: 8px
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .08);
+            border-radius: 10px
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn .4s ease both
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: border-color .2s
+        }
+
+        .card:hover {
+            border-color: var(--border-hover)
+        }
+
+        .inp {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            color: var(--text);
+            font-size: 14px;
+            width: 100%;
+            transition: border-color .2s, box-shadow .2s;
+            outline: none
+        }
+
+        .inp:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow)
+        }
+
+        select.inp {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 15px var(--accent-glow)
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, .25)
+        }
+
+        .btn-ghost {
+            background: var(--bg-input);
+            color: var(--text);
+            border: 1px solid var(--border)
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--border-hover);
+            background: rgba(255, 255, 255, .04)
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 11px;
+            border-radius: 6px
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .3px
+        }
+
+        .badge-working {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid rgba(16, 185, 129, .15)
+        }
+
+        .badge-leave {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+            border: 1px solid rgba(245, 158, 11, .15)
+        }
+
+        .badge-absent {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid rgba(239, 68, 68, .15)
+        }
+
+        .badge-team {
+            font-size: 10px;
+            padding: 2px 8px
+        }
+
+        .team-huyen {
+            background: rgba(129, 140, 248, .1);
+            color: var(--indigo)
+        }
+
+        .team-son {
+            background: rgba(16, 185, 129, .1);
+            color: var(--green)
+        }
+
+        .team-dung {
+            background: rgba(249, 115, 22, .1);
+            color: var(--orange)
+        }
+
+        .tabs {
+            display: flex;
+            gap: 2px;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(17, 24, 39, .6)
+        }
+
+        .tab {
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-dim);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all .2s;
+            white-space: nowrap;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none
+        }
+
+        .tab:hover {
+            color: var(--text)
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            font-weight: 700
+        }
+
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px
+        }
+
+        .tbl th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .tbl td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .tbl tbody tr:hover {
+            background: rgba(255, 255, 255, .02)
+        }
+
+        .tbl .text-r {
+            text-align: right
+        }
+
+        .tbl .text-c {
+            text-align: center
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10, 15, 26, .85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .logo h1 {
+            font-size: 17px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .logo .ver {
+            font-size: 9px;
+            background: var(--green-bg);
+            color: var(--green);
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-weight: 700
+        }
+
+        .page {
+            padding: 20px 24px;
+            display: none
+        }
+
+        .page.show {
+            display: block
+        }
+
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px
+        }
+
+        .stat {
+            text-align: center;
+            padding: 20px 16px
+        }
+
+        .stat-icon {
+            font-size: 20px;
+            margin-bottom: 6px
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 900;
+            line-height: 1.2
+        }
+
+        .stat-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 600
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            margin-bottom: 6px
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px
+        }
+
+        .filter-bar label {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-weight: 600;
+            margin-right: 4px
+        }
+
+        .filter-bar .inp {
+            width: auto;
+            min-width: 140px;
+            padding: 7px 12px;
+            font-size: 12px
+        }
+
+        .type-btn {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .type-btn.active-w {
+            background: var(--green-bg);
+            color: var(--green);
+            border-color: rgba(16, 185, 129, .3)
+        }
+
+        .type-btn.active-l {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+            border-color: rgba(245, 158, 11, .3)
+        }
+
+        .type-btn.active-a {
+            background: var(--red-bg);
+            color: var(--red);
+            border-color: rgba(239, 68, 68, .3)
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 40px
+        }
+
+        .footer .hl {
+            color: var(--accent);
+            font-weight: 700
+        }
+
+        .toast-box {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .toast {
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            animation: slideDown .3s ease;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .3)
+        }
+
+        .toast-success {
+            background: #065f46;
+            color: #6ee7b7
+        }
+
+        .toast-error {
+            background: #7f1d1d;
+            color: #fca5a5
+        }
+
+        .toast-warning {
+            background: #78350f;
+            color: #fcd34d
+        }
+
+        @media(max-width:640px) {
+            .header {
+                padding: 10px 16px
+            }
+
+            .tabs {
+                padding: 0 16px
+            }
+
+            .page {
+                padding: 16px
+            }
+
+            .tab {
+                padding: 12px 14px;
+                font-size: 12px
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr
+            }
+
+            .stat-value {
+                font-size: 18px
+            }
+
+            .tbl {
+                font-size: 11px
+            }
+
+            .tbl th,
+            .tbl td {
+                padding: 8px 10px
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="logo"><span style="font-size:22px">📅</span>
+            <h1>Chấm Công</h1><span class="ver">v1.0</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px"><span
+                style="color:var(--green);font-size:11px;font-weight:600">● TS Global</span>
+            <span id="user-badge" class="badge"
+                style="background:var(--bg-input);color:var(--text-dim);border:1px solid var(--border)"></span>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('checkin')">📝 Điểm danh</button>
+        <button class="tab" onclick="switchTab('summary')">📋 Tổng hợp</button>
+        <button class="tab" onclick="switchTab('admin')">👨‍💼 Admin</button>
+    </div>
+
+    <!-- CHECKIN -->
+    <div id="page-checkin" class="page show">
+        <div class="card fade-in" style="padding:20px;margin-bottom:16px">
+            <div style="font-weight:700;font-size:13px;margin-bottom:12px">👤 Chọn nhân viên</div>
+            <select id="sel-user" class="inp" onchange="onUserChange()">
+                <option value="">— Chọn tên bạn —</option>
+            </select>
+        </div>
+        <div id="checkin-form" style="display:none">
+            <div class="card fade-in" style="padding:20px;margin-bottom:16px;animation-delay:.06s">
+                <div style="font-weight:700;font-size:13px;margin-bottom:16px">📅 Điểm danh ngày</div>
+                <div class="form-grid">
+                    <div class="form-group"><label>📅 Ngày</label><input type="date" id="inp-date" class="inp"></div>
+                    <div class="form-group">
+                        <label>📋 Trạng thái</label>
+                        <div style="display:flex;gap:8px;margin-top:4px">
+                            <button class="type-btn active-w" id="btn-w" onclick="setType('working')">✅ Đi làm</button>
+                            <button class="type-btn" id="btn-l" onclick="setType('leave')">🏖️ Nghỉ phép</button>
+                            <button class="type-btn" id="btn-a" onclick="setType('absent')">❌ Nghỉ KP</button>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>📝 Ghi chú (tùy chọn)</label><input type="text" id="inp-note"
+                            class="inp" placeholder="vd: Nghỉ ốm, WFH..."></div>
+                </div>
+                <div style="margin-top:16px"><button class="btn btn-primary" onclick="submitCheckin()">🚀 Gửi điểm
+                        danh</button></div>
+            </div>
+            <div class="card fade-in" style="padding:20px;animation-delay:.12s">
+                <div style="font-weight:700;font-size:13px;margin-bottom:12px">📋 Lịch sử tháng này</div>
+                <div id="my-history" style="color:var(--text-muted);font-size:13px">Chưa có dữ liệu</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div id="page-summary" class="page">
+        <div class="card fade-in" style="padding:16px;margin-bottom:16px">
+            <div class="filter-bar" style="margin-bottom:0">
+                <label>📅 Tháng:</label><input type="month" id="sum-month" class="inp" onchange="loadSummary()">
+                <label>👥 Team:</label>
+                <select id="sum-team" class="inp" onchange="loadSummary()">
+                    <option value="">Tất cả</option>
+                    <option value="Team Huyền">Team Huyền</option>
+                    <option value="Team Sơn">Team Sơn</option>
+                    <option value="Team Dũng">Team Dũng</option>
+                </select>
+            </div>
+        </div>
+        <div class="grid-stats" style="margin-bottom:16px">
+            <div class="card stat fade-in">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" style="color:var(--blue)" id="sc-people">0</div>
+                <div class="stat-label">Nhân viên</div>
+            </div>
+            <div class="card stat fade-in" style="animation-delay:.04s">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value" style="color:var(--green)" id="sc-working">0</div>
+                <div class="stat-label">Ngày đi làm</div>
+            </div>
+            <div class="card stat fade-in" style="animation-delay:.08s">
+                <div class="stat-icon">🏖️</div>
+                <div class="stat-value" style="color:var(--yellow)" id="sc-leave">0</div>
+                <div class="stat-label">Nghỉ phép</div>
+            </div>
+            <div class="card stat fade-in" style="animation-delay:.12s">
+                <div class="stat-icon">❌</div>
+                <div class="stat-value" style="color:var(--red)" id="sc-absent">0</div>
+                <div class="stat-label">Nghỉ KP</div>
+            </div>
+        </div>
+        <div class="card fade-in" style="overflow:hidden;animation-delay:.16s">
+            <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:700;font-size:13px">📊 Bảng
+                Chấm Công</div>
+            <div style="overflow-x:auto">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>Nhân sự</th>
+                            <th>Team</th>
+                            <th class="text-c">Đi làm</th>
+                            <th class="text-c">Nghỉ phép</th>
+                            <th class="text-c">Nghỉ KP</th>
+                            <th class="text-c">Tổng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sum-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="page-admin" class="page">
+        <div id="admin-login" class="card fade-in" style="padding:24px;max-width:380px;margin:60px auto">
+            <div style="font-weight:700;font-size:13px;margin-bottom:14px">🔐 Đăng nhập Admin</div>
+            <input type="password" id="admin-pw" class="inp" placeholder="Nhập mật khẩu..." style="margin-bottom:12px"
+                onkeydown="if(event.key==='Enter')adminLogin()">
+            <button class="btn btn-primary" style="width:100%" onclick="adminLogin()">🔓 Đăng nhập</button>
+        </div>
+        <div id="admin-dash" style="display:none">
+            <div class="card fade-in" style="padding:14px 16px;margin-bottom:16px">
+                <div class="filter-bar" style="margin-bottom:0">
+                    <label>📅 Ngày:</label><input type="date" id="admin-date" class="inp">
+                    <button class="btn btn-ghost btn-sm" onclick="loadAdmin()">🔍 Tải</button>
+                </div>
+            </div>
+            <div class="card fade-in" style="overflow:hidden;animation-delay:.08s">
+                <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:700;font-size:13px">📋
+                    Chấm công ngày</div>
+                <div style="overflow-x:auto">
+                    <table class="tbl">
+                        <thead>
+                            <tr>
+                                <th>Nhân sự</th>
+                                <th>Team</th>
+                                <th>Ngày</th>
+                                <th>Trạng thái</th>
+                                <th>Ghi chú</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-box" id="toast-box"></div>
+    <div class="footer">Made with ❤️ by <span class="hl">Sếp Sơn</span> · TS Global © 2026</div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        if (!firebase.apps.length) firebase.initializeApp({
+            apiKey: "AIzaSyCC83ANMEUhotAgetLng366fRu-ub26a_0", authDomain: "ts-global-super-app.firebaseapp.com",
+            projectId: "ts-global-super-app", storageBucket: "ts-global-super-app.firebasestorage.app",
+            messagingSenderId: "4116358702", appId: "1:4116358702:web:c13bbdaae217dd986f71ff"
+        });
+        const db = firebase.firestore();
+        const ADMIN_PW = 'tsglobal2026';
+        const COL = 'attendance';
+        const STAFF = [
+            { name: 'Cao Sơn', team: 'Team Sơn' }, { name: 'Phương', team: 'Team Sơn' }, { name: 'Linh', team: 'Team Sơn' },
+            { name: 'Huyền', team: 'Team Huyền' }, { name: 'Trang', team: 'Team Huyền' }, { name: 'Ngọc', team: 'Team Huyền' },
+            { name: 'Dũng', team: 'Team Dũng' }, { name: 'Hà', team: 'Team Dũng' }, { name: 'Mai', team: 'Team Dũng' }
+        ];
+        const TEAM_CLS = { 'Team Huyền': 'team-huyen', 'Team Sơn': 'team-son', 'Team Dũng': 'team-dung' };
+        const TYPE_BADGE = { working: 'badge-working', leave: 'badge-leave', absent: 'badge-absent' };
+        const TYPE_LABEL = { working: '✅ Đi làm', leave: '🏖️ Nghỉ phép', absent: '❌ Nghỉ KP' };
+        let isAdmin = false;
+        let selectedType = 'working';
+
+        function teamBadge(t) { return `<span class="badge badge-team ${TEAM_CLS[t] || ''}">${t.replace('Team ', '')}</span>`; }
+        function typeBadge(t) { return `<span class="badge ${TYPE_BADGE[t] || TYPE_BADGE.working}">${TYPE_LABEL[t] || t}</span>`; }
+        function showToast(msg, type = 'success') { const t = document.createElement('div'); t.className = `toast toast-${type}`; t.textContent = msg; document.getElementById('toast-box').appendChild(t); setTimeout(() => t.remove(), 4000); }
+
+        function switchTab(name) {
+            document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['checkin', 'summary', 'admin'][i] === name));
+            document.querySelectorAll('.page').forEach(p => p.classList.toggle('show', p.id === 'page-' + name));
+            if (name === 'summary') loadSummary();
+            if (name === 'admin' && isAdmin) loadAdmin();
+        }
+
+        (function () {
+            const sel = document.getElementById('sel-user');
+            STAFF.forEach(s => { const o = document.createElement('option'); o.value = s.name; o.textContent = `${s.name} · ${s.team}`; sel.appendChild(o); });
+            document.getElementById('inp-date').valueAsDate = new Date();
+            const m = new Date().toISOString().substring(0, 7);
+            document.getElementById('sum-month').value = m;
+            document.getElementById('admin-date').valueAsDate = new Date();
+        })();
+
+        function onUserChange() {
+            const v = document.getElementById('sel-user').value;
+            document.getElementById('checkin-form').style.display = v ? 'block' : 'none';
+            document.getElementById('user-badge').textContent = v ? '👤 ' + v : '';
+            if (v) loadMyHistory();
+        }
+
+        function setType(type) {
+            selectedType = type;
+            document.getElementById('btn-w').className = 'type-btn' + (type === 'working' ? ' active-w' : '');
+            document.getElementById('btn-l').className = 'type-btn' + (type === 'leave' ? ' active-l' : '');
+            document.getElementById('btn-a').className = 'type-btn' + (type === 'absent' ? ' active-a' : '');
+        }
+
+        async function submitCheckin() {
+            const name = document.getElementById('sel-user').value;
+            const date = document.getElementById('inp-date').value;
+            const note = document.getElementById('inp-note').value.trim();
+            if (!name) { showToast('Chọn nhân viên!', 'warning'); return; }
+            if (!date) { showToast('Chọn ngày!', 'warning'); return; }
+            const staff = STAFF.find(s => s.name === name);
+            // Check duplicate
+            const existing = await db.collection(COL).where('name', '==', name).where('date', '==', date).get();
+            if (!existing.empty) { showToast('Đã điểm danh ngày này rồi!', 'warning'); return; }
+            await db.collection(COL).add({ name, team: staff.team, date, type: selectedType, note, submittedAt: new Date().toISOString() });
+            showToast('✅ Điểm danh thành công!');
+            document.getElementById('inp-note').value = '';
+            loadMyHistory();
+        }
+
+        async function loadMyHistory() {
+            const name = document.getElementById('sel-user').value;
+            if (!name) return;
+            const month = new Date().toISOString().substring(0, 7);
+            const snap = await db.collection(COL).where('name', '==', name).where('date', '>=', month + '-01').where('date', '<=', month + '-31').get();
+            const docs = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => b.date.localeCompare(a.date));
+            const el = document.getElementById('my-history');
+            if (docs.length === 0) { el.innerHTML = 'Chưa điểm danh tháng này'; return; }
+            el.innerHTML = docs.map(d => `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--bg-input);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:6px">
+    <div><strong>${d.date}</strong> ${d.note ? '<span style="color:var(--text-dim)">(' + d.note + ')</span>' : ''}</div>
+    ${typeBadge(d.type)}</div>`).join('');
+        }
+
+        async function loadSummary() {
+            const month = document.getElementById('sum-month').value;
+            const teamF = document.getElementById('sum-team').value;
+            if (!month) return;
+            const snap = await db.collection(COL).where('date', '>=', month + '-01').where('date', '<=', month + '-31').get();
+            let docs = snap.docs.map(d => d.data());
+            if (teamF) docs = docs.filter(d => d.team === teamF);
+            const people = {};
+            docs.forEach(d => {
+                if (!people[d.name]) people[d.name] = { name: d.name, team: d.team, working: 0, leave: 0, absent: 0 };
+                people[d.name][d.type] = (people[d.name][d.type] || 0) + 1;
+            });
+            const sorted = Object.values(people).sort((a, b) => b.working - a.working);
+            const tw = sorted.reduce((s, p) => s + p.working, 0);
+            const tl = sorted.reduce((s, p) => s + p.leave, 0);
+            const ta = sorted.reduce((s, p) => s + p.absent, 0);
+            document.getElementById('sc-people').textContent = sorted.length;
+            document.getElementById('sc-working').textContent = tw;
+            document.getElementById('sc-leave').textContent = tl;
+            document.getElementById('sc-absent').textContent = ta;
+            const tbody = document.getElementById('sum-tbody');
+            if (sorted.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-c" style="padding:20px;color:var(--text-muted)">Không có dữ liệu</td></tr>'; return; }
+            tbody.innerHTML = sorted.map(p => {
+                const total = p.working + p.leave + p.absent;
+                return `<tr><td style="font-weight:600">${p.name}</td><td>${teamBadge(p.team)}</td>
+      <td class="text-c" style="color:var(--green);font-weight:700">${p.working}</td>
+      <td class="text-c" style="color:var(--yellow)">${p.leave}</td>
+      <td class="text-c" style="color:var(--red)">${p.absent}</td>
+      <td class="text-c" style="font-weight:700">${total}</td></tr>`;
+            }).join('');
+        }
+
+        function adminLogin() {
+            if (document.getElementById('admin-pw').value === ADMIN_PW) {
+                isAdmin = true; document.getElementById('admin-login').style.display = 'none'; document.getElementById('admin-dash').style.display = 'block';
+                showToast('🔓 Đăng nhập thành công!'); loadAdmin();
+            } else showToast('❌ Sai mật khẩu!', 'error');
+        }
+
+        async function loadAdmin() {
+            const date = document.getElementById('admin-date').value;
+            if (!date) return;
+            const snap = await db.collection(COL).where('date', '==', date).get();
+            const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            const tbody = document.getElementById('admin-tbody');
+            if (docs.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-c" style="padding:20px;color:var(--text-muted)">Không có dữ liệu ngày ' + date + '</td></tr>'; return; }
+            tbody.innerHTML = docs.map(d => `<tr><td style="font-weight:600">${d.name}</td><td>${teamBadge(d.team)}</td><td>${d.date}</td>
+    <td>${typeBadge(d.type)}</td><td style="color:var(--text-dim)">${d.note || '—'}</td>
+    <td><button class="btn btn-sm btn-ghost" onclick="cycleType('${d.id}','${d.type}')">🔄</button> <button class="btn btn-sm" style="color:var(--red);background:none;border:none" onclick="deleteEntry('${d.id}')">🗑️</button></td></tr>`).join('');
+        }
+
+        async function cycleType(id, current) {
+            const order = ['working', 'leave', 'absent'];
+            const next = order[(order.indexOf(current) + 1) % 3];
+            await db.collection(COL).doc(id).update({ type: next });
+            showToast('Đã đổi → ' + TYPE_LABEL[next]); loadAdmin();
+        }
+        async function deleteEntry(id) { await db.collection(COL).doc(id).delete(); showToast('Đã xóa!'); loadAdmin(); }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ads Automation - TS Global</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg-deep: #0a0f1a;
+            --bg-card: #111827;
+            --bg-input: #1a2332;
+            --border: rgba(255, 255, 255, .06);
+            --border-hover: rgba(255, 255, 255, .12);
+            --text: #e5e7eb;
+            --text-dim: #6b7280;
+            --text-muted: #4b5563;
+            --accent: #f97316;
+            --accent-glow: rgba(249, 115, 22, .15);
+            --green: #10b981;
+            --green-bg: rgba(16, 185, 129, .1);
+            --yellow: #f59e0b;
+            --yellow-bg: rgba(245, 158, 11, .1);
+            --red: #ef4444;
+            --red-bg: rgba(239, 68, 68, .08);
+            --blue: #3b82f6;
+            --indigo: #818cf8;
+            --orange: #f97316;
+            --purple: #8b5cf6;
+            --radius: 12px;
+            --radius-sm: 8px
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .08);
+            border-radius: 10px
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .5
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn .4s ease both
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: border-color .2s
+        }
+
+        .card:hover {
+            border-color: var(--border-hover)
+        }
+
+        .inp {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            color: var(--text);
+            font-size: 14px;
+            width: 100%;
+            transition: border-color .2s, box-shadow .2s;
+            outline: none;
+            font-family: inherit
+        }
+
+        .inp:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow)
+        }
+
+        .inp::placeholder {
+            color: var(--text-muted)
+        }
+
+        textarea.inp {
+            resize: vertical;
+            min-height: 60px
+        }
+
+        select.inp {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            transition: all .2s;
+            font-family: inherit
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f97316, #ef4444);
+            color: #fff;
+            box-shadow: 0 4px 15px var(--accent-glow)
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, .25)
+        }
+
+        .btn-primary:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none
+        }
+
+        .btn-ghost {
+            background: var(--bg-input);
+            color: var(--text);
+            border: 1px solid var(--border)
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--border-hover);
+            background: rgba(255, 255, 255, .04)
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 11px;
+            border-radius: 6px
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, .15)
+        }
+
+        .btn-green:hover {
+            transform: translateY(-1px)
+        }
+
+        .btn-green:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .3px
+        }
+
+        .tabs {
+            display: flex;
+            gap: 2px;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(17, 24, 39, .6)
+        }
+
+        .tab {
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-dim);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all .2s;
+            white-space: nowrap;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none
+        }
+
+        .tab:hover {
+            color: var(--text)
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            font-weight: 700
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10, 15, 26, .85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .logo h1 {
+            font-size: 17px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f97316, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .logo .ver {
+            font-size: 9px;
+            background: var(--green-bg);
+            color: var(--green);
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-weight: 700
+        }
+
+        .page {
+            padding: 20px 24px;
+            display: none
+        }
+
+        .page.show {
+            display: block
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            margin-bottom: 6px
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+            background: var(--bg-input)
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(249, 115, 22, .03)
+        }
+
+        .drop-zone .icon {
+            font-size: 36px;
+            margin-bottom: 8px
+        }
+
+        .drop-zone .text {
+            font-size: 13px;
+            color: var(--text-dim)
+        }
+
+        .drop-zone .text strong {
+            color: var(--accent)
+        }
+
+        .video-list {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .video-item {
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            animation: fadeIn .3s ease
+        }
+
+        .video-item .name {
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .video-item .size {
+            color: var(--text-muted);
+            font-size: 10px
+        }
+
+        .video-item .remove {
+            color: var(--red);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 14px;
+            padding: 2px 6px
+        }
+
+        .step-flow {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px
+        }
+
+        .step {
+            padding: 6px 14px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            background: var(--bg-input);
+            transition: all .3s
+        }
+
+        .step.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(249, 115, 22, .08);
+            box-shadow: 0 0 12px var(--accent-glow)
+        }
+
+        .step.done {
+            border-color: var(--green);
+            color: var(--green);
+            background: var(--green-bg)
+        }
+
+        .step-arrow {
+            color: var(--text-muted);
+            font-size: 10px
+        }
+
+        .log-box {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+            line-height: 1.8
+        }
+
+        .log-item {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start
+        }
+
+        .log-item .time {
+            color: var(--text-muted);
+            white-space: nowrap
+        }
+
+        .log-item .msg {
+            color: var(--text)
+        }
+
+        .log-item.success .msg {
+            color: var(--green)
+        }
+
+        .log-item.error .msg {
+            color: var(--red)
+        }
+
+        .log-item.info .msg {
+            color: var(--blue)
+        }
+
+        .log-item.warn .msg {
+            color: var(--yellow)
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, .2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin .6s linear infinite
+        }
+
+        .preview-card {
+            padding: 12px 16px;
+            border-left: 3px solid var(--accent);
+            margin-bottom: 8px
+        }
+
+        .preview-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 2px
+        }
+
+        .preview-value {
+            font-size: 13px;
+            font-weight: 600
+        }
+
+        .structure-diagram {
+            padding: 16px;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+            font-size: 12px
+        }
+
+        .structure-camp {
+            padding: 10px;
+            border: 2px solid var(--accent);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px
+        }
+
+        .structure-adset {
+            padding: 8px 12px;
+            border: 1px dashed var(--blue);
+            border-radius: 6px;
+            margin: 6px 0 6px 20px;
+            font-size: 11px;
+            color: var(--blue)
+        }
+
+        .history-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .history-item:last-child {
+            border-bottom: none
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: var(--bg-input);
+            border-radius: 99px;
+            overflow: hidden;
+            margin: 8px 0
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 99px;
+            transition: width .3s;
+            background: linear-gradient(90deg, var(--accent), var(--green))
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 40px
+        }
+
+        .footer .hl {
+            color: var(--accent);
+            font-weight: 700
+        }
+
+        .toast-box {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .toast {
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            animation: slideDown .3s ease;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .3)
+        }
+
+        .toast-success {
+            background: #065f46;
+            color: #6ee7b7
+        }
+
+        .toast-error {
+            background: #7f1d1d;
+            color: #fca5a5
+        }
+
+        .toast-warning {
+            background: #78350f;
+            color: #fcd34d
+        }
+
+        @media(max-width:640px) {
+            .header {
+                padding: 10px 16px
+            }
+
+            .tabs {
+                padding: 0 16px
+            }
+
+            .page {
+                padding: 16px
+            }
+
+            .tab {
+                padding: 12px 14px;
+                font-size: 12px
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="logo"><span style="font-size:22px">🚀</span>
+            <h1>Ads Automation</h1><span class="ver">v2.0</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px"><span
+                style="color:var(--green);font-size:11px;font-weight:600">● TS Global</span></div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('create')">🚀 Tạo Campaign</button>
+        <button class="tab" onclick="switchTab('config')">⚙️ Cấu hình</button>
+        <button class="tab" onclick="switchTab('history')">📋 Lịch sử</button>
+    </div>
+
+    <!-- CREATE -->
+    <div id="page-create" class="page show">
+        <div class="step-flow" id="step-flow">
+            <span class="step active" id="s1">1. Upload Videos</span><span class="step-arrow">→</span>
+            <span class="step" id="s2">2. AI Generate Text</span><span class="step-arrow">→</span>
+            <span class="step" id="s3">3. Preview</span><span class="step-arrow">→</span>
+            <span class="step" id="s4">4. Launch 🚀</span>
+        </div>
+
+        <!-- STEP 1: Multi Upload -->
+        <div id="step-upload" class="card fade-in" style="padding:20px;margin-bottom:16px">
+            <div style="font-weight:700;font-size:13px;margin-bottom:4px">🎬 Step 1 — Upload Videos</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px">Mỗi video = 1 Ad Set riêng trong cùng 1
+                Campaign</div>
+            <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                <div class="icon">🎬</div>
+                <div class="text">Kéo thả <strong>nhiều videos</strong> vào đây hoặc click để chọn</div>
+                <div style="font-size:10px;color:var(--text-muted);margin-top:4px">MP4, MOV — mỗi file tối đa 500MB
+                </div>
+            </div>
+            <input type="file" id="file-input" accept="video/*" multiple style="display:none"
+                onchange="onFilesSelect(event)">
+            <div class="video-list" id="video-list"></div>
+            <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+                <div class="form-group" style="flex:1;min-width:200px"><label>📄 Page ID</label><input type="text"
+                        id="inp-page" class="inp" placeholder="Page ID để chạy ads..."></div>
+                <div class="form-group" style="flex:1;min-width:200px"><label>🔗 Link (Landing Page)</label><input
+                        type="text" id="inp-link" class="inp" placeholder="https://yoursite.com"></div>
+            </div>
+            <div style="margin-top:12px" class="form-group">
+                <label>📦 Mô tả sản phẩm (AI sẽ dựa vào đây để viết ad text)</label>
+                <textarea id="inp-product" class="inp" rows="3"
+                    placeholder="Nhập mô tả sản phẩm hoặc bấm nút bên dưới để AI tự đọc từ Landing Page..."></textarea>
+            </div>
+            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-ghost btn-sm" id="btn-read-page" onclick="readLandingPage()">🔍 AI đọc Landing
+                    Page & tự điền mô tả</button>
+                <button class="btn btn-primary" id="btn-generate" onclick="generateAllTexts()" disabled>🤖 Generate Ad
+                    Text cho tất cả videos (AI)</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: AI Text per video -->
+        <div id="step-text" style="display:none">
+            <div class="card fade-in" style="padding:20px;margin-bottom:16px">
+                <div style="font-weight:700;font-size:13px;margin-bottom:4px">🤖 Step 2 — Ad Text cho từng video</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px">AI đã generate text riêng cho mỗi
+                    video. Bạn có thể chỉnh sửa.</div>
+                <div id="text-cards"></div>
+                <div style="margin-top:12px;display:flex;gap:8px">
+                    <button class="btn btn-ghost btn-sm" onclick="generateAllTexts()">🔄 Generate lại tất cả</button>
+                    <button class="btn btn-primary" onclick="showPreview()">📋 Preview Campaign Structure</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: Preview Structure -->
+        <div id="step-preview" style="display:none">
+            <div class="card fade-in" style="padding:20px;margin-bottom:16px">
+                <div style="font-weight:700;font-size:13px;margin-bottom:12px">📋 Step 3 — Campaign Structure Preview
+                </div>
+                <div id="preview-content"></div>
+                <div
+                    style="margin-top:12px;padding:8px 12px;background:var(--yellow-bg);border:1px solid rgba(245,158,11,.15);border-radius:var(--radius-sm);font-size:11px;color:var(--yellow)">
+                    ⚠️ Tất cả sẽ được tạo với status <strong>PAUSED</strong> — bật trên Facebook Ads Manager khi sẵn
+                    sàng.
+                </div>
+                <div style="margin-top:12px;display:flex;gap:8px">
+                    <button class="btn btn-green" id="btn-launch" onclick="launchCampaign()">🚀 Launch Campaign
+                        (PAUSED)</button>
+                    <button class="btn btn-ghost" onclick="goToStep(2)">← Quay lại sửa</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: Launch Log -->
+        <div id="step-launch" style="display:none">
+            <div class="card fade-in" style="padding:20px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <div style="font-weight:700;font-size:13px">🚀 Đang tạo Campaign...</div>
+                    <div id="launch-progress-text" style="font-size:11px;color:var(--text-dim)">0%</div>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar" id="launch-progress" style="width:0%"></div>
+                </div>
+                <div class="log-box" id="log-box"></div>
+                <div id="launch-result" style="margin-top:12px;display:none"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div id="page-config" class="page">
+        <div class="card fade-in" style="padding:20px;margin-bottom:16px">
+            <div style="font-weight:700;font-size:13px;margin-bottom:16px">⚙️ Cấu hình API</div>
+            <div class="form-grid">
+                <div class="form-group" style="grid-column:1/-1"><label>🔑 Facebook Access Token</label><input
+                        type="password" id="cfg-token" class="inp" placeholder="EAAxxxxxxx..."></div>
+                <div class="form-group"><label>🏢 Ad Account ID</label><input type="text" id="cfg-account" class="inp"
+                        placeholder="act_123456789"></div>
+                <div class="form-group"><label>📄 Default Page ID</label><input type="text" id="cfg-page" class="inp"
+                        placeholder="1234567890"></div>
+                <div class="form-group"><label>🤖 Gemini API Key</label><input type="password" id="cfg-gemini"
+                        class="inp" placeholder="AIzaSyxxxxxx..."></div>
+                <div class="form-group"><label>🧠 Gemini Model</label><input type="text" id="cfg-model" class="inp"
+                        value="gemini-1.5-flash-latest" placeholder="gemini-1.5-flash-latest"></div>
+                <div class="form-group"><label>📍 Facebook Pixel ID</label><input type="text" id="cfg-pixel" class="inp"
+                        placeholder="123456789012345"></div>
+                <div class="form-group"><label>🎯 Conversion Event</label>
+                    <select id="cfg-event" class="inp">
+                        <option value="COMPLETE_REGISTRATION" selected>Complete Registration</option>
+                        <option value="PURCHASE">Purchase</option>
+                        <option value="ADD_TO_CART">Add to Cart</option>
+                        <option value="INITIATED_CHECKOUT">Initiated Checkout</option>
+                        <option value="LEAD">Lead</option>
+                        <option value="VIEW_CONTENT">View Content</option>
+                        <option value="CONTACT">Contact</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card fade-in" style="padding:20px;margin-bottom:16px;animation-delay:.06s">
+            <div style="font-weight:700;font-size:13px;margin-bottom:16px">📊 Default Campaign Settings</div>
+            <div class="form-grid">
+                <div class="form-group"><label>🎯 Objective</label>
+                    <select id="cfg-objective" class="inp">
+                        <option value="OUTCOME_SALES">Conversions (Sales)</option>
+                        <option value="OUTCOME_TRAFFIC">Traffic</option>
+                        <option value="OUTCOME_ENGAGEMENT">Engagement</option>
+                        <option value="OUTCOME_AWARENESS">Awareness</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>💰 Budget / Ad Set / ngày (VNĐ)</label><input type="number"
+                        id="cfg-budget" class="inp" value="200000" min="50000" step="50000"></div>
+                <div class="form-group"><label>🌍 Target Country</label><input type="text" id="cfg-country" class="inp"
+                        value="PH" placeholder="PH, VN, US..."></div>
+                <div class="form-group"><label>📌 CTA Button</label>
+                    <select id="cfg-cta" class="inp">
+                        <option value="SHOP_NOW">Shop Now</option>
+                        <option value="LEARN_MORE">Learn More</option>
+                        <option value="ORDER_NOW">Order Now</option>
+                        <option value="BUY_NOW">Buy Now</option>
+                        <option value="SIGN_UP">Sign Up</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="saveConfig()">💾 Lưu cấu hình</button>
+            <button class="btn btn-ghost" onclick="loadConfig()">🔄 Tải lại</button>
+            <button class="btn btn-ghost" onclick="listModels()">🔍 Kiểm tra models Gemini</button>
+        </div>
+        <div id="model-results" style="margin-top:12px;display:none"></div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="page-history" class="page">
+        <div class="card fade-in" style="padding:20px">
+            <div style="font-weight:700;font-size:13px;margin-bottom:16px">📋 Campaigns đã tạo</div>
+            <div id="history-list" style="color:var(--text-muted);font-size:13px">Chưa có campaigns</div>
+        </div>
+    </div>
+
+    <div class="toast-box" id="toast-box"></div>
+    <div class="footer">Made with ❤️ by <span class="hl">Sếp Sơn</span> · TS Global © 2026</div>
+
+    <script>
+        // ==================== STATE ====================
+        let videoFiles = []; // [{file, headline, primary, desc}]
+        let currentStep = 1;
+        const CONFIG_KEY = 'ts_ads_config';
+        const HISTORY_KEY = 'ts_ads_history';
+        const FB_API = 'https://graph.facebook.com/v21.0';
+
+        // ==================== HELPERS ====================
+        function showToast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.className = `toast toast-${type}`;
+            t.textContent = msg;
+            document.getElementById('toast-box').appendChild(t);
+            setTimeout(() => t.remove(), 4000);
+        }
+
+        function switchTab(name) {
+            document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['create', 'config', 'history'][i] === name));
+            document.querySelectorAll('.page').forEach(p => p.classList.toggle('show', p.id === 'page-' + name));
+            if (name === 'config') loadConfig();
+            if (name === 'history') loadHistory();
+        }
+
+        function goToStep(n) {
+            currentStep = n;
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById('s' + i);
+                el.classList.toggle('active', i === n);
+                el.classList.toggle('done', i < n);
+            }
+            document.getElementById('step-text').style.display = n >= 2 ? 'block' : 'none';
+            document.getElementById('step-preview').style.display = n >= 3 ? 'block' : 'none';
+            document.getElementById('step-launch').style.display = n >= 4 ? 'block' : 'none';
+        }
+
+        function addLog(msg, type = '') {
+            const box = document.getElementById('log-box');
+            const time = new Date().toLocaleTimeString('vi-VN');
+            box.innerHTML += `<div class="log-item ${type}"><span class="time">[${time}]</span><span class="msg">${msg}</span></div>`;
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function setProgress(pct) {
+            document.getElementById('launch-progress').style.width = pct + '%';
+            document.getElementById('launch-progress-text').textContent = Math.round(pct) + '%';
+        }
+
+        function getConfig() { return JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}'); }
+
+        // ==================== LIST MODELS ====================
+        async function listModels() {
+            const key = document.getElementById('cfg-gemini').value.trim();
+            if (!key) { showToast('Nhập Gemini API Key trước!', 'warning'); return; }
+            const el = document.getElementById('model-results');
+            el.style.display = 'block';
+            el.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--text-dim)"><span class="spinner"></span> Đang kiểm tra...</div>';
+            try {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+                const data = await resp.json();
+                if (data.error) throw new Error(data.error.message);
+                const models = (data.models || []).filter(m => m.supportedGenerationMethods?.includes('generateContent'));
+                if (models.length === 0) { el.innerHTML = '<div class="card" style="padding:12px;color:var(--red);font-size:12px">❌ Không tìm thấy model nào</div>'; return; }
+                el.innerHTML = `<div class="card" style="padding:12px">
+                    <div style="font-weight:700;font-size:12px;margin-bottom:8px">✅ ${models.length} models khả dụng (bấm để chọn):</div>
+                    ${models.map(m => {
+                    const name = m.name.replace('models/', '');
+                    return `<div style="padding:4px 8px;font-size:11px;cursor:pointer;border-radius:4px;margin:2px 0;background:var(--bg-input);border:1px solid var(--border)" 
+                            onclick="document.getElementById('cfg-model').value='${name}';showToast('Đã chọn: ${name}')" 
+                            onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                            <strong style="color:var(--accent)">${name}</strong>
+                            <span style="color:var(--text-muted);margin-left:8px">${m.displayName || ''}</span>
+                        </div>`;
+                }).join('')}
+                </div>`;
+            } catch (err) {
+                el.innerHTML = `<div class="card" style="padding:12px;color:var(--red);font-size:12px">❌ ${err.message}</div>`;
+            }
+        }
+
+        // ==================== CONFIG ====================
+        function saveConfig() {
+            const cfg = {
+                token: document.getElementById('cfg-token').value.trim(),
+                account: document.getElementById('cfg-account').value.trim(),
+                page: document.getElementById('cfg-page').value.trim(),
+                gemini: document.getElementById('cfg-gemini').value.trim(),
+                model: document.getElementById('cfg-model').value.trim() || 'gemini-1.5-flash-latest',
+                pixel: document.getElementById('cfg-pixel').value.trim(),
+                event: document.getElementById('cfg-event').value,
+                objective: document.getElementById('cfg-objective').value,
+                budget: parseInt(document.getElementById('cfg-budget').value) || 200000,
+                country: document.getElementById('cfg-country').value.trim() || 'PH',
+                cta: document.getElementById('cfg-cta').value
+            };
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+            showToast('💾 Đã lưu cấu hình!');
+        }
+
+        function loadConfig() {
+            const cfg = getConfig();
+            document.getElementById('cfg-token').value = cfg.token || '';
+            document.getElementById('cfg-account').value = cfg.account || '';
+            document.getElementById('cfg-page').value = cfg.page || '';
+            document.getElementById('cfg-gemini').value = cfg.gemini || '';
+            document.getElementById('cfg-model').value = cfg.model || 'gemini-1.5-flash-latest';
+            document.getElementById('cfg-pixel').value = cfg.pixel || '';
+            if (cfg.event) document.getElementById('cfg-event').value = cfg.event;
+            if (cfg.objective) document.getElementById('cfg-objective').value = cfg.objective;
+            document.getElementById('cfg-budget').value = cfg.budget || 200000;
+            document.getElementById('cfg-country').value = cfg.country || 'PH';
+            if (cfg.cta) document.getElementById('cfg-cta').value = cfg.cta;
+            if (cfg.page) document.getElementById('inp-page').value = cfg.page;
+        }
+
+        // ==================== MULTI FILE UPLOAD ====================
+        const dropZone = document.getElementById('drop-zone');
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault(); dropZone.classList.remove('dragover');
+            addFiles(Array.from(e.dataTransfer.files));
+        });
+
+        function onFilesSelect(e) { addFiles(Array.from(e.target.files)); }
+
+        function addFiles(files) {
+            files.forEach(f => {
+                if (!f.type.startsWith('video/')) return;
+                if (f.size > 500 * 1024 * 1024) { showToast(`${f.name} quá lớn (max 500MB)!`, 'error'); return; }
+                if (videoFiles.find(v => v.file.name === f.name)) return; // skip duplicate
+                videoFiles.push({ file: f, headline: '', primary: '', desc: '' });
+            });
+            renderVideoList();
+            document.getElementById('btn-generate').disabled = videoFiles.length === 0;
+            if (videoFiles.length > 0) showToast(`✅ ${videoFiles.length} video đã sẵn sàng!`);
+        }
+
+        function removeVideo(idx) {
+            videoFiles.splice(idx, 1);
+            renderVideoList();
+            document.getElementById('btn-generate').disabled = videoFiles.length === 0;
+        }
+
+        function renderVideoList() {
+            const el = document.getElementById('video-list');
+            if (videoFiles.length === 0) { el.innerHTML = ''; return; }
+            el.innerHTML = videoFiles.map((v, i) => `
+    <div class="video-item">
+      <div class="name">🎬 <span>${v.file.name}</span></div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="size">${(v.file.size / 1024 / 1024).toFixed(1)}MB</span>
+        <span class="badge" style="background:var(--blue);background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.15)">Ad Set ${i + 1}</span>
+        <button class="remove" onclick="removeVideo(${i})">✕</button>
+      </div>
+    </div>`).join('');
+        }
+
+        // ==================== READ LANDING PAGE ====================
+        async function readLandingPage() {
+            const url = document.getElementById('inp-link').value.trim();
+            if (!url) { showToast('Nhập Link (Landing Page) trước!', 'warning'); return; }
+            const cfg = getConfig();
+            if (!cfg.gemini) { showToast('Cần cấu hình Gemini API Key trước!', 'warning'); switchTab('config'); return; }
+
+            const btn = document.getElementById('btn-read-page');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Đang đọc landing page...';
+
+            try {
+                // Fetch page via CORS proxies
+                let html = '';
+                const proxies = [
+                    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+                    `https://corsproxy.io/?${encodeURIComponent(url)}`,
+                    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+                ];
+
+                for (const proxy of proxies) {
+                    try {
+                        const resp = await fetch(proxy, { signal: AbortSignal.timeout(10000) });
+                        if (resp.ok) { html = await resp.text(); break; }
+                    } catch (e) { console.log('[AdsAuto] Proxy failed:', proxy, e.message); }
+                }
+
+                if (!html) {
+                    throw new Error('Không thể truy cập landing page. Thử nhập mô tả sản phẩm thủ công.');
+                }
+
+                // Strip HTML tags, scripts, styles -> extract text
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                doc.querySelectorAll('script,style,noscript,iframe,svg').forEach(el => el.remove());
+                let pageText = doc.body?.textContent || '';
+                pageText = pageText.replace(/\s+/g, ' ').trim();
+                // Limit to ~3000 chars for the AI prompt
+                if (pageText.length > 3000) pageText = pageText.slice(0, 3000) + '...';
+
+                if (pageText.length < 20) {
+                    throw new Error('Landing page không có nội dung đủ. Thử nhập mô tả thủ công.');
+                }
+
+                btn.innerHTML = '<span class="spinner"></span> AI đang phân tích sản phẩm...';
+
+                // Send to Gemini to extract product info
+                const modelName = cfg.model || 'gemini-1.5-flash-latest';
+                const prompt = `Analyze this landing page content and extract a concise product description for writing Facebook ad copy.
+
+PAGE CONTENT:
+${pageText}
+
+Return a product summary in this format (2-4 sentences, English):
+- Product name and type
+- Key features/benefits
+- Price (if available)
+- Any promotions/offers (free shipping, discount, etc.)
+
+Just return the summary text, no markdown, no explanation.`;
+
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${cfg.gemini}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { temperature: 0.3 }
+                    })
+                });
+                const data = await resp.json();
+                if (data.error) throw new Error(data.error.message);
+                const summary = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!summary) throw new Error('AI không thể phân tích trang.');
+
+                document.getElementById('inp-product').value = summary.trim();
+                showToast('✅ AI đã đọc landing page & điền mô tả sản phẩm!');
+
+            } catch (err) {
+                showToast('❌ ' + err.message, 'error');
+                console.error('[AdsAuto] Read page error:', err);
+            }
+            btn.disabled = false;
+            btn.innerHTML = '🔍 AI đọc Landing Page & tự điền mô tả';
+        }
+
+        // ==================== AI TEXT GENERATION ====================
+        async function generateAllTexts() {
+            const cfg = getConfig();
+            if (!cfg.gemini) { showToast('Cần cấu hình Gemini API Key trước!', 'warning'); switchTab('config'); return; }
+            if (videoFiles.length === 0) { showToast('Chọn ít nhất 1 video!', 'warning'); return; }
+
+            document.getElementById('btn-generate').disabled = true;
+            document.getElementById('btn-generate').innerHTML = '<span class="spinner"></span> Đang generate cho ' + videoFiles.length + ' videos...';
+
+            try {
+                const productDesc = document.getElementById('inp-product').value.trim();
+                const landingPage = document.getElementById('inp-link').value.trim();
+
+                const prompt = `You are an expert Facebook Ads copywriter. Generate ad copy for ${videoFiles.length} video ads.
+
+TARGET MARKET: Philippines
+${productDesc ? `PRODUCT INFO: ${productDesc}` : 'PRODUCT: General e-commerce product'}
+${landingPage ? `LANDING PAGE: ${landingPage}` : ''}
+
+RULES:
+- Write in English (Philippines market)
+- Mention specific product features/benefits from the product info above
+- Use emojis, create urgency, include call to action
+- Each ad copy must be UNIQUE with different angles (e.g. benefit, social proof, urgency, emotional)
+- headline: max 40 chars, catchy
+- primary_text: 2-3 sentences, compelling with emoji
+- description: max 30 chars
+
+IMPORTANT: Return ONLY a valid JSON array, no markdown, no explanation.
+Format: [{"headline":"...","primary_text":"...","description":"..."}]
+Generate exactly ${videoFiles.length} objects.`;
+
+                console.log('[AdsAuto] Calling Gemini API...');
+                const modelName = cfg.model || 'gemini-1.5-flash-latest';
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${cfg.gemini}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { temperature: 0.9 }
+                    })
+                });
+
+                if (!resp.ok) {
+                    const errText = await resp.text();
+                    console.error('[AdsAuto] API Error:', resp.status, errText);
+                    throw new Error(`API ${resp.status}: ${errText.slice(0, 200)}`);
+                }
+
+                const data = await resp.json();
+                console.log('[AdsAuto] Raw response:', JSON.stringify(data).slice(0, 500));
+
+                if (data.error) {
+                    throw new Error(data.error.message || JSON.stringify(data.error));
+                }
+
+                const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!rawText) {
+                    console.error('[AdsAuto] No text in response:', data);
+                    throw new Error('Gemini không trả về text. Kiểm tra API Key hoặc quota.');
+                }
+
+                console.log('[AdsAuto] Raw text:', rawText);
+
+                // Extract JSON from response - handle markdown code blocks & extra text
+                let jsonStr = rawText;
+                // Remove markdown code fences
+                jsonStr = jsonStr.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
+                // Find the JSON array
+                const arrMatch = jsonStr.match(/\[[\s\S]*\]/);
+                if (!arrMatch) {
+                    console.error('[AdsAuto] Cannot find JSON array in:', jsonStr);
+                    throw new Error('AI response không chứa JSON array. Raw: ' + jsonStr.slice(0, 100));
+                }
+                jsonStr = arrMatch[0];
+
+                let results;
+                try {
+                    results = JSON.parse(jsonStr);
+                } catch (parseErr) {
+                    console.error('[AdsAuto] JSON parse error:', parseErr, '\nJSON:', jsonStr);
+                    throw new Error('Không parse được JSON. Raw: ' + jsonStr.slice(0, 150));
+                }
+
+                if (!Array.isArray(results) || results.length === 0) {
+                    throw new Error('AI trả về array rỗng');
+                }
+
+                console.log('[AdsAuto] Parsed results:', results);
+
+                // Map results to videos - handle case where AI returns fewer items
+                for (let i = 0; i < videoFiles.length; i++) {
+                    const r = results[i] || results[results.length - 1] || {};
+                    videoFiles[i].headline = r.headline || r.title || '';
+                    videoFiles[i].primary = r.primary_text || r.primaryText || r.text || r.body || '';
+                    videoFiles[i].desc = r.description || r.desc || '';
+                }
+
+                const filled = videoFiles.filter(v => v.headline || v.primary).length;
+                renderTextCards();
+                goToStep(2);
+                showToast(`🤖 AI đã generate text cho ${filled}/${videoFiles.length} videos!`);
+
+            } catch (err) {
+                showToast('❌ Lỗi AI: ' + err.message, 'error');
+                console.error('[AdsAuto] Error:', err);
+                // Still show step 2 so user can manually fill in
+                renderTextCards();
+                goToStep(2);
+                showToast('⚠️ Bạn có thể nhập text thủ công', 'warning');
+            }
+            document.getElementById('btn-generate').disabled = false;
+            document.getElementById('btn-generate').innerHTML = '🤖 Generate Ad Text cho tất cả videos (AI)';
+        }
+
+        function renderTextCards() {
+            document.getElementById('text-cards').innerHTML = videoFiles.map((v, i) => `
+    <div class="card" style="padding:14px;margin-bottom:10px;border-left:3px solid var(--blue)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span class="badge" style="background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.15);font-weight:700">Ad Set ${i + 1}</span>
+        <span style="font-size:11px;color:var(--text-dim)">🎬 ${v.file.name}</span>
+      </div>
+      <div class="form-grid" style="gap:10px">
+        <div class="form-group"><label>📌 Headline</label><input type="text" class="inp txt-hl" data-idx="${i}" value="${v.headline}" onchange="videoFiles[${i}].headline=this.value"></div>
+        <div class="form-group"><label>📋 Description</label><input type="text" class="inp txt-desc" data-idx="${i}" value="${v.desc}" onchange="videoFiles[${i}].desc=this.value"></div>
+        <div class="form-group" style="grid-column:1/-1"><label>📝 Primary Text</label><textarea class="inp txt-pr" data-idx="${i}" rows="2" onchange="videoFiles[${i}].primary=this.value">${v.primary}</textarea></div>
+      </div>
+    </div>`).join('');
+        }
+
+        // ==================== PREVIEW ====================
+        function showPreview() {
+            const cfg = getConfig();
+            const pageId = document.getElementById('inp-page').value || cfg.page;
+            const link = document.getElementById('inp-link').value || 'https://www.facebook.com';
+            const budget = cfg.budget || 200000;
+            const objective = cfg.objective || 'OUTCOME_SALES';
+            const country = cfg.country || 'PH';
+            const cta = cfg.cta || 'SHOP_NOW';
+            const totalBudget = budget * videoFiles.length;
+
+            document.getElementById('preview-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+      <div class="preview-card card"><div class="preview-label">🎯 Objective</div><div class="preview-value">${objective}</div></div>
+      <div class="preview-card card"><div class="preview-label">🌍 Target</div><div class="preview-value">🇵🇭 ${country}</div></div>
+      <div class="preview-card card"><div class="preview-label">💰 Budget / Ad Set</div><div class="preview-value">${budget.toLocaleString()}đ</div></div>
+      <div class="preview-card card"><div class="preview-label">💰 Tổng budget/ngày</div><div class="preview-value" style="color:var(--yellow)">${totalBudget.toLocaleString()}đ</div></div>
+    </div>
+    <div class="structure-diagram">
+      <div class="structure-camp">
+        <div style="font-weight:800;font-size:13px;color:var(--accent)">📢 Campaign: Auto_${new Date().toISOString().slice(0, 10)}</div>
+        <div style="font-size:10px;color:var(--text-muted)">Objective: ${objective} · Status: PAUSED</div>
+        ${videoFiles.map((v, i) => `
+          <div class="structure-adset">
+            <strong>Ad Set ${i + 1}:</strong> ${v.file.name} · 💰 ${budget.toLocaleString()}đ/ngày<br>
+            <span style="font-size:10px;color:var(--text-dim)">📌 ${v.headline} · CTA: ${cta}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+            goToStep(3);
+        }
+
+        // ==================== LAUNCH ====================
+        async function launchCampaign() {
+            const cfg = getConfig();
+            if (!cfg.token || !cfg.account) { showToast('Cần cấu hình Access Token và Ad Account!', 'error'); switchTab('config'); return; }
+
+            const pageId = document.getElementById('inp-page').value || cfg.page;
+            const link = document.getElementById('inp-link').value || 'https://www.facebook.com';
+            const budget = cfg.budget || 200000;
+            const country = cfg.country || 'PH';
+            const cta = cfg.cta || 'SHOP_NOW';
+            const objective = cfg.objective || 'OUTCOME_SALES';
+            const account = cfg.account.startsWith('act_') ? cfg.account : 'act_' + cfg.account;
+            const campaignName = `Auto_${videoFiles.length}vids_${new Date().toISOString().slice(0, 10)}_${Date.now().toString(36)}`;
+            const totalSteps = 1 + videoFiles.length * 4; // 1 campaign + (upload + adset + creative + ad) per video
+            let completedSteps = 0;
+
+            goToStep(4);
+            document.getElementById('btn-launch').disabled = true;
+            document.getElementById('log-box').innerHTML = '';
+            setProgress(0);
+
+            try {
+                // 1. Create Campaign
+                addLog(`📢 Tạo Campaign: ${campaignName} (${videoFiles.length} Ad Sets)...`, 'info');
+                addLog(`📋 Objective: ${objective} | Account: ${account}`, 'info');
+
+                // Facebook API - CBO: budget + bid strategy at campaign level
+                const campBody = new URLSearchParams();
+                campBody.append('name', campaignName);
+                campBody.append('objective', objective);
+                campBody.append('status', 'PAUSED');
+                campBody.append('special_ad_categories', 'NONE');
+                campBody.append('daily_budget', budget);
+                campBody.append('bid_strategy', 'LOWEST_COST_WITHOUT_CAP');
+                campBody.append('access_token', cfg.token);
+
+                console.log('[AdsAuto] Campaign params:', Object.fromEntries(campBody));
+                const campResp = await fetch(`${FB_API}/${account}/campaigns`, {
+                    method: 'POST',
+                    body: campBody
+                });
+                const campData = await campResp.json();
+                console.log('[AdsAuto] Campaign response:', campData);
+                if (campData.error) {
+                    const e = campData.error;
+                    const detail = e.error_user_msg || e.error_user_title || '';
+                    addLog(`❌ Error code: ${e.code} | subcode: ${e.error_subcode || 'N/A'}`, 'error');
+                    if (detail) addLog(`💡 ${detail}`, 'warn');
+                    throw new Error('Campaign: ' + e.message);
+                }
+                const campaignId = campData.id;
+                addLog(`✅ Campaign created! ID: ${campaignId}`, 'success');
+                completedSteps++; setProgress((completedSteps / totalSteps) * 100);
+
+                const adSetResults = [];
+
+                // 2. For each video → upload + ad set + creative + ad
+                for (let i = 0; i < videoFiles.length; i++) {
+                    const v = videoFiles[i];
+                    const label = `[Ad Set ${i + 1}/${videoFiles.length}]`;
+
+                    // Upload video
+                    addLog(`${label} 📤 Upload: ${v.file.name} (${(v.file.size / 1024 / 1024).toFixed(1)}MB)...`, 'info');
+                    const vForm = new FormData();
+                    vForm.append('source', v.file);
+                    vForm.append('title', v.file.name);
+                    vForm.append('access_token', cfg.token);
+                    const vResp = await fetch(`${FB_API}/${account}/advideos`, { method: 'POST', body: vForm });
+                    const vData = await vResp.json();
+                    console.log('[AdsAuto] Video upload response:', vData);
+                    if (vData.error) {
+                        const e = vData.error;
+                        const detail = e.error_user_msg || e.error_user_title || '';
+                        addLog(`❌ Error code: ${e.code} | subcode: ${e.error_subcode || 'N/A'} | type: ${e.type || 'N/A'}`, 'error');
+                        if (detail) addLog(`💡 ${detail}`, 'warn');
+                        addLog(`💡 Kiểm tra: Token có quyền ads_management trên Ad Account ${account}?`, 'warn');
+                        throw new Error(`${label} Video upload: ${e.message}`);
+                    }
+                    addLog(`${label} ✅ Video uploaded: ${vData.id}`, 'success');
+                    completedSteps++; setProgress((completedSteps / totalSteps) * 100);
+
+                    // Create Ad Set
+                    addLog(`${label} 🎯 Creating Ad Set...`, 'info');
+                    const asParams = new URLSearchParams();
+                    asParams.append('name', `AdSet${i + 1}_${v.file.name.replace(/\.[^/.]+$/, '')}`);
+                    asParams.append('campaign_id', campaignId);
+                    asParams.append('billing_event', 'IMPRESSIONS');
+                    asParams.append('optimization_goal', 'OFFSITE_CONVERSIONS');
+                    // promoted_object is REQUIRED for Conversions objective
+                    if (!cfg.pixel) {
+                        throw new Error('Pixel ID là bắt buộc cho Conversion campaign! Vào Cấu hình → nhập Pixel ID.');
+                    }
+                    asParams.append('promoted_object', JSON.stringify({ pixel_id: cfg.pixel, custom_event_type: cfg.event || 'PURCHASE' }));
+                    asParams.append('targeting', JSON.stringify({ geo_locations: { countries: [country] } }));
+                    asParams.append('status', 'PAUSED');
+                    asParams.append('access_token', cfg.token);
+                    console.log('[AdsAuto] AdSet params:', Object.fromEntries(asParams));
+                    const asResp = await fetch(`${FB_API}/${account}/adsets`, {
+                        method: 'POST',
+                        body: asParams
+                    });
+                    const asData = await asResp.json();
+                    console.log('[AdsAuto] AdSet response:', asData);
+                    if (asData.error) {
+                        const e = asData.error;
+                        const detail = e.error_user_msg || e.error_user_title || '';
+                        addLog(`❌ Error code: ${e.code} | subcode: ${e.error_subcode || 'N/A'}`, 'error');
+                        if (detail) addLog(`💡 ${detail}`, 'warn');
+                        throw new Error(`${label} Ad Set: ${e.message}`);
+                    }
+                    addLog(`${label} ✅ Ad Set created: ${asData.id}`, 'success');
+                    completedSteps++; setProgress((completedSteps / totalSteps) * 100);
+
+                    // Wait for video processing & get thumbnail
+                    addLog(`${label} ⏳ Đang chờ video xử lý...`, 'info');
+                    await new Promise(r => setTimeout(r, 5000));
+
+                    // Get video thumbnail from Facebook
+                    let thumbUrl = '';
+                    try {
+                        const thumbResp = await fetch(`${FB_API}/${vData.id}/thumbnails?access_token=${cfg.token}`);
+                        const thumbData = await thumbResp.json();
+                        thumbUrl = thumbData.data?.[0]?.uri || '';
+                        if (thumbUrl) addLog(`${label} 🖼️ Thumbnail: OK`, 'success');
+                    } catch (e) { console.log('[AdsAuto] Thumbnail fetch failed:', e); }
+
+                    // If no thumbnail, try video picture
+                    if (!thumbUrl) {
+                        try {
+                            const picResp = await fetch(`${FB_API}/${vData.id}?fields=picture&access_token=${cfg.token}`);
+                            const picData = await picResp.json();
+                            thumbUrl = picData.picture || '';
+                        } catch (e) { console.log('[AdsAuto] Picture fetch failed:', e); }
+                    }
+
+                    // Create Ad Creative
+                    addLog(`${label} 🎨 Creating Creative...`, 'info');
+                    const crParams = new URLSearchParams();
+                    crParams.append('name', `Creative${i + 1}_${v.file.name.replace(/\.[^/.]+$/, '')}`);
+                    const videoDataObj = {
+                        video_id: vData.id,
+                        title: v.headline || 'Video Ad',
+                        message: v.primary || '',
+                        link_description: v.desc || '',
+                        call_to_action: { type: cta, value: { link: link } }
+                    };
+                    if (thumbUrl) videoDataObj.image_url = thumbUrl;
+                    crParams.append('object_story_spec', JSON.stringify({
+                        page_id: pageId,
+                        video_data: videoDataObj
+                    }));
+                    crParams.append('access_token', cfg.token);
+                    console.log('[AdsAuto] Creative params:', Object.fromEntries(crParams));
+                    const crResp = await fetch(`${FB_API}/${account}/adcreatives`, {
+                        method: 'POST',
+                        body: crParams
+                    });
+                    const crData = await crResp.json();
+                    console.log('[AdsAuto] Creative response:', crData);
+                    if (crData.error) {
+                        const e = crData.error;
+                        const detail = e.error_user_msg || e.error_user_title || '';
+                        addLog(`❌ Error code: ${e.code} | subcode: ${e.error_subcode || 'N/A'}`, 'error');
+                        if (detail) addLog(`💡 ${detail}`, 'warn');
+                        throw new Error(`${label} Creative: ${e.message}`);
+                    }
+                    addLog(`${label} ✅ Creative created: ${crData.id}`, 'success');
+                    completedSteps++; setProgress((completedSteps / totalSteps) * 100);
+
+                    // Create Ad
+                    addLog(`${label} 📢 Creating Ad...`, 'info');
+                    const adParams = new URLSearchParams();
+                    adParams.append('name', `Ad${i + 1}_${v.file.name.replace(/\.[^/.]+$/, '')}`);
+                    adParams.append('adset_id', asData.id);
+                    adParams.append('creative', JSON.stringify({ creative_id: crData.id }));
+                    adParams.append('status', 'PAUSED');
+                    adParams.append('access_token', cfg.token);
+                    const adResp = await fetch(`${FB_API}/${account}/ads`, {
+                        method: 'POST',
+                        body: adParams
+                    });
+                    const adData = await adResp.json();
+                    if (adData.error) throw new Error(`${label} Ad: ${adData.error.message}`);
+                    addLog(`${label} ✅ Ad created: ${adData.id}`, 'success');
+                    completedSteps++; setProgress((completedSteps / totalSteps) * 100);
+
+                    adSetResults.push({ video: v.file.name, adsetId: asData.id, creativeId: crData.id, adId: adData.id, videoId: vData.id });
+                }
+
+                setProgress(100);
+                addLog(`🎉 HOÀN TẤT! Campaign với ${videoFiles.length} Ad Sets — Status: PAUSED`, 'success');
+
+                // Save history
+                const hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+                hist.unshift({ name: campaignName, campaignId, adSets: adSetResults, budget, country, videoCount: videoFiles.length, createdAt: new Date().toISOString() });
+                localStorage.setItem(HISTORY_KEY, JSON.stringify(hist.slice(0, 50)));
+
+                document.getElementById('launch-result').style.display = 'block';
+                document.getElementById('launch-result').innerHTML = `
+      <div class="card" style="padding:16px;border-left:3px solid var(--green);background:var(--green-bg)">
+        <div style="font-weight:700;font-size:14px;color:var(--green);margin-bottom:8px">🎉 Campaign tạo thành công!</div>
+        <div style="font-size:12px;color:var(--text-dim)">
+          <strong>Campaign:</strong> ${campaignId}<br>
+          <strong>Ad Sets:</strong> ${videoFiles.length}<br>
+          <strong>Budget:</strong> ${(budget * videoFiles.length).toLocaleString()}đ/ngày<br>
+          <strong>Status:</strong> <span style="color:var(--yellow)">PAUSED</span> — 
+          <a href="https://www.facebook.com/adsmanager" target="_blank" style="color:var(--blue)">Bật trên Ads Manager →</a>
+        </div>
+      </div>`;
+            } catch (err) {
+                addLog(`❌ ERROR: ${err.message}`, 'error');
+                showToast('❌ Lỗi: ' + err.message, 'error');
+                document.getElementById('launch-result').style.display = 'block';
+                document.getElementById('launch-result').innerHTML = `
+      <div class="card" style="padding:16px;border-left:3px solid var(--red);background:var(--red-bg)">
+        <div style="font-weight:700;color:var(--red)">❌ Lỗi</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:4px">${err.message}</div>
+      </div>`;
+            }
+            document.getElementById('btn-launch').disabled = false;
+        }
+
+        // ==================== HISTORY ====================
+        function loadHistory() {
+            const hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            const el = document.getElementById('history-list');
+            if (hist.length === 0) { el.innerHTML = '<p style="color:var(--text-muted)">Chưa có campaigns</p>'; return; }
+            el.innerHTML = hist.map(h => `
+    <div class="history-item">
+      <div>
+        <div style="font-weight:700;font-size:13px">${h.name}</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:2px">
+          🎬 ${h.videoCount || (h.adSets ? h.adSets.length : 1)} videos · 🌍 ${h.country} · 💰 ${(h.budget || 0).toLocaleString()}đ/adset/ngày
+        </div>
+        <div style="font-size:10px;color:var(--text-muted)">Campaign: ${h.campaignId} · ${new Date(h.createdAt).toLocaleString('vi-VN')}</div>
+      </div>
+      <span class="badge" style="background:var(--yellow-bg);color:var(--yellow);border:1px solid rgba(245,158,11,.15)">PAUSED</span>
+    </div>`).join('');
+        }
+
+        // ==================== INIT ====================
+        loadConfig();
+    </script>
+</body>
+
+</html>

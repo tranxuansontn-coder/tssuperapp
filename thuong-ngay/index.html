@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thưởng Ngày - TS Global</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg-deep: #0a0f1a;
+            --bg-card: #111827;
+            --bg-input: #1a2332;
+            --border: rgba(255, 255, 255, .06);
+            --border-hover: rgba(255, 255, 255, .12);
+            --text: #e5e7eb;
+            --text-dim: #6b7280;
+            --text-muted: #4b5563;
+            --accent: #ef4444;
+            --accent-glow: rgba(239, 68, 68, .15);
+            --green: #10b981;
+            --green-bg: rgba(16, 185, 129, .1);
+            --yellow: #f59e0b;
+            --yellow-bg: rgba(245, 158, 11, .1);
+            --red: #ef4444;
+            --red-bg: rgba(239, 68, 68, .08);
+            --blue: #3b82f6;
+            --indigo: #818cf8;
+            --orange: #f97316;
+            --radius: 12px;
+            --radius-sm: 8px
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .08);
+            border-radius: 10px
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn .4s ease both
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: border-color .2s
+        }
+
+        .card:hover {
+            border-color: var(--border-hover)
+        }
+
+        .inp {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            color: var(--text);
+            font-size: 14px;
+            width: 100%;
+            transition: border-color .2s, box-shadow .2s;
+            outline: none
+        }
+
+        .inp:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow)
+        }
+
+        .inp::placeholder {
+            color: var(--text-muted)
+        }
+
+        select.inp {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            color: #fff;
+            box-shadow: 0 4px 15px var(--accent-glow)
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, .25)
+        }
+
+        .btn-ghost {
+            background: var(--bg-input);
+            color: var(--text);
+            border: 1px solid var(--border)
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--border-hover);
+            background: rgba(255, 255, 255, .04)
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 11px;
+            border-radius: 6px
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .3px
+        }
+
+        .badge-pending {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+            border: 1px solid rgba(245, 158, 11, .15)
+        }
+
+        .badge-approved {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid rgba(16, 185, 129, .15)
+        }
+
+        .badge-team {
+            font-size: 10px;
+            padding: 2px 8px
+        }
+
+        .team-huyen {
+            background: rgba(129, 140, 248, .1);
+            color: var(--indigo)
+        }
+
+        .team-son {
+            background: rgba(16, 185, 129, .1);
+            color: var(--green)
+        }
+
+        .team-dung {
+            background: rgba(249, 115, 22, .1);
+            color: var(--orange)
+        }
+
+        .tabs {
+            display: flex;
+            gap: 2px;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(17, 24, 39, .6)
+        }
+
+        .tab {
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-dim);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all .2s;
+            white-space: nowrap;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none
+        }
+
+        .tab:hover {
+            color: var(--text)
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            font-weight: 700
+        }
+
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px
+        }
+
+        .tbl th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .tbl td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .tbl tbody tr:hover {
+            background: rgba(255, 255, 255, .02)
+        }
+
+        .tbl .text-r {
+            text-align: right
+        }
+
+        .tbl .text-c {
+            text-align: center
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10, 15, 26, .85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .logo h1 {
+            font-size: 17px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .logo .ver {
+            font-size: 9px;
+            background: var(--green-bg);
+            color: var(--green);
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-weight: 700
+        }
+
+        .page {
+            padding: 20px 24px;
+            display: none
+        }
+
+        .page.show {
+            display: block
+        }
+
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px
+        }
+
+        .stat {
+            text-align: center;
+            padding: 20px 16px
+        }
+
+        .stat-icon {
+            font-size: 20px;
+            margin-bottom: 6px
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 900;
+            line-height: 1.2
+        }
+
+        .stat-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 600
+        }
+
+        .rank {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 900
+        }
+
+        .rank-1 {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #000
+        }
+
+        .rank-2 {
+            background: linear-gradient(135deg, #d1d5db, #9ca3af);
+            color: #000
+        }
+
+        .rank-3 {
+            background: linear-gradient(135deg, #fb923c, #ea580c);
+            color: #fff
+        }
+
+        .rank-n {
+            background: var(--bg-input);
+            color: var(--text-dim)
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px
+        }
+
+        .filter-bar label {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-weight: 600;
+            margin-right: 4px
+        }
+
+        .filter-bar .inp {
+            width: auto;
+            min-width: 140px;
+            padding: 7px 12px;
+            font-size: 12px
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            margin-bottom: 6px
+        }
+
+        .rule-card {
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 3px solid var(--accent)
+        }
+
+        .rule-card .rule-title {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 10px
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 8px 12px;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            margin-bottom: 6px;
+            font-size: 12px
+        }
+
+        .rule-item .label {
+            color: var(--text-dim);
+            min-width: 130px
+        }
+
+        .rule-item .value {
+            font-weight: 700;
+            color: var(--green)
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 40px
+        }
+
+        .footer .hl {
+            color: var(--accent);
+            font-weight: 700
+        }
+
+        .toast-box {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .toast {
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            animation: slideDown .3s ease;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .3)
+        }
+
+        .toast-success {
+            background: #065f46;
+            color: #6ee7b7
+        }
+
+        .toast-error {
+            background: #7f1d1d;
+            color: #fca5a5
+        }
+
+        .toast-warning {
+            background: #78350f;
+            color: #fcd34d
+        }
+
+        @media(max-width:640px) {
+            .header {
+                padding: 10px 16px
+            }
+
+            .tabs {
+                padding: 0 16px
+            }
+
+            .page {
+                padding: 16px
+            }
+
+            .tab {
+                padding: 12px 14px;
+                font-size: 12px
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr
+            }
+
+            .stat-value {
+                font-size: 18px
+            }
+
+            .tbl {
+                font-size: 11px
+            }
+
+            .tbl th,
+            .tbl td {
+                padding: 8px 10px
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="logo"><span style="font-size:22px">🎁</span>
+            <h1>Thưởng Ngày</h1><span class="ver">v5.0</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px"><span
+                style="color:var(--green);font-size:11px;font-weight:600">● TS Global</span></div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+        <button class="tab" onclick="switchTab('rules')">📐 Rules tháng</button>
+        <button class="tab" onclick="switchTab('admin')">⚙️ Admin</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page show">
+        <div class="card fade-in" style="padding:16px;margin-bottom:16px">
+            <div class="filter-bar" style="margin-bottom:0">
+                <label>📅 Tháng:</label><input type="month" id="db-month" class="inp" onchange="loadDashboard()">
+                <label>👥 Team:</label>
+                <select id="db-team" class="inp" onchange="loadDashboard()">
+                    <option value="">Tất cả</option>
+                    <option value="Team Huyền">Team Huyền</option>
+                    <option value="Team Sơn">Team Sơn</option>
+                    <option value="Team Dũng">Team Dũng</option>
+                </select>
+            </div>
+        </div>
+        <div id="db-rules-preview"></div>
+        <div class="grid-stats" style="margin-bottom:16px" id="db-stats">
+            <div class="card stat fade-in">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" style="color:var(--blue)" id="ds-people">0</div>
+                <div class="stat-label">Nhân viên</div>
+            </div>
+            <div class="card stat fade-in" style="animation-delay:.04s">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-value" style="color:var(--green)" id="ds-qualified">0</div>
+                <div class="stat-label">Đạt thưởng</div>
+            </div>
+            <div class="card stat fade-in" style="animation-delay:.08s">
+                <div class="stat-icon">📅</div>
+                <div class="stat-value" style="color:var(--yellow)" id="ds-days">0</div>
+                <div class="stat-label">Ngày thưởng</div>
+            </div>
+            <div class="card stat fade-in" style="animation-delay:.12s">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" style="color:var(--green)" id="ds-total">0đ</div>
+                <div class="stat-label">Tổng thưởng</div>
+            </div>
+        </div>
+        <div class="card fade-in" style="overflow:hidden;animation-delay:.16s">
+            <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:700;font-size:13px">🏅 Bảng
+                Xếp Hạng Thưởng Ngày</div>
+            <div style="overflow-x:auto">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nhân sự</th>
+                            <th>Team</th>
+                            <th class="text-r">Ngày thưởng</th>
+                            <th class="text-r">Tổng DS</th>
+                            <th class="text-r">Ads TB</th>
+                            <th class="text-r">Tổng thưởng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="db-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- RULES VIEW (ai cũng xem được) -->
+    <div id="page-rules" class="page">
+        <div class="card fade-in" style="padding:16px;margin-bottom:16px">
+            <div class="filter-bar" style="margin-bottom:0">
+                <label>📅 Tháng:</label><input type="month" id="rl-month" class="inp" onchange="loadRulesView()">
+            </div>
+        </div>
+        <div id="rl-content"></div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="page-admin" class="page">
+        <div id="admin-login" class="card fade-in" style="padding:24px;max-width:380px;margin:60px auto">
+            <div style="font-weight:700;font-size:13px;margin-bottom:14px">🔐 Đăng nhập Admin</div>
+            <input type="password" id="admin-pw" class="inp" placeholder="Nhập mật khẩu..." style="margin-bottom:12px"
+                onkeydown="if(event.key==='Enter')adminLogin()">
+            <button class="btn btn-primary" style="width:100%" onclick="adminLogin()">🔓 Đăng nhập</button>
+        </div>
+        <div id="admin-dash" style="display:none">
+            <div class="card fade-in" style="padding:20px;margin-bottom:16px">
+                <div style="font-weight:700;font-size:13px;margin-bottom:16px">📐 Set Rule Thưởng Ngày</div>
+                <div class="filter-bar"><label>📅 Tháng:</label><input type="month" id="adm-month" class="inp"></div>
+                <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px">💡 Nhân viên đạt DS tối thiểu +
+                    ads% dưới max → được thưởng. Nhiều tier từ thấp → cao.</div>
+                <div id="adm-tiers"></div>
+                <div style="margin-top:12px;display:flex;gap:8px">
+                    <button class="btn btn-ghost btn-sm" onclick="addTier()">➕ Thêm mốc</button>
+                    <button class="btn btn-primary" onclick="saveRules()">💾 Lưu Rule</button>
+                    <button class="btn btn-ghost btn-sm" onclick="loadAdminRules()">🔄 Tải lại</button>
+                </div>
+            </div>
+            <div class="card fade-in" style="padding:20px;animation-delay:.08s">
+                <div style="font-weight:700;font-size:13px;margin-bottom:12px">📋 Lịch sử Rules</div>
+                <div id="adm-history"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-box" id="toast-box"></div>
+    <div class="footer">Made with ❤️ by <span class="hl">Sếp Sơn</span> · TS Global © 2026</div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        if (!firebase.apps.length) firebase.initializeApp({
+            apiKey: "AIzaSyCC83ANMEUhotAgetLng366fRu-ub26a_0", authDomain: "ts-global-super-app.firebaseapp.com",
+            projectId: "ts-global-super-app", storageBucket: "ts-global-super-app.firebasestorage.app",
+            messagingSenderId: "4116358702", appId: "1:4116358702:web:c13bbdaae217dd986f71ff"
+        });
+        const db = firebase.firestore();
+        const ADMIN_PW = 'tsglobal2026';
+        const TEAMS = ['Team Huyền', 'Team Sơn', 'Team Dũng'];
+        const TEAM_CLS = { 'Team Huyền': 'team-huyen', 'Team Sơn': 'team-son', 'Team Dũng': 'team-dung' };
+        let isAdmin = false;
+        let currentTiers = [];
+
+        function fmtVND(n) { if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B'; if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M'; if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K'; return n.toLocaleString('vi-VN') + 'đ'; }
+        function teamBadge(t) { return `<span class="badge badge-team ${TEAM_CLS[t] || ''}">${t.replace('Team ', '')}</span>`; }
+        function rankBadge(r) { const c = r === 1 ? 'rank-1' : r === 2 ? 'rank-2' : r === 3 ? 'rank-3' : 'rank-n'; return `<span class="rank ${c}">${r}</span>`; }
+        function showToast(msg, type = 'success') { const t = document.createElement('div'); t.className = `toast toast-${type}`; t.textContent = msg; document.getElementById('toast-box').appendChild(t); setTimeout(() => t.remove(), 4000); }
+
+        function switchTab(name) {
+            document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['dashboard', 'rules', 'admin'][i] === name));
+            document.querySelectorAll('.page').forEach(p => p.classList.toggle('show', p.id === 'page-' + name));
+            if (name === 'dashboard') loadDashboard();
+            if (name === 'rules') loadRulesView();
+            if (name === 'admin' && isAdmin) loadAdminRules();
+        }
+
+        // ==================== GET RULES ====================
+        async function getRules(month) {
+            const doc = await db.collection('bonus_rules').doc(month).get();
+            return doc.exists ? doc.data() : { tiers: [] };
+        }
+
+        // ==================== CALC BONUS ====================
+        function calcBonus(revenue, adsCost, tiers) {
+            const ratio = revenue > 0 ? (adsCost / revenue) * 100 : 999;
+            let bonus = 0;
+            // Sort tiers by minRevenue ascending, pick highest matching
+            const sorted = [...tiers].sort((a, b) => a.minRevenue - b.minRevenue);
+            for (const tier of sorted) {
+                if (revenue >= tier.minRevenue && ratio <= tier.maxAdsRatio) {
+                    bonus = tier.bonusAmount;
+                }
+            }
+            return bonus;
+        }
+
+        // ==================== DASHBOARD ====================
+        async function loadDashboard() {
+            const month = document.getElementById('db-month').value;
+            const teamF = document.getElementById('db-team').value;
+            if (!month) return;
+            const [rules, snap] = await Promise.all([
+                getRules(month),
+                db.collection('daily_revenue').where('date', '>=', month + '-01').where('date', '<=', month + '-31').get()
+            ]);
+            // Show rules preview
+            if (rules.tiers && rules.tiers.length > 0) {
+                document.getElementById('db-rules-preview').innerHTML = `<div class="card fade-in" style="padding:12px 16px;margin-bottom:12px"><div style="font-size:11px;color:var(--text-dim);margin-bottom:6px">📐 <strong>Rule tháng này:</strong></div><div style="display:flex;flex-wrap:wrap;gap:8px">${rules.tiers.map(t => `<span class="badge badge-approved" style="font-size:10px">DS ≥ ${fmtVND(t.minRevenue)} · Ads ≤ ${t.maxAdsRatio}% → <strong>${fmtVND(t.bonusAmount)}</strong></span>`).join('')}</div></div>`;
+            } else {
+                document.getElementById('db-rules-preview').innerHTML = `<div class="card fade-in" style="padding:12px 16px;margin-bottom:12px;border-left:3px solid var(--yellow)"><span style="font-size:12px;color:var(--yellow)">⚠️ Chưa set rule cho tháng này. Vào Admin → Set Rule.</span></div>`;
+            }
+            let docs = snap.docs.map(d => d.data()).filter(d => d.status === 'approved');
+            if (teamF) docs = docs.filter(d => d.team === teamF);
+            // Aggregate per person per day → calc bonus
+            const people = {};
+            docs.forEach(d => {
+                if (!people[d.name]) people[d.name] = { name: d.name, team: d.team, bonusDays: 0, totalRevenue: 0, totalAdsRatio: 0, totalBonus: 0, days: 0 };
+                const p = people[d.name];
+                const bonus = calcBonus(d.revenue, d.adsCost, rules.tiers || []);
+                if (bonus > 0) p.bonusDays++;
+                p.totalRevenue += d.revenue || 0;
+                p.totalBonus += bonus;
+                p.days++;
+                p.totalAdsRatio += (d.adsRatio || 0);
+            });
+            const sorted = Object.values(people).sort((a, b) => b.totalBonus - a.totalBonus);
+            const totalBonusDays = sorted.reduce((s, p) => s + p.bonusDays, 0);
+            const totalBonus = sorted.reduce((s, p) => s + p.totalBonus, 0);
+            const qualified = sorted.filter(p => p.totalBonus > 0).length;
+            document.getElementById('ds-people').textContent = sorted.length;
+            document.getElementById('ds-qualified').textContent = qualified;
+            document.getElementById('ds-days').textContent = totalBonusDays;
+            document.getElementById('ds-total').textContent = fmtVND(totalBonus);
+            const tbody = document.getElementById('db-tbody');
+            if (sorted.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-c" style="padding:20px;color:var(--text-muted)">Không có dữ liệu</td></tr>'; return; }
+            tbody.innerHTML = sorted.map((p, i) => {
+                const avgRatio = p.days > 0 ? (p.totalAdsRatio / p.days).toFixed(1) : 0;
+                return `<tr><td>${rankBadge(i + 1)}</td><td style="font-weight:600">${p.name}</td><td>${teamBadge(p.team)}</td>
+      <td class="text-r" style="color:var(--yellow);font-weight:700">${p.bonusDays}</td>
+      <td class="text-r" style="color:var(--text-dim)">${fmtVND(p.totalRevenue)}</td>
+      <td class="text-r"><span style="color:${avgRatio <= 30 ? 'var(--green)' : avgRatio <= 50 ? 'var(--yellow)' : 'var(--red)'}">${avgRatio}%</span></td>
+      <td class="text-r"><span class="badge ${p.totalBonus > 0 ? 'badge-approved' : 'badge-pending'}" style="font-size:11px;font-weight:700">${fmtVND(p.totalBonus)}</span></td></tr>`;
+            }).join('');
+        }
+
+        // ==================== RULES VIEW ====================
+        async function loadRulesView() {
+            const month = document.getElementById('rl-month').value;
+            if (!month) return;
+            const rules = await getRules(month);
+            const el = document.getElementById('rl-content');
+            if (!rules.tiers || rules.tiers.length === 0) {
+                el.innerHTML = '<div class="card" style="padding:30px;text-align:center;color:var(--text-muted)">⚠️ Chưa set rule cho tháng ' + month + '</div>';
+                return;
+            }
+            el.innerHTML = `<div class="card rule-card fade-in"><div class="rule-title">📐 Rule thưởng tháng ${month}</div>${rules.tiers.sort((a, b) => a.minRevenue - b.minRevenue).map((t, i) => `
+    <div class="rule-item"><span class="label">Mốc ${i + 1} — DS tối thiểu:</span><span class="value">${fmtVND(t.minRevenue)}</span>
+    <span class="label">Ads tối đa:</span><span class="value">${t.maxAdsRatio}%</span>
+    <span class="label">Thưởng:</span><span class="value" style="color:var(--yellow)">${fmtVND(t.bonusAmount)}</span></div>`).join('')}
+    ${rules.updatedAt ? `<div style="font-size:10px;color:var(--text-muted);margin-top:8px">Cập nhật: ${new Date(rules.updatedAt).toLocaleString('vi-VN')}</div>` : ''}
+  </div>`;
+        }
+
+        // ==================== ADMIN ====================
+        function adminLogin() {
+            if (document.getElementById('admin-pw').value === ADMIN_PW) {
+                isAdmin = true; document.getElementById('admin-login').style.display = 'none'; document.getElementById('admin-dash').style.display = 'block';
+                showToast('🔓 Đăng nhập thành công!'); loadAdminRules();
+            } else showToast('❌ Sai mật khẩu!', 'error');
+        }
+
+        let tierCount = 0;
+        function addTier(data) {
+            const idx = tierCount++;
+            const html = `<div class="card" style="padding:12px;margin-bottom:8px;border-left:2px solid var(--yellow)" id="tier-${idx}">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-weight:700;font-size:12px;color:var(--yellow)">🏆 Mốc ${idx + 1}</span>
+      <button class="btn btn-sm" style="color:var(--red);background:none;border:none;font-size:12px" onclick="document.getElementById('tier-${idx}').remove()">🗑️</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>💰 DS tối thiểu (VNĐ)</label><input type="number" class="inp tier-rev" placeholder="vd: 10000000" min="0" step="1000000" value="${data ? data.minRevenue : ''}"></div>
+      <div class="form-group"><label>📢 Ads% tối đa</label><input type="number" class="inp tier-ads" placeholder="vd: 50" min="0" max="100" step="1" value="${data ? data.maxAdsRatio : ''}"></div>
+      <div class="form-group"><label>🎁 Thưởng (VNĐ)</label><input type="number" class="inp tier-bonus" placeholder="vd: 50000" min="0" step="10000" value="${data ? data.bonusAmount : ''}"></div>
+    </div>
+  </div>`;
+            document.getElementById('adm-tiers').insertAdjacentHTML('beforeend', html);
+        }
+
+        async function loadAdminRules() {
+            const month = document.getElementById('adm-month').value;
+            if (!month) return;
+            const rules = await getRules(month);
+            document.getElementById('adm-tiers').innerHTML = '';
+            tierCount = 0;
+            if (rules.tiers && rules.tiers.length > 0) { rules.tiers.forEach(t => addTier(t)); }
+            else { addTier({ minRevenue: 10000000, maxAdsRatio: 50, bonusAmount: 50000 }); addTier({ minRevenue: 15000000, maxAdsRatio: 40, bonusAmount: 100000 }); }
+            // History
+            const snap = await db.collection('bonus_rules').orderBy('updatedAt', 'desc').limit(6).get();
+            document.getElementById('adm-history').innerHTML = snap.docs.map(d => { const r = d.data(); return `<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:12px"><strong style="color:var(--accent)">${d.id}</strong> — ${r.tiers ? r.tiers.length : 0} mốc · cập nhật ${r.updatedAt ? new Date(r.updatedAt).toLocaleDateString('vi-VN') : '-'}</div>`; }).join('') || '<p style="color:var(--text-muted);font-size:12px">Chưa có lịch sử</p>';
+        }
+
+        async function saveRules() {
+            const month = document.getElementById('adm-month').value;
+            if (!month) { showToast('Chọn tháng!', 'warning'); return; }
+            const tiers = [];
+            document.querySelectorAll('[id^="tier-"]').forEach(el => {
+                const rev = parseFloat(el.querySelector('.tier-rev').value) || 0;
+                const ads = parseFloat(el.querySelector('.tier-ads').value) || 100;
+                const bonus = parseFloat(el.querySelector('.tier-bonus').value) || 0;
+                if (rev > 0 && bonus > 0) tiers.push({ minRevenue: rev, maxAdsRatio: ads, bonusAmount: bonus });
+            });
+            if (tiers.length === 0) { showToast('Thêm ít nhất 1 mốc!', 'warning'); return; }
+            await db.collection('bonus_rules').doc(month).set({ tiers, updatedAt: new Date().toISOString() }, { merge: true });
+            showToast('💾 Đã lưu rule!'); loadAdminRules();
+        }
+
+        // ==================== INIT ====================
+        (function () {
+            const m = new Date().toISOString().substring(0, 7);
+            document.getElementById('db-month').value = m;
+            document.getElementById('rl-month').value = m;
+            document.getElementById('adm-month').value = m;
+            loadDashboard();
+        })();
+    </script>
+</body>
+
+</html>
