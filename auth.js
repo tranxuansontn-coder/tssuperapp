@@ -194,9 +194,12 @@ const TOPBAR_LABELS = {
     scorer: { icon: 'fa-star', label: 'Chấm Điểm & Set Giá' },
     overtime: { icon: 'fa-clock', label: 'OT Tracker' },
     users: { icon: 'fa-users-gear', label: 'Quản lý nhân viên' },
+    doanhso: { icon: 'fa-chart-bar', label: 'Doanh số cá nhân' },
+    chamcong: { icon: 'fa-calendar-check', label: 'Chấm công' },
     dailybonus: { icon: 'fa-gift', label: 'Thưởng ngày' },
     teambonus: { icon: 'fa-people-group', label: 'Thưởng team' },
     monthlyincome: { icon: 'fa-wallet', label: 'Thu nhập tháng' },
+    adsauto: { icon: 'fa-rocket', label: 'Ads Automation' },
     voice: { icon: 'fa-microphone-lines', label: 'Sửa Voice' },
     ads: { icon: 'fa-chart-line', label: 'Phân Tích Ads' },
     forum: { icon: 'fa-comments', label: 'TS Forum' }

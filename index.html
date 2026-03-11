@@ -698,18 +698,43 @@
                             onclick="navigate('coming','monthlyincome')" href="javascript:void(0)"><span
                                 class="nav-icon"><i class="fa-solid fa-wallet"></i></span><span class="nav-label">Thu
                                 nhập tháng</span><span class="badge-soon">Soon</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-doanhso" onclick="navigate('doanhso')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-chart-bar"></i></span><span class="nav-label">Doanh
+                                số</span><span class="badge-new">Mới</span></a></li>
                     <li class="nav-item"><a class="nav-link" id="nav-overtime" onclick="navigate('overtime')"
                             href="javascript:void(0)"><span class="nav-icon"><i
                                     class="fa-solid fa-clock"></i></span><span class="nav-label">OT Tracker</span><span
                                 class="badge-new">Mới</span></a></li>
-                    <li class="nav-item"><a class="nav-link" id="nav-dailybonus"
-                            onclick="navigate('coming','dailybonus')" href="javascript:void(0)"><span
-                                class="nav-icon"><i class="fa-solid fa-gift"></i></span><span class="nav-label">Thưởng
-                                ngày</span><span class="badge-soon">Soon</span></a></li>
-                    <li class="nav-item"><a class="nav-link" id="nav-teambonus" onclick="navigate('coming','teambonus')"
+                    <li class="nav-item"><a class="nav-link" id="nav-dailybonus" onclick="navigate('dailybonus')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-gift"></i></span><span class="nav-label">Thưởng
+                                ngày</span><span class="badge-new">Mới</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-teambonus" onclick="navigate('teambonus')"
                             href="javascript:void(0)"><span class="nav-icon"><i
                                     class="fa-solid fa-people-group"></i></span><span class="nav-label">Thưởng
-                                team</span><span class="badge-soon">Soon</span></a></li>
+                                team</span><span class="badge-new">Mới</span></a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-chamcong" onclick="navigate('chamcong')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-calendar-check"></i></span><span class="nav-label">Chấm
+                                công</span><span class="badge-new">Mới</span></a></li>
+                </ul>
+            </div>
+
+            <div class="nav-divider"></div>
+
+            <!-- Automation (collapsible) -->
+            <div class="nav-group-header open" style="margin-top:0">
+                <i class="fa-solid fa-robot" style="font-size:.75rem;width:16px;text-align:center"></i>
+                <span>Automation</span>
+                <i class="fa-solid fa-chevron-right chevron"></i>
+            </div>
+            <div class="nav-group-items open">
+                <ul class="nav-list">
+                    <li class="nav-item"><a class="nav-link" id="nav-adsauto" onclick="navigate('adsauto')"
+                            href="javascript:void(0)"><span class="nav-icon"><i
+                                    class="fa-solid fa-rocket"></i></span><span class="nav-label">Ads
+                                Automation</span><span class="badge-new">Mới</span></a></li>
                 </ul>
             </div>
 
@@ -823,6 +848,15 @@
                             <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
                             <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
                         </div>
+                        <div class="app-card" onclick="navigate('doanhso')">
+                            <div class="app-card-icon icon-blue"><i class="fa-solid fa-chart-bar"></i></div>
+                            <div class="app-card-title">Doanh số cá nhân</div>
+                            <div class="app-card-desc">Nhập doanh số + ads hàng ngày, xếp hạng DS, nguồn dữ liệu tính
+                                thưởng.</div>
+                            <div class="app-card-footer"><button class="btn-open"><i
+                                        class="fa-solid fa-arrow-right"></i> Mở ngay</button><span
+                                    class="badge-new">Mới</span></div>
+                        </div>
                         <div class="app-card" onclick="navigate('overtime')">
                             <div class="app-card-icon icon-green"><i class="fa-solid fa-clock"></i></div>
                             <div class="app-card-title">OT Tracker</div>
@@ -832,19 +866,31 @@
                                         class="fa-solid fa-arrow-right"></i> Mở ngay</button><span
                                     class="badge-new">Mới</span></div>
                         </div>
-                        <div class="app-card disabled">
+                        <div class="app-card" onclick="navigate('dailybonus')">
                             <div class="app-card-icon icon-orange"><i class="fa-solid fa-gift"></i></div>
                             <div class="app-card-title">Thưởng ngày</div>
                             <div class="app-card-desc">Tính thưởng theo hiệu suất làm việc hàng ngày.</div>
-                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
-                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
+                            <div class="app-card-footer"><button class="btn-open"><i
+                                        class="fa-solid fa-arrow-right"></i> Mở ngay</button><span
+                                    class="badge-new">Mới</span></div>
                         </div>
-                        <div class="app-card disabled">
+                        <div class="app-card" onclick="navigate('teambonus')">
                             <div class="app-card-icon icon-purple"><i class="fa-solid fa-people-group"></i></div>
                             <div class="app-card-title">Thưởng team</div>
-                            <div class="app-card-desc">Đánh giá hiệu suất nhóm, tính thưởng team.</div>
-                            <div class="app-card-footer"><span class="card-badge-soon">Coming Soon</span></div>
-                            <div class="coming-overlay"><span class="coming-label">🚧 Coming Soon</span></div>
+                            <div class="app-card-desc">Đánh giá hiệu suất nhóm, tính thưởng team theo mốc hàng tháng.
+                            </div>
+                            <div class="app-card-footer"><button class="btn-open"><i
+                                        class="fa-solid fa-arrow-right"></i> Mở ngay</button><span
+                                    class="badge-new">Mới</span></div>
+                        </div>
+                        <div class="app-card" onclick="navigate('chamcong')">
+                            <div class="app-card-icon icon-green"><i class="fa-solid fa-calendar-check"></i></div>
+                            <div class="app-card-title">Chấm công</div>
+                            <div class="app-card-desc">Điểm danh hàng ngày, theo dõi ngày làm việc, nghỉ phép, nghỉ
+                                không phép.</div>
+                            <div class="app-card-footer"><button class="btn-open"><i
+                                        class="fa-solid fa-arrow-right"></i> Mở ngay</button><span
+                                    class="badge-new">Mới</span></div>
                         </div>
                     </div>
 
@@ -926,6 +972,16 @@
                     title="Chấm Điểm & Set Giá"></iframe></div>
             <div class="view iframe-view" id="view-overtime"><iframe src="./overtime-tracker/index.html"
                     title="OT Tracker"></iframe></div>
+            <div class="view iframe-view" id="view-dailybonus"><iframe src="./thuong-ngay/index.html"
+                    title="Thưởng Ngày"></iframe></div>
+            <div class="view iframe-view" id="view-teambonus"><iframe src="./thuong-team/index.html"
+                    title="Thưởng Team"></iframe></div>
+            <div class="view iframe-view" id="view-doanhso"><iframe src="./doanh-so/index.html"
+                    title="Doanh Số"></iframe></div>
+            <div class="view iframe-view" id="view-chamcong"><iframe src="./cham-cong/index.html"
+                    title="Chấm Công"></iframe></div>
+            <div class="view iframe-view" id="view-adsauto"><iframe src="./ads-automation/index.html"
+                    title="Ads Automation"></iframe></div>
 
             <!-- USER MANAGEMENT -->
             <div class="view mgmt-view" id="view-users">
