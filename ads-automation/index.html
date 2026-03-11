@@ -671,6 +671,20 @@
                 onchange="onFilesSelect(event)">
             <div class="video-list" id="video-list"></div>
             <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+                <div class="form-group" style="flex:1;min-width:150px"><label>👤 Mã MKT</label><input type="text"
+                        id="inp-mkt" class="inp" placeholder="vd: mktminh" oninput="updateCampPreview()"></div>
+                <div class="form-group" style="flex:1;min-width:150px"><label>📦 Mã hàng</label><input type="text"
+                        id="inp-product-code" class="inp" placeholder="vd: carwiper" oninput="updateCampPreview()">
+                </div>
+                <div class="form-group" style="flex:1;min-width:150px"><label>✏️ Tuỳ chỉnh</label><input type="text"
+                        id="inp-custom-name" class="inp" placeholder="vd: ngày 11/03" oninput="updateCampPreview()">
+                </div>
+            </div>
+            <div id="camp-name-preview"
+                style="margin-top:8px;padding:8px 12px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:12px;color:var(--text-dim);border:1px dashed rgba(255,255,255,0.1)">
+                📋 Tên Campaign: <span id="camp-name-value" style="color:var(--accent);font-weight:600">---</span>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
                 <div class="form-group" style="flex:1;min-width:200px"><label>📄 Page ID</label><input type="text"
                         id="inp-page" class="inp" placeholder="Page ID để chạy ads..."></div>
                 <div class="form-group" style="flex:1;min-width:200px"><label>🔗 Link (Landing Page)</label><input
@@ -681,11 +695,11 @@
                 <textarea id="inp-product" class="inp" rows="3"
                     placeholder="Nhập mô tả sản phẩm hoặc bấm nút bên dưới để AI tự đọc từ Landing Page..."></textarea>
             </div>
-            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-                <button class="btn btn-ghost btn-sm" id="btn-read-page" onclick="readLandingPage()">🔍 AI đọc Landing
-                    Page & tự điền mô tả</button>
-                <button class="btn btn-primary" id="btn-generate" onclick="generateAllTexts()" disabled>🤖 Generate Ad
-                    Text cho tất cả videos (AI)</button>
+            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <button class="btn btn-ghost btn-sm" id="btn-read-page" onclick="readLandingPage()"
+                    style="white-space:nowrap">🔍 AI đọc Landing Page</button>
+                <button class="btn btn-primary" id="btn-generate" onclick="generateAllTexts()" disabled
+                    style="white-space:nowrap">🤖 Generate Ad Text (AI)</button>
             </div>
         </div>
 
@@ -937,6 +951,20 @@
             addFiles(Array.from(e.dataTransfer.files));
         });
 
+        function updateCampPreview() {
+            const mkt = document.getElementById('inp-mkt')?.value?.trim() || '';
+            const prod = document.getElementById('inp-product-code')?.value?.trim() || '';
+            const custom = document.getElementById('inp-custom-name')?.value?.trim() || '';
+            const el = document.getElementById('camp-name-value');
+            if (el) {
+                if (mkt || prod) {
+                    const parts = [mkt, prod, custom].filter(p => p);
+                    el.textContent = parts.join('_');
+                } else {
+                    el.textContent = 'Auto_[số video]_[ngày tạo]';
+                }
+            }
+        }
         function onFilesSelect(e) { addFiles(Array.from(e.target.files)); }
 
         function addFiles(files) {
@@ -1229,7 +1257,17 @@ Generate exactly ${videoFiles.length} objects.`;
             const cta = cfg.cta || 'SHOP_NOW';
             const objective = cfg.objective || 'OUTCOME_SALES';
             const account = cfg.account.startsWith('act_') ? cfg.account : 'act_' + cfg.account;
-            const campaignName = `Auto_${videoFiles.length}vids_${new Date().toISOString().slice(0, 10)}_${Date.now().toString(36)}`;
+            // Campaign naming: mã_mkt + mã_hàng + tuỳ_chỉnh
+            const mktCode = document.getElementById('inp-mkt')?.value?.trim() || '';
+            const productCode = document.getElementById('inp-product-code')?.value?.trim() || '';
+            const customName = document.getElementById('inp-custom-name')?.value?.trim() || '';
+            let campaignName = '';
+            if (mktCode || productCode) {
+                const parts = [mktCode, productCode, customName].filter(p => p);
+                campaignName = parts.join('_');
+            } else {
+                campaignName = `Auto_${videoFiles.length}vids_${new Date().toISOString().slice(0, 10)}_${Date.now().toString(36)}`;
+            }
             const totalSteps = 1 + videoFiles.length * 4; // 1 campaign + (upload + adset + creative + ad) per video
             let completedSteps = 0;
 
