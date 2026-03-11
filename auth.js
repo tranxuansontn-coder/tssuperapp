@@ -200,6 +200,7 @@ const TOPBAR_LABELS = {
     teambonus: { icon: 'fa-people-group', label: 'Thưởng team' },
     monthlyincome: { icon: 'fa-wallet', label: 'Thu nhập tháng' },
     adsauto: { icon: 'fa-rocket', label: 'Ads Automation' },
+    adsrules: { icon: 'fa-gears', label: 'Ads Rules' },
     voice: { icon: 'fa-microphone-lines', label: 'Sửa Voice' },
     ads: { icon: 'fa-chart-line', label: 'Phân Tích Ads' },
     forum: { icon: 'fa-comments', label: 'TS Forum' }
