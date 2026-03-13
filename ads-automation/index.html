@@ -721,6 +721,87 @@
             gap: 4px
         }
         .manual-toggle:hover { color: var(--text) }
+
+        /* Searchable Dropdown */
+        .search-dropdown { position: relative }
+        .search-dropdown .sd-input {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            padding-right: 32px;
+            color: var(--text);
+            font-size: 13px;
+            width: 100%;
+            outline: none;
+            font-family: inherit;
+            cursor: pointer;
+            transition: border-color .2s, box-shadow .2s;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden
+        }
+        .search-dropdown .sd-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            cursor: text
+        }
+        .search-dropdown .sd-input::placeholder { color: var(--text-muted); font-size: 12px }
+        .search-dropdown .sd-arrow {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            transition: transform .2s
+        }
+        .search-dropdown.open .sd-arrow { transform: translateY(-50%) rotate(180deg) }
+        .search-dropdown .sd-list {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-sm);
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 12px 40px rgba(0,0,0,.4);
+            animation: slideDown .15s ease
+        }
+        .search-dropdown.open .sd-list { display: block }
+        .search-dropdown .sd-item {
+            padding: 9px 14px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background .15s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border)
+        }
+        .search-dropdown .sd-item:last-child { border-bottom: none }
+        .search-dropdown .sd-item:hover { background: rgba(249,115,22,.06) }
+        .search-dropdown .sd-item.selected { background: rgba(249,115,22,.1); color: var(--accent); font-weight: 600 }
+        .search-dropdown .sd-item .sd-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+        .search-dropdown .sd-item .sd-id { font-size: 10px; color: var(--text-muted); white-space: nowrap }
+        .search-dropdown .sd-empty {
+            padding: 12px 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center
+        }
+        .search-dropdown .sd-count {
+            padding: 4px 14px;
+            font-size: 10px;
+            color: var(--text-muted);
+            background: rgba(255,255,255,.02);
+            border-bottom: 1px solid var(--border)
+        }
     </style>
 </head>
 
@@ -791,9 +872,12 @@
             </div>
             <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
                 <div class="form-group" style="flex:1;min-width:200px"><label>📄 Page</label>
-                    <select id="inp-page" class="inp">
-                        <option value="">-- Chọn Page (connect FB trước) --</option>
-                    </select>
+                    <div class="search-dropdown" id="sd-page-create">
+                        <input class="sd-input" placeholder="🔍 Tìm Page..." onclick="sdToggle('sd-page-create')" oninput="sdFilter('sd-page-create')">
+                        <span class="sd-arrow">▼</span>
+                        <div class="sd-list"></div>
+                        <input type="hidden" id="inp-page" value="">
+                    </div>
                 </div>
                 <div class="form-group" style="flex:1;min-width:200px"><label>🔗 Link (Landing Page)</label><input
                         type="text" id="inp-link" class="inp" placeholder="https://yoursite.com"></div>
@@ -884,21 +968,30 @@
                     <div class="form-grid" style="gap:12px">
                         <div class="fb-select-group">
                             <label>📄 Chọn Page</label>
-                            <select id="cfg-fb-page" class="inp" onchange="onFbPageSelect()">
-                                <option value="">-- Chọn Page --</option>
-                            </select>
+                            <div class="search-dropdown" id="sd-page">
+                                <input class="sd-input" placeholder="🔍 Tìm Page theo tên..." onclick="sdToggle('sd-page')" oninput="sdFilter('sd-page')">
+                                <span class="sd-arrow">▼</span>
+                                <div class="sd-list"></div>
+                                <input type="hidden" id="cfg-fb-page" value="">
+                            </div>
                         </div>
                         <div class="fb-select-group">
                             <label>🏢 Chọn Tài khoản QC</label>
-                            <select id="cfg-fb-account" class="inp" onchange="onFbAccountSelect()">
-                                <option value="">-- Chọn TKQC --</option>
-                            </select>
+                            <div class="search-dropdown" id="sd-account">
+                                <input class="sd-input" placeholder="🔍 Tìm TKQC theo tên..." onclick="sdToggle('sd-account')" oninput="sdFilter('sd-account')">
+                                <span class="sd-arrow">▼</span>
+                                <div class="sd-list"></div>
+                                <input type="hidden" id="cfg-fb-account" value="">
+                            </div>
                         </div>
                         <div class="fb-select-group" style="grid-column:1/-1">
                             <label>📍 Chọn Pixel</label>
-                            <select id="cfg-fb-pixel" class="inp">
-                                <option value="">-- Chọn Pixel (chọn TKQC trước) --</option>
-                            </select>
+                            <div class="search-dropdown" id="sd-pixel">
+                                <input class="sd-input" placeholder="🔍 Tìm Pixel theo tên..." onclick="sdToggle('sd-pixel')" oninput="sdFilter('sd-pixel')">
+                                <span class="sd-arrow">▼</span>
+                                <div class="sd-list"></div>
+                                <input type="hidden" id="cfg-fb-pixel" value="">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1097,54 +1190,146 @@
                 document.getElementById('header-fb-avatar').src = avatarUrl;
             }
 
-            // Reset dropdowns when disconnected
+            // Reset searchable dropdowns when disconnected
             if (!connected) {
-                ['cfg-fb-page', 'cfg-fb-account', 'cfg-fb-pixel', 'inp-page'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.innerHTML = `<option value="">-- ${id.includes('page') ? 'Chọn Page' : id.includes('account') ? 'Chọn TKQC' : 'Chọn Pixel'} --</option>`;
+                ['sd-page', 'sd-page-create', 'sd-account', 'sd-pixel'].forEach(sdId => {
+                    sdData[sdId] = [];
+                    const wrapper = document.getElementById(sdId);
+                    if (!wrapper) return;
+                    wrapper.querySelector('.sd-input').value = '';
+                    wrapper.querySelector('.sd-list').innerHTML = '';
+                    wrapper.querySelector('input[type=hidden]').value = '';
                 });
             }
         }
 
+        // ==================== SEARCHABLE DROPDOWN ENGINE ====================
+        const sdData = {}; // { sdId: [{value, name, id, extra}] }
+
+        function sdToggle(sdId) {
+            const wrapper = document.getElementById(sdId);
+            const isOpen = wrapper.classList.contains('open');
+            // Close all other dropdowns
+            document.querySelectorAll('.search-dropdown.open').forEach(el => el.classList.remove('open'));
+            if (!isOpen) {
+                wrapper.classList.add('open');
+                const inp = wrapper.querySelector('.sd-input');
+                inp.select();
+                sdRender(sdId, '');
+            }
+        }
+
+        function sdFilter(sdId) {
+            const wrapper = document.getElementById(sdId);
+            const query = wrapper.querySelector('.sd-input').value;
+            if (!wrapper.classList.contains('open')) wrapper.classList.add('open');
+            sdRender(sdId, query);
+        }
+
+        function sdRender(sdId, query) {
+            const wrapper = document.getElementById(sdId);
+            const list = wrapper.querySelector('.sd-list');
+            const items = sdData[sdId] || [];
+            const selectedVal = wrapper.querySelector('input[type=hidden]').value;
+            const q = (query || '').toLowerCase().trim();
+
+            const filtered = q ? items.filter(it => it.name.toLowerCase().includes(q) || it.id.toLowerCase().includes(q)) : items;
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class="sd-empty">${items.length === 0 ? '📭 Chưa có dữ liệu' : '🔍 Không tìm thấy "' + q + '"'}</div>`;
+                return;
+            }
+
+            let html = '';
+            if (q && filtered.length !== items.length) {
+                html += `<div class="sd-count">🔍 ${filtered.length}/${items.length} kết quả</div>`;
+            }
+            html += filtered.map(it => `<div class="sd-item${it.value === selectedVal ? ' selected' : ''}" data-value="${it.value}" onclick="sdSelect('${sdId}', '${it.value.replace(/'/g, "\\'")}')">
+                <span class="sd-name">${it.name}</span>
+                <span class="sd-id">${it.id}</span>
+            </div>`).join('');
+            list.innerHTML = html;
+        }
+
+        function sdSelect(sdId, value) {
+            const wrapper = document.getElementById(sdId);
+            const items = sdData[sdId] || [];
+            const item = items.find(it => it.value === value);
+            const hidden = wrapper.querySelector('input[type=hidden]');
+            const inp = wrapper.querySelector('.sd-input');
+
+            hidden.value = value;
+            inp.value = item ? `${item.name} (${item.id})` : '';
+            wrapper.classList.remove('open');
+
+            // Trigger callbacks
+            if (sdId === 'sd-page') {
+                // Sync to create tab page dropdown
+                sdSelectByValue('sd-page-create', value);
+            }
+            if (sdId === 'sd-page-create') {
+                // Sync back to config page dropdown
+                sdSelectByValue('sd-page', value);
+            }
+            if (sdId === 'sd-account') {
+                onFbAccountSelect();
+            }
+        }
+
+        function sdSelectByValue(sdId, value) {
+            const wrapper = document.getElementById(sdId);
+            if (!wrapper) return;
+            const items = sdData[sdId] || [];
+            const item = items.find(it => it.value === value);
+            wrapper.querySelector('input[type=hidden]').value = value;
+            wrapper.querySelector('.sd-input').value = item ? `${item.name} (${item.id})` : '';
+        }
+
+        // Close dropdowns on outside click
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.search-dropdown')) {
+                document.querySelectorAll('.search-dropdown.open').forEach(el => el.classList.remove('open'));
+            }
+        });
+
         function populatePageDropdowns() {
-            const options = fbPages.map(p => `<option value="${p.id}" data-token="${p.access_token || ''}">${p.name} (${p.id})</option>`).join('');
-            const defaultOpt = '<option value="">-- Chọn Page --</option>';
-            document.getElementById('cfg-fb-page').innerHTML = defaultOpt + options;
-            document.getElementById('inp-page').innerHTML = defaultOpt + options;
+            const items = fbPages.map(p => ({ value: p.id, name: p.name, id: p.id, token: p.access_token || '' }));
+            sdData['sd-page'] = items;
+            sdData['sd-page-create'] = items;
+            sdRender('sd-page', '');
+            sdRender('sd-page-create', '');
         }
 
         function populateAccountDropdown() {
-            const el = document.getElementById('cfg-fb-account');
-            el.innerHTML = '<option value="">-- Chọn TKQC --</option>' +
-                fbAdAccounts.map(a => `<option value="act_${a.account_id}">${a.name || 'TKQC'} (act_${a.account_id})</option>`).join('');
+            sdData['sd-account'] = fbAdAccounts.map(a => ({ value: 'act_' + a.account_id, name: a.name || 'TKQC', id: 'act_' + a.account_id }));
+            sdRender('sd-account', '');
         }
 
         async function populatePixelDropdown(accountId) {
-            const el = document.getElementById('cfg-fb-pixel');
-            el.innerHTML = '<option value="">⏳ Đang tải Pixels...</option>';
+            const wrapper = document.getElementById('sd-pixel');
+            wrapper.querySelector('.sd-input').value = '⏳ Đang tải Pixels...';
             try {
                 const resp = await fetch(`${FB_API}/${accountId}/adspixels?fields=name,id&access_token=${fbAccessToken}`);
                 const data = await resp.json();
                 fbPixels = data.data || [];
-                if (fbPixels.length === 0) {
-                    el.innerHTML = '<option value="">-- Không có Pixel nào --</option>';
-                } else {
-                    el.innerHTML = '<option value="">-- Chọn Pixel --</option>' +
-                        fbPixels.map(p => `<option value="${p.id}">${p.name} (${p.id})</option>`).join('');
-                    // Auto-select from saved config
-                    const cfg = getConfig();
-                    if (cfg.pixel) setDropdownValue('cfg-fb-pixel', cfg.pixel);
-                }
+                sdData['sd-pixel'] = fbPixels.map(p => ({ value: p.id, name: p.name, id: p.id }));
+                wrapper.querySelector('.sd-input').value = '';
+                wrapper.querySelector('.sd-input').placeholder = fbPixels.length ? '🔍 Tìm Pixel theo tên...' : '📭 Không có Pixel nào';
+                sdRender('sd-pixel', '');
+                // Auto-select from saved config
+                const cfg = getConfig();
+                if (cfg.pixel) sdSelectByValue('sd-pixel', cfg.pixel);
             } catch (err) {
-                el.innerHTML = '<option value="">❌ Lỗi tải Pixels</option>';
+                wrapper.querySelector('.sd-input').value = '';
+                wrapper.querySelector('.sd-input').placeholder = '❌ Lỗi tải Pixels';
+                sdData['sd-pixel'] = [];
                 console.error('[FB Connect] Pixels error:', err);
             }
         }
 
         function onFbPageSelect() {
             const val = document.getElementById('cfg-fb-page').value;
-            // Sync to inp-page dropdown
-            setDropdownValue('inp-page', val);
+            sdSelectByValue('sd-page-create', val);
         }
 
         function onFbAccountSelect() {
@@ -1152,15 +1337,28 @@
             if (val) {
                 populatePixelDropdown(val);
             } else {
-                document.getElementById('cfg-fb-pixel').innerHTML = '<option value="">-- Chọn Pixel (chọn TKQC trước) --</option>';
+                sdData['sd-pixel'] = [];
+                const wrapper = document.getElementById('sd-pixel');
+                wrapper.querySelector('.sd-input').value = '';
+                wrapper.querySelector('.sd-input').placeholder = '🔍 Chọn TKQC trước...';
+                wrapper.querySelector('input[type=hidden]').value = '';
             }
         }
 
         function setDropdownValue(id, value) {
+            // For hidden inputs inside searchable dropdowns
             const el = document.getElementById(id);
             if (!el) return;
-            for (let i = 0; i < el.options.length; i++) {
-                if (el.options[i].value === value) { el.selectedIndex = i; return; }
+            // Check if this is a hidden input in a search-dropdown
+            const wrapper = el.closest('.search-dropdown');
+            if (wrapper) {
+                sdSelectByValue(wrapper.id, value);
+            } else if (el.tagName === 'SELECT') {
+                for (let i = 0; i < el.options.length; i++) {
+                    if (el.options[i].value === value) { el.selectedIndex = i; return; }
+                }
+            } else {
+                el.value = value;
             }
         }
 
