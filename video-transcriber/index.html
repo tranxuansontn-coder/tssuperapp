@@ -248,6 +248,17 @@
             cursor: not-allowed;
         }
 
+        .btn-danger {
+            background: transparent;
+            color: #f87171;
+            border-color: #f87171;
+        }
+        .btn-danger:hover {
+            background: #7f1d1d;
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+
         .btn-secondary {
             background: transparent;
             color: var(--text-sub);
@@ -715,6 +726,10 @@
                     style="white-space:nowrap; flex-shrink:0; padding:0.55rem 0.9rem; font-size:0.82rem;">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> Bóc băng
                 </button>
+                <button class="btn-danger" id="btnReset" onclick="resetAll()" 
+                    style="display:none; white-space:nowrap; flex-shrink:0; padding:0.55rem 0.9rem; font-size:0.82rem;">
+                    <i class="fa-solid fa-trash-can"></i> Xoá video
+                </button>
             </div>
 
             <div class="controls" id="controls">
@@ -1067,6 +1082,9 @@
                 emptyTranscript.style.display = 'none';
                 addTranscriptLine(resultText);
 
+                // Show reset button
+                document.getElementById('btnReset').style.display = 'flex';
+
             } catch (err) {
                 console.error(err);
                 statsDisplay.innerText = '❌ Lỗi: ' + err.message;
@@ -1083,6 +1101,45 @@
             navigator.clipboard.writeText(transcriptText).then(() => {
                 alert('✅ Đã copy bản transcript!');
             });
+        };
+
+        window.resetAll = function () {
+            // Stop any playing media
+            mediaPlayer.pause();
+            mediaPlayer.removeAttribute('src');
+            mediaPlayer.load();
+
+            // Reset state
+            currentFile = null;
+            fileUri = null;
+            transcriptText = '';
+            processing = false;
+
+            // Reset UI - show upload zone, hide video
+            uploadZone.style.display = '';
+            videoContainer.style.display = 'none';
+            controls.style.display = 'none';
+            progressBarContainer.style.display = 'none';
+            progressBar.style.width = '0%';
+            statsDisplay.style.display = 'none';
+            statsDisplay.innerText = '';
+
+            // Reset transcript
+            transcriptBox.innerHTML = '';
+            transcriptBox.appendChild(emptyTranscript);
+            emptyTranscript.style.display = '';
+
+            // Reset buttons
+            btnProcess.disabled = true;
+            btnProcess.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Bóc băng';
+            document.getElementById('btnReset').style.display = 'none';
+            document.getElementById('btnTTS').disabled = true;
+
+            // Reset file input so same file can be re-selected
+            fileInput.value = '';
+
+            // Stop TTS if playing
+            stopSpeaking();
         };
 
         // ========== TEXT-TO-SPEECH ENGINE ==========
