@@ -146,6 +146,31 @@
         .pagination .pg-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
         .pagination .pg-btn:disabled { opacity:.3; cursor:not-allowed; }
         .pagination .pg-info { font-size:11px; color:var(--text-muted); margin:0 8px; }
+
+        /* AI Section */
+        .ai-config-bar { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; padding:12px 16px; background:rgba(139,92,246,.04); border:1px solid rgba(139,92,246,.15); border-radius:10px; margin-bottom:16px; }
+        .ai-config-bar .form-group { flex:1; min-width:200px; }
+        .ai-config-bar label { font-size:11px; color:rgba(139,92,246,.8); margin-bottom:4px; display:block; font-weight:600; }
+        .btn-ai { background:linear-gradient(135deg,#8b5cf6,#6366f1); color:#fff; padding:10px 20px; font-size:13px; font-weight:700; border:none; border-radius:8px; cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; gap:8px; transition:all .2s; }
+        .btn-ai:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(139,92,246,.3); }
+        .btn-ai:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+        .ai-result { margin-top:16px; }
+        .ai-rec { padding:14px 16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; margin-bottom:10px; display:flex; gap:12px; align-items:center; transition:all .2s; }
+        .ai-rec:hover { border-color:rgba(139,92,246,.3); }
+        .ai-rec .ai-check { width:18px; height:18px; accent-color:#8b5cf6; cursor:pointer; flex-shrink:0; }
+        .ai-rec .ai-icon { font-size:18px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:8px; flex-shrink:0; }
+        .ai-rec .ai-body { flex:1; min-width:0; }
+        .ai-rec .ai-camp-name { font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .ai-rec .ai-action { font-size:11px; color:var(--text-dim); margin-top:2px; }
+        .ai-rec .ai-reason { font-size:10px; color:var(--text-muted); margin-top:2px; font-style:italic; }
+        .ai-summary { padding:14px 16px; background:rgba(139,92,246,.06); border:1px solid rgba(139,92,246,.15); border-radius:10px; margin-bottom:14px; font-size:12px; line-height:1.7; }
+        .ai-actions-bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:14px; }
+
+        /* Enhanced Rules */
+        .condition-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:8px; padding:8px 10px; background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:6px; }
+        .condition-row select, .condition-row input { padding:6px 8px; background:var(--bg); border:1px solid var(--border); border-radius:4px; color:var(--text); font-size:11px; font-family:inherit; outline:none; }
+        .condition-row select:focus, .condition-row input:focus { border-color:var(--accent); }
+        .condition-row .cond-remove { background:none; border:none; color:var(--danger); cursor:pointer; font-size:14px; padding:2px 4px; }
     </style>
 </head>
 <body>
@@ -210,8 +235,9 @@
 
     <!-- TABS -->
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('campaigns')">📊 Quản lý Campaigns</div>
-        <div class="tab" onclick="switchTab('rules')">📐 Quản lý Rules</div>
+        <div class="tab active" onclick="switchTab('campaigns')">📊 Campaigns</div>
+        <div class="tab" onclick="switchTab('ai')">🤖 AI Phân Tích</div>
+        <div class="tab" onclick="switchTab('rules')">📐 Rules</div>
         <div class="tab" onclick="switchTab('logs')">📋 Lịch sử</div>
     </div>
 
@@ -253,7 +279,23 @@
         </div>
     </div>
 
-    <!-- TAB 2: RULES -->
+    <!-- TAB 2: AI ANALYSIS -->
+    <div class="tab-view" id="tab-ai">
+        <div class="card">
+            <div class="card-title">🤖 AI Phân Tích Campaigns</div>
+            <div class="ai-config-bar">
+                <div class="form-group">
+                    <label>🔑 Gemini API Key</label>
+                    <input type="password" class="inp" id="cfg-gemini" placeholder="AIzaSyxxxxxx...">
+                </div>
+                <button class="btn-ai" id="btn-ai-analyze" onclick="aiAnalyze()" disabled>🤖 Phân tích & Đề xuất</button>
+            </div>
+            <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px">AI sẽ đọc toàn bộ data campaigns (spend, CPA, budget, đăng ký) và đề xuất hành động tối ưu cho từng campaign.</div>
+            <div id="ai-result"></div>
+        </div>
+    </div>
+
+    <!-- TAB 3: RULES -->
     <div class="tab-view" id="tab-rules">
         <div class="card">
             <div class="card-title">📐 Danh sách Rules
@@ -287,17 +329,25 @@
 
     <!-- MODAL: CREATE RULE -->
     <div class="modal-overlay" id="modal-rule">
-        <div class="modal">
+        <div class="modal" style="max-width:560px">
             <h3>📐 Tạo Rule mới</h3>
             <div class="form-group"><label>Tên Rule</label><input type="text" class="inp" id="rule-name" placeholder="vd: Tăng budget khi CPA thấp"></div>
             <div class="form-group"><label>Loại Rule</label>
                 <select class="inp" id="rule-type" onchange="updateRuleForm()">
                     <option value="budget_up">📈 Tăng ngân sách</option>
                     <option value="budget_down">📉 Giảm ngân sách</option>
+                    <option value="pause">⏸️ Tắt Campaign</option>
+                    <option value="enable">▶️ Bật Campaign</option>
                     <option value="duplicate">📋 Duplicate Campaign</option>
                 </select>
             </div>
             <div id="rule-form-fields"></div>
+            <div style="margin-top:12px">
+                <label style="font-size:12px;color:var(--text-dim);margin-bottom:6px;display:block">📋 Điều kiện (campaign phải thỏa TẤT CẢ điều kiện)</label>
+                <div id="rule-conditions"></div>
+                <button class="btn btn-ghost btn-sm" onclick="addConditionRow()" style="margin-top:6px">+ Thêm điều kiện</button>
+            </div>
+            <div class="form-group" style="margin-top:12px"><label>🔍 Filter tên campaign (để trống = tất cả)</label><input type="text" class="inp" id="rule-filter" placeholder="vd: mktminh"></div>
             <div class="modal-actions">
                 <button class="btn btn-ghost" onclick="closeModal('modal-rule')">Hủy</button>
                 <button class="btn btn-primary" onclick="saveRule()">💾 Lưu Rule</button>
@@ -443,12 +493,14 @@
         }
 
         // ===== TABS =====
+        const TAB_ORDER = ['campaigns', 'ai', 'rules', 'logs'];
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach((t, i) => {
-                t.classList.toggle('active', ['campaigns', 'rules', 'logs'][i] === tab);
+                t.classList.toggle('active', TAB_ORDER[i] === tab);
             });
             document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
+            if (tab === 'ai') { loadGeminiKey(); updateAiBtn(); }
         }
 
         // ===== REFRESH / LOAD CAMPAIGNS =====
@@ -722,42 +774,252 @@
             finally { closeModal('modal-bulk'); document.getElementById('modal-bulk-ok').disabled = false; document.getElementById('modal-bulk-ok').textContent = '✅ Thực hiện'; }
         }
 
-        // ===== RULES =====
+        // ===== AI ANALYSIS =====
+        let aiRecommendations = [];
+        function loadGeminiKey() { document.getElementById('cfg-gemini').value = localStorage.getItem('adsRules_gemini') || ''; }
+        function saveGeminiKey() { localStorage.setItem('adsRules_gemini', document.getElementById('cfg-gemini').value.trim()); }
+        function updateAiBtn() { document.getElementById('btn-ai-analyze').disabled = !campaigns.length || !document.getElementById('cfg-gemini').value.trim(); }
+        document.addEventListener('input', e => { if (e.target.id === 'cfg-gemini') { saveGeminiKey(); updateAiBtn(); } });
+
+        async function aiAnalyze() {
+            const key = document.getElementById('cfg-gemini').value.trim();
+            if (!key) { showToast('❌ Nhập Gemini API Key!', 'error'); return; }
+            if (!campaigns.length) { showToast('⚠️ Tải campaigns trước!', 'warning'); return; }
+            const btn = document.getElementById('btn-ai-analyze');
+            btn.disabled = true; btn.innerHTML = '<span class="spin">🤖</span> Đang phân tích...';
+            const resultEl = document.getElementById('ai-result');
+            resultEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-dim)"><div class="spinner"></div><div style="margin-top:8px">AI đang đọc data và phân tích...</div></div>';
+
+            // Build campaign summary for AI
+            const activeCamps = campaigns.filter(c => c.status === 'ACTIVE');
+            const campSummary = activeCamps.map(c => {
+                const ins = c._insights || {};
+                return `- ${c.name} | Budget: ${parseInt(c.daily_budget||0).toLocaleString()}₫ | Spend: ${(ins.spend||0).toLocaleString()}₫ | CPA: ${ins.cpa ? ins.cpa.toLocaleString()+'₫' : 'N/A'} | Đăng ký: ${ins.results||0}`;
+            }).join('\n');
+
+            const prompt = `Bạn là chuyên gia Facebook Ads optimization. Phân tích danh sách campaigns dưới đây và đề xuất hành động tối ưu.
+
+DANH SÁCH CAMPAIGNS ĐANG ACTIVE (${activeCamps.length} campaigns):
+${campSummary}
+
+QUY TẮC PHÂN TÍCH:
+- CPA < 100.000₫ và có đăng ký → campaign tốt, xem xét TĂNG budget 20-50%
+- CPA 100.000-150.000₫ → campaign trung bình, GIỮ NGUYÊN hoặc giảm nhẹ
+- CPA > 150.000₫ hoặc spend cao mà ít/không đăng ký → campaign kém, GIẢM budget hoặc TẮT
+- Campaign có CPA rất thấp & đăng ký tốt → xem xét DUPLICATE
+- Campaign mới (spend ít) → THEO DÕI, chưa action
+
+TRẢ VỀ JSON ARRAY, mỗi item có format:
+{"campaign_name": "tên campaign", "action": "increase|decrease|pause|duplicate|keep", "value": 20, "unit": "percent", "reason": "lý do ngắn gọn tiếng Việt"}
+
+Chỉ trả về JSON array, không markdown, không giải thích thêm.`;
+
+            try {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.3 } })
+                });
+                const data = await resp.json();
+                if (data.error) throw new Error(data.error.message);
+                let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+                aiRecommendations = JSON.parse(text);
+                renderAiResults(activeCamps);
+                addLog(`🤖 AI đã phân tích ${activeCamps.length} campaigns → ${aiRecommendations.length} đề xuất`, 'success');
+            } catch (e) {
+                resultEl.innerHTML = `<div style="color:var(--danger);font-size:12px;padding:20px;text-align:center">❌ Lỗi AI: ${e.message}</div>`;
+                addLog(`❌ AI Error: ${e.message}`, 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = '🤖 Phân tích & Đề xuất';
+            }
+        }
+
+        function renderAiResults(activeCamps) {
+            const resultEl = document.getElementById('ai-result');
+            if (!aiRecommendations.length) { resultEl.innerHTML = '<p style="color:var(--text-dim);font-size:12px;text-align:center;padding:20px">AI không có đề xuất nào.</p>'; return; }
+            const actionIcons = { increase: '📈', decrease: '📉', pause: '⏸️', duplicate: '📋', keep: '✅' };
+            const actionColors = { increase: 'rgba(16,185,129,.15)', decrease: 'rgba(239,68,68,.15)', pause: 'rgba(239,68,68,.15)', duplicate: 'rgba(59,130,246,.15)', keep: 'rgba(255,255,255,.05)' };
+            const actionLabels = { increase: 'Tăng budget', decrease: 'Giảm budget', pause: 'Tắt campaign', duplicate: 'Duplicate', keep: 'Giữ nguyên' };
+
+            const actionable = aiRecommendations.filter(r => r.action !== 'keep');
+            const keeps = aiRecommendations.filter(r => r.action === 'keep');
+
+            let html = `<div class="ai-summary">🤖 <strong>AI đề xuất:</strong> ${actionable.length} hành động cần thực hiện, ${keeps.length} campaigns giữ nguyên</div>`;
+            html += '<div style="margin-bottom:8px;display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="aiSelectAll(true)">☑️ Chọn tất cả</button><button class="btn btn-ghost btn-sm" onclick="aiSelectAll(false)">☐ Bỏ chọn</button></div>';
+
+            actionable.forEach((rec, i) => {
+                const icon = actionIcons[rec.action] || '📐';
+                const bgColor = actionColors[rec.action] || 'rgba(255,255,255,.05)';
+                let actionText = actionLabels[rec.action] || rec.action;
+                if (rec.value && rec.unit === 'percent') actionText += ` ${rec.value}%`;
+                html += `<div class="ai-rec">
+                    <input type="checkbox" class="ai-check" data-idx="${i}" checked>
+                    <div class="ai-icon" style="background:${bgColor}">${icon}</div>
+                    <div class="ai-body">
+                        <div class="ai-camp-name">${rec.campaign_name}</div>
+                        <div class="ai-action">${actionText}</div>
+                        <div class="ai-reason">${rec.reason || ''}</div>
+                    </div>
+                </div>`;
+            });
+            if (keeps.length) {
+                html += `<details style="margin-top:10px"><summary style="font-size:11px;color:var(--text-dim);cursor:pointer">✅ ${keeps.length} campaigns giữ nguyên (bấm để xem)</summary>`;
+                keeps.forEach(rec => {
+                    html += `<div class="ai-rec" style="opacity:.6"><div class="ai-icon" style="background:rgba(255,255,255,.05)">✅</div><div class="ai-body"><div class="ai-camp-name">${rec.campaign_name}</div><div class="ai-reason">${rec.reason || ''}</div></div></div>`;
+                });
+                html += '</details>';
+            }
+            if (actionable.length) {
+                html += `<div class="ai-actions-bar"><button class="btn-ai" id="btn-ai-execute" onclick="aiExecute()">🚀 Thực hiện đề xuất đã chọn</button><span style="font-size:11px;color:var(--text-dim)">Chỉ thực hiện các mục đã tick ✅</span></div>`;
+            }
+            resultEl.innerHTML = html;
+        }
+
+        function aiSelectAll(checked) {
+            document.querySelectorAll('.ai-check').forEach(cb => cb.checked = checked);
+        }
+
+        async function aiExecute() {
+            const token = fbAccessToken;
+            if (!token) { showToast('❌ Chưa kết nối Facebook!', 'error'); return; }
+            const checkedIdxs = [...document.querySelectorAll('.ai-check:checked')].map(cb => parseInt(cb.dataset.idx));
+            const actionable = aiRecommendations.filter(r => r.action !== 'keep');
+            const selected = checkedIdxs.map(i => actionable[i]).filter(Boolean);
+            if (!selected.length) { showToast('⚠️ Chọn ít nhất 1 đề xuất!', 'warning'); return; }
+
+            const btn = document.getElementById('btn-ai-execute');
+            btn.disabled = true; btn.innerHTML = '<span class="spin">🚀</span> Đang thực hiện...';
+            addLog(`🤖 Thực hiện ${selected.length} đề xuất AI...`, 'info');
+
+            for (const rec of selected) {
+                const camp = campaigns.find(c => c.name === rec.campaign_name);
+                if (!camp) { addLog(`⚠️ Không tìm thấy: ${rec.campaign_name}`, 'warn'); continue; }
+
+                if (rec.action === 'increase' || rec.action === 'decrease') {
+                    const cur = parseInt(camp.daily_budget || 0);
+                    let nb = cur;
+                    if (rec.unit === 'percent') nb = Math.round(cur * (rec.action === 'increase' ? (1 + (rec.value||20) / 100) : (1 - (rec.value||20) / 100)));
+                    else nb = rec.action === 'increase' ? cur + (rec.value||50000) : cur - (rec.value||50000);
+                    if (nb < 1000) nb = 1000;
+                    addLog(`💰 ${camp.name}: ${cur.toLocaleString()}₫ → ${nb.toLocaleString()}₫`, 'info');
+                    const body = new URLSearchParams(); body.append('daily_budget', nb.toString()); body.append('access_token', token);
+                    const resp = await fetch(`${FB_API}/${camp.id}`, { method: 'POST', body });
+                    const data = await resp.json();
+                    if (data.error) addLog(`❌ ${camp.name}: ${data.error.message}`, 'error');
+                    else addLog(`✅ ${camp.name}: Budget updated`, 'success');
+                } else if (rec.action === 'pause') {
+                    addLog(`⏸️ ${camp.name}: → PAUSED`, 'info');
+                    const body = new URLSearchParams(); body.append('status', 'PAUSED'); body.append('access_token', token);
+                    const resp = await fetch(`${FB_API}/${camp.id}`, { method: 'POST', body });
+                    const data = await resp.json();
+                    if (data.error) addLog(`❌ ${camp.name}: ${data.error.message}`, 'error');
+                    else addLog(`✅ ${camp.name}: Paused`, 'success');
+                } else if (rec.action === 'duplicate') {
+                    addLog(`📋 Duplicating ${camp.name}...`, 'info');
+                    const body = new URLSearchParams(); body.append('status_option', 'PAUSED'); body.append('access_token', token);
+                    const resp = await fetch(`${FB_API}/${camp.id}/copies`, { method: 'POST', body });
+                    const data = await resp.json();
+                    if (data.error) addLog(`❌ ${camp.name}: ${data.error.message}`, 'error');
+                    else addLog(`✅ ${camp.name}: Duplicated`, 'success');
+                }
+                await new Promise(r => setTimeout(r, 500));
+            }
+            addLog('🎉 Hoàn tất đề xuất AI!', 'success');
+            btn.disabled = false; btn.innerHTML = '🚀 Thực hiện đề xuất đã chọn';
+            setTimeout(() => refreshAllData(), 1500);
+        }
+
+        // ===== RULES (Enhanced with conditions) =====
+        let ruleConditionCount = 0;
         function openRuleModal(editIndex) {
             document.getElementById('rule-name').value = '';
             document.getElementById('rule-type').value = 'budget_up';
+            document.getElementById('rule-filter').value = '';
+            document.getElementById('rule-conditions').innerHTML = '';
+            ruleConditionCount = 0;
             updateRuleForm();
             document.getElementById('modal-rule').classList.add('active');
             document.getElementById('modal-rule').dataset.editIndex = editIndex ?? '';
         }
+
+        function addConditionRow() {
+            const container = document.getElementById('rule-conditions');
+            const idx = ruleConditionCount++;
+            const html = `<div class="condition-row" id="cond-${idx}">
+                <select class="cond-metric" style="min-width:100px">
+                    <option value="cpa">CPA (Cost/ĐK)</option>
+                    <option value="spend">Spend</option>
+                    <option value="results">Đăng ký</option>
+                    <option value="daily_budget">Daily Budget</option>
+                </select>
+                <select class="cond-op">
+                    <option value=">">></option>
+                    <option value=">=">>=</option>
+                    <option value="<"><</option>
+                    <option value="<="><=</option>
+                    <option value="==">=</option>
+                </select>
+                <input type="number" class="cond-val" placeholder="Giá trị" style="width:100px">
+                <button class="cond-remove" onclick="document.getElementById('cond-${idx}').remove()">✖</button>
+            </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function getConditionsFromForm() {
+            const rows = document.querySelectorAll('#rule-conditions .condition-row');
+            return [...rows].map(row => ({
+                metric: row.querySelector('.cond-metric').value,
+                op: row.querySelector('.cond-op').value,
+                value: parseFloat(row.querySelector('.cond-val').value) || 0
+            }));
+        }
+
+        function campaignMatchesConditions(camp, conditions) {
+            for (const cond of conditions) {
+                let val = 0;
+                if (cond.metric === 'cpa') val = camp._insights?.cpa || 0;
+                else if (cond.metric === 'spend') val = camp._insights?.spend || 0;
+                else if (cond.metric === 'results') val = camp._insights?.results || 0;
+                else if (cond.metric === 'daily_budget') val = parseInt(camp.daily_budget || 0);
+                const target = cond.value;
+                if (cond.op === '>' && !(val > target)) return false;
+                if (cond.op === '>=' && !(val >= target)) return false;
+                if (cond.op === '<' && !(val < target)) return false;
+                if (cond.op === '<=' && !(val <= target)) return false;
+                if (cond.op === '==' && !(val === target)) return false;
+            }
+            return true;
+        }
+
         function updateRuleForm() {
             const type = document.getElementById('rule-type').value;
             let html = '';
             if (type === 'budget_up' || type === 'budget_down') {
                 const verb = type === 'budget_up' ? 'Tăng' : 'Giảm';
                 html = `<div class="form-group"><label>${verb} theo</label><select class="inp" id="rule-method"><option value="percent">Phần trăm (%)</option><option value="amount">Số tiền cố định (VNĐ)</option></select></div>
-                <div class="form-group"><label>Giá trị</label><input type="number" class="inp" id="rule-value" placeholder="vd: 20" value="20"></div>
-                <div class="form-group"><label>Áp dụng cho campaigns có tên chứa (để trống = tất cả)</label><input type="text" class="inp" id="rule-filter" placeholder="vd: mktminh"></div>`;
+                <div class="form-group"><label>Giá trị</label><input type="number" class="inp" id="rule-value" placeholder="vd: 20" value="20"></div>`;
             } else if (type === 'duplicate') {
                 html = `<div class="form-group"><label>Số bản copy</label><input type="number" class="inp" id="rule-copies" value="1" min="1" max="10"></div>
-                <div class="form-group"><label>Trạng thái bản copy</label><select class="inp" id="rule-dup-status"><option value="PAUSED">🔴 PAUSED</option><option value="ACTIVE">🟢 ACTIVE</option></select></div>
-                <div class="form-group"><label>Áp dụng cho campaigns có tên chứa (để trống = tất cả)</label><input type="text" class="inp" id="rule-filter" placeholder="vd: carwiper"></div>`;
+                <div class="form-group"><label>Trạng thái bản copy</label><select class="inp" id="rule-dup-status"><option value="PAUSED">🔴 PAUSED</option><option value="ACTIVE">🟢 ACTIVE</option></select></div>`;
             }
+            // pause & enable don't need extra fields
             document.getElementById('rule-form-fields').innerHTML = html;
         }
+
         function saveRule() {
             const name = document.getElementById('rule-name').value.trim();
             const type = document.getElementById('rule-type').value;
             if (!name) { alert('Nhập tên rule!'); return; }
             const rule = { name, type, createdAt: new Date().toISOString() };
+            rule.filter = document.getElementById('rule-filter').value.trim();
+            rule.conditions = getConditionsFromForm();
             if (type === 'budget_up' || type === 'budget_down') {
                 rule.method = document.getElementById('rule-method').value;
                 rule.value = parseFloat(document.getElementById('rule-value').value);
-                rule.filter = document.getElementById('rule-filter').value.trim();
             } else if (type === 'duplicate') {
                 rule.copies = parseInt(document.getElementById('rule-copies').value) || 1;
                 rule.dupStatus = document.getElementById('rule-dup-status').value;
-                rule.filter = document.getElementById('rule-filter').value.trim();
             }
             const editIndex = document.getElementById('modal-rule').dataset.editIndex;
             if (editIndex !== '') rules[parseInt(editIndex)] = rule; else rules.push(rule);
@@ -774,8 +1036,9 @@
             if (!token) { addLog('❌ Chưa kết nối Facebook!', 'error'); return; }
             if (!campaigns.length) await refreshAllData();
             let targets = campaigns;
-            if (rule.filter) targets = campaigns.filter(c => c.name.toLowerCase().includes(rule.filter.toLowerCase()));
-            if (!targets.length) { addLog(`⚠️ Không tìm thấy campaign nào khớp filter "${rule.filter}"`, 'warn'); return; }
+            if (rule.filter) targets = targets.filter(c => c.name.toLowerCase().includes(rule.filter.toLowerCase()));
+            if (rule.conditions?.length) targets = targets.filter(c => campaignMatchesConditions(c, rule.conditions));
+            if (!targets.length) { addLog(`⚠️ Không tìm thấy campaign nào khớp điều kiện`, 'warn'); return; }
             addLog(`🚀 Chạy rule "${rule.name}" trên ${targets.length} campaigns...`, 'info');
             for (const camp of targets) {
                 if (rule.type === 'budget_up' || rule.type === 'budget_down') {
@@ -790,6 +1053,14 @@
                     const data = await resp.json();
                     if (data.error) addLog(`❌ ${camp.name}: ${data.error.message}`, 'error');
                     else addLog(`✅ ${camp.name}: OK`, 'success');
+                } else if (rule.type === 'pause' || rule.type === 'enable') {
+                    const st = rule.type === 'pause' ? 'PAUSED' : 'ACTIVE';
+                    addLog(`${rule.type === 'pause' ? '⏸️' : '▶️'} ${camp.name}: → ${st}`, 'info');
+                    const body = new URLSearchParams(); body.append('status', st); body.append('access_token', token);
+                    const resp = await fetch(`${FB_API}/${camp.id}`, { method: 'POST', body });
+                    const data = await resp.json();
+                    if (data.error) addLog(`❌ ${camp.name}: ${data.error.message}`, 'error');
+                    else addLog(`✅ ${camp.name}: → ${st}`, 'success');
                 } else if (rule.type === 'duplicate') {
                     for (let i = 0; i < rule.copies; i++) {
                         addLog(`📋 Duplicating ${camp.name} (${i+1}/${rule.copies})...`, 'info');
@@ -808,8 +1079,9 @@
 
         function renderRules() {
             if (!rules.length) { document.getElementById('rules-list').innerHTML = '<p style="color:var(--text-dim);font-size:12px;text-align:center;padding:20px 0">Chưa có rule nào. Bấm "Tạo Rule mới" để bắt đầu.</p>'; return; }
-            const icons = { budget_up: ['📈', 'rule-icon-up'], budget_down: ['📉', 'rule-icon-down'], duplicate: ['📋', 'rule-icon-dup'] };
-            const labels = { budget_up: 'Tăng ngân sách', budget_down: 'Giảm ngân sách', duplicate: 'Duplicate' };
+            const icons = { budget_up: ['📈', 'rule-icon-up'], budget_down: ['📉', 'rule-icon-down'], duplicate: ['📋', 'rule-icon-dup'], pause: ['⏸️', 'rule-icon-down'], enable: ['▶️', 'rule-icon-up'] };
+            const labels = { budget_up: 'Tăng ngân sách', budget_down: 'Giảm ngân sách', duplicate: 'Duplicate', pause: 'Tắt campaign', enable: 'Bật campaign' };
+            const condLabels = { cpa: 'CPA', spend: 'Spend', results: 'Đăng ký', daily_budget: 'Budget' };
             let html = '';
             rules.forEach((r, i) => {
                 const [icon, iconClass] = icons[r.type] || ['📐', ''];
@@ -818,6 +1090,9 @@
                 else if (r.method === 'amount') desc += ` ${r.value?.toLocaleString()}₫`;
                 if (r.copies) desc += ` × ${r.copies} copies`;
                 if (r.filter) desc += ` | Filter: "${r.filter}"`;
+                if (r.conditions?.length) {
+                    desc += ' | Khi: ' + r.conditions.map(c => `${condLabels[c.metric]||c.metric} ${c.op} ${c.value.toLocaleString()}`).join(' & ');
+                }
                 html += `<div class="rule-card"><div class="rule-icon ${iconClass}">${icon}</div>
                     <div class="rule-info"><div class="rule-name">${r.name}</div><div class="rule-desc">${desc}</div></div>
                     <div class="rule-actions"><button class="btn btn-primary btn-sm" onclick="executeRule(${i})">▶️ Chạy</button><button class="btn btn-ghost btn-sm" onclick="deleteRule(${i})">🗑️</button></div></div>`;
