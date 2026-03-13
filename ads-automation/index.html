@@ -635,8 +635,17 @@
             box-shadow: 0 4px 15px rgba(24, 119, 242, .2);
             font-weight: 700
         }
-        .btn-fb:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(24, 119, 242, .3) }
-        .btn-fb:disabled { opacity: .5; cursor: not-allowed; transform: none }
+
+        .btn-fb:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(24, 119, 242, .3)
+        }
+
+        .btn-fb:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none
+        }
 
         .btn-disconnect {
             background: rgba(239, 68, 68, .1);
@@ -649,7 +658,10 @@
             font-weight: 600;
             font-family: inherit
         }
-        .btn-disconnect:hover { background: rgba(239, 68, 68, .2) }
+
+        .btn-disconnect:hover {
+            background: rgba(239, 68, 68, .2)
+        }
 
         .fb-profile {
             display: flex;
@@ -658,6 +670,7 @@
             font-size: 12px;
             font-weight: 600
         }
+
         .fb-profile img {
             width: 28px;
             height: 28px;
@@ -673,6 +686,7 @@
             margin-bottom: 16px;
             text-align: center
         }
+
         .fb-connect-card.connected {
             border-style: solid;
             border-color: rgba(16, 185, 129, .3);
@@ -680,7 +694,10 @@
             text-align: left
         }
 
-        .fb-select-group { margin-top: 12px }
+        .fb-select-group {
+            margin-top: 12px
+        }
+
         .fb-select-group label {
             display: block;
             font-size: 11px;
@@ -688,7 +705,10 @@
             color: var(--text-dim);
             margin-bottom: 6px
         }
-        .fb-select-group select { width: 100% }
+
+        .fb-select-group select {
+            width: 100%
+        }
 
         .fb-status {
             display: flex;
@@ -696,16 +716,19 @@
             gap: 10px;
             margin-bottom: 12px
         }
+
         .fb-status img {
             width: 36px;
             height: 36px;
             border-radius: 50%;
             border: 2px solid var(--green)
         }
+
         .fb-status .name {
             font-weight: 700;
             font-size: 14px
         }
+
         .fb-status .email {
             font-size: 11px;
             color: var(--text-dim)
@@ -720,10 +743,16 @@
             align-items: center;
             gap: 4px
         }
-        .manual-toggle:hover { color: var(--text) }
+
+        .manual-toggle:hover {
+            color: var(--text)
+        }
 
         /* Searchable Dropdown */
-        .search-dropdown { position: relative }
+        .search-dropdown {
+            position: relative
+        }
+
         .search-dropdown .sd-input {
             background: var(--bg-input);
             border: 1px solid var(--border);
@@ -741,12 +770,18 @@
             white-space: nowrap;
             overflow: hidden
         }
+
         .search-dropdown .sd-input:focus {
             border-color: var(--accent);
             box-shadow: 0 0 0 3px var(--accent-glow);
             cursor: text
         }
-        .search-dropdown .sd-input::placeholder { color: var(--text-muted); font-size: 12px }
+
+        .search-dropdown .sd-input::placeholder {
+            color: var(--text-muted);
+            font-size: 12px
+        }
+
         .search-dropdown .sd-arrow {
             position: absolute;
             right: 12px;
@@ -757,7 +792,11 @@
             font-size: 10px;
             transition: transform .2s
         }
-        .search-dropdown.open .sd-arrow { transform: translateY(-50%) rotate(180deg) }
+
+        .search-dropdown.open .sd-arrow {
+            transform: translateY(-50%) rotate(180deg)
+        }
+
         .search-dropdown .sd-list {
             display: none;
             position: absolute;
@@ -770,10 +809,14 @@
             max-height: 220px;
             overflow-y: auto;
             z-index: 100;
-            box-shadow: 0 12px 40px rgba(0,0,0,.4);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, .4);
             animation: slideDown .15s ease
         }
-        .search-dropdown.open .sd-list { display: block }
+
+        .search-dropdown.open .sd-list {
+            display: block
+        }
+
         .search-dropdown .sd-item {
             padding: 9px 14px;
             font-size: 12px;
@@ -784,22 +827,46 @@
             gap: 8px;
             border-bottom: 1px solid var(--border)
         }
-        .search-dropdown .sd-item:last-child { border-bottom: none }
-        .search-dropdown .sd-item:hover { background: rgba(249,115,22,.06) }
-        .search-dropdown .sd-item.selected { background: rgba(249,115,22,.1); color: var(--accent); font-weight: 600 }
-        .search-dropdown .sd-item .sd-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
-        .search-dropdown .sd-item .sd-id { font-size: 10px; color: var(--text-muted); white-space: nowrap }
+
+        .search-dropdown .sd-item:last-child {
+            border-bottom: none
+        }
+
+        .search-dropdown .sd-item:hover {
+            background: rgba(249, 115, 22, .06)
+        }
+
+        .search-dropdown .sd-item.selected {
+            background: rgba(249, 115, 22, .1);
+            color: var(--accent);
+            font-weight: 600
+        }
+
+        .search-dropdown .sd-item .sd-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        .search-dropdown .sd-item .sd-id {
+            font-size: 10px;
+            color: var(--text-muted);
+            white-space: nowrap
+        }
+
         .search-dropdown .sd-empty {
             padding: 12px 14px;
             font-size: 12px;
             color: var(--text-muted);
             text-align: center
         }
+
         .search-dropdown .sd-count {
             padding: 4px 14px;
             font-size: 10px;
             color: var(--text-muted);
-            background: rgba(255,255,255,.02);
+            background: rgba(255, 255, 255, .02);
             border-bottom: 1px solid var(--border)
         }
 
@@ -812,11 +879,13 @@
             border-radius: var(--radius-sm);
             transition: all .3s
         }
+
         .schedule-section.active {
             border-style: solid;
             border-color: rgba(139, 92, 246, .3);
             background: rgba(139, 92, 246, .06)
         }
+
         .schedule-toggle {
             display: flex;
             align-items: center;
@@ -824,6 +893,7 @@
             cursor: pointer;
             user-select: none
         }
+
         .schedule-toggle .switch {
             position: relative;
             width: 40px;
@@ -834,6 +904,7 @@
             transition: all .2s;
             flex-shrink: 0
         }
+
         .schedule-toggle .switch::after {
             content: '';
             position: absolute;
@@ -845,30 +916,42 @@
             left: 2px;
             transition: all .2s
         }
+
         .schedule-toggle.on .switch {
             background: rgba(139, 92, 246, .2);
             border-color: var(--purple)
         }
+
         .schedule-toggle.on .switch::after {
             background: var(--purple);
             left: 20px
         }
+
         .schedule-toggle .label {
             font-size: 13px;
             font-weight: 600;
             color: var(--text-dim)
         }
-        .schedule-toggle.on .label { color: var(--purple) }
+
+        .schedule-toggle.on .label {
+            color: var(--purple)
+        }
+
         .schedule-fields {
             display: none;
             margin-top: 12px;
             gap: 12px
         }
+
         .schedule-fields.show {
             display: block;
             animation: fadeIn .3s ease
         }
-        .schedule-fields .form-group label { color: var(--purple) }
+
+        .schedule-fields .form-group label {
+            color: var(--purple)
+        }
+
         .schedule-hint {
             margin-top: 8px;
             font-size: 10px;
@@ -954,14 +1037,16 @@
                         <label>📅 Ngày bắt đầu</label>
                         <input type="date" id="inp-start-date" class="inp">
                     </div>
-                    <div style="margin-top:6px;font-size:10px;color:var(--purple);font-weight:600">💡 Campaign sẽ bắt đầu chạy từ 00:00 ngày đã chọn</div>
+                    <div style="margin-top:6px;font-size:10px;color:var(--purple);font-weight:600">💡 Campaign sẽ bắt
+                        đầu chạy từ 00:00 ngày đã chọn</div>
                 </div>
                 <div class="schedule-hint" id="schedule-hint">💡 Tắt = Lên camp chạy luôn ngay lập tức</div>
             </div>
             <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
                 <div class="form-group" style="flex:1;min-width:200px"><label>📄 Page</label>
                     <div class="search-dropdown" id="sd-page-create">
-                        <input class="sd-input" placeholder="🔍 Tìm Page..." onclick="sdToggle('sd-page-create')" oninput="sdFilter('sd-page-create')">
+                        <input class="sd-input" placeholder="🔍 Tìm Page..." onclick="sdToggle('sd-page-create')"
+                            oninput="sdFilter('sd-page-create')">
                         <span class="sd-arrow">▼</span>
                         <div class="sd-list"></div>
                         <input type="hidden" id="inp-page" value="">
@@ -1037,7 +1122,8 @@
             <div id="fb-connect-area" class="fb-connect-card">
                 <div style="font-size:32px;margin-bottom:8px">📱</div>
                 <div style="font-size:13px;font-weight:600;margin-bottom:4px">Kết nối tài khoản Facebook</div>
-                <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px">Tự động lấy danh sách Pages, TKQC và Pixels</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px">Tự động lấy danh sách Pages, TKQC
+                    và Pixels</div>
                 <button class="btn btn-fb" onclick="fbLogin()">🔗 Connect with Facebook</button>
             </div>
             <div id="fb-connected-area" style="display:none">
@@ -1054,7 +1140,8 @@
                         <div class="fb-select-group">
                             <label>📄 Chọn Page</label>
                             <div class="search-dropdown" id="sd-page">
-                                <input class="sd-input" placeholder="🔍 Tìm Page theo tên..." onclick="sdToggle('sd-page')" oninput="sdFilter('sd-page')">
+                                <input class="sd-input" placeholder="🔍 Tìm Page theo tên..."
+                                    onclick="sdToggle('sd-page')" oninput="sdFilter('sd-page')">
                                 <span class="sd-arrow">▼</span>
                                 <div class="sd-list"></div>
                                 <input type="hidden" id="cfg-fb-page" value="">
@@ -1063,7 +1150,8 @@
                         <div class="fb-select-group">
                             <label>🏢 Chọn Tài khoản QC</label>
                             <div class="search-dropdown" id="sd-account">
-                                <input class="sd-input" placeholder="🔍 Tìm TKQC theo tên..." onclick="sdToggle('sd-account')" oninput="sdFilter('sd-account')">
+                                <input class="sd-input" placeholder="🔍 Tìm TKQC theo tên..."
+                                    onclick="sdToggle('sd-account')" oninput="sdFilter('sd-account')">
                                 <span class="sd-arrow">▼</span>
                                 <div class="sd-list"></div>
                                 <input type="hidden" id="cfg-fb-account" value="">
@@ -1072,26 +1160,61 @@
                         <div class="fb-select-group" style="grid-column:1/-1">
                             <label>📍 Chọn Pixel</label>
                             <div class="search-dropdown" id="sd-pixel">
-                                <input class="sd-input" placeholder="🔍 Tìm Pixel theo tên..." onclick="sdToggle('sd-pixel')" oninput="sdFilter('sd-pixel')">
+                                <input class="sd-input" placeholder="🔍 Tìm Pixel theo tên..."
+                                    onclick="sdToggle('sd-pixel')" oninput="sdFilter('sd-pixel')">
                                 <span class="sd-arrow">▼</span>
                                 <div class="sd-list"></div>
                                 <input type="hidden" id="cfg-fb-pixel" value="">
+                            </div>
+                            <!-- Manual Pixel Input (auto-shown when API returns no pixels) -->
+                            <div id="manual-pixel-section"
+                                style="display:none;margin-top:10px;padding:12px;background:rgba(249,115,22,.05);border:1px dashed rgba(249,115,22,.3);border-radius:8px">
+                                <div
+                                    style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                                    <span style="font-size:11px;font-weight:700;color:var(--accent)">⚠️ Không tìm thấy
+                                        Pixel — Nhập thủ công</span>
+                                    <button onclick="hideManualPixel()"
+                                        style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;line-height:1;padding:2px 5px"
+                                        title="Ẩn">✕</button>
+                                </div>
+                                <div style="display:flex;gap:8px;align-items:center">
+                                    <input type="text" id="cfg-pixel-inline" class="inp"
+                                        placeholder="Nhập Pixel ID (vd: 123456789012345)"
+                                        oninput="validatePixelId(this)"
+                                        style="flex:1;font-family:monospace;font-size:13px">
+                                    <button onclick="applyManualPixel()" class="btn btn-primary"
+                                        style="white-space:nowrap;padding:10px 14px;font-size:12px">✅ Dùng ID
+                                        này</button>
+                                </div>
+                                <div id="pixel-validate-msg"
+                                    style="font-size:11px;margin-top:5px;color:var(--text-dim)">📌 Tìm Pixel ID trong <a
+                                        href="https://business.facebook.com/events_manager" target="_blank"
+                                        style="color:var(--accent)">Facebook Events Manager</a></div>
+                            </div>
+                            <!-- Toggle link to manually enter pixel even when not needed -->
+                            <div id="manual-pixel-toggle" style="margin-top:6px">
+                                <span onclick="showManualPixel()"
+                                    style="font-size:11px;color:var(--text-dim);cursor:pointer;display:inline-flex;align-items:center;gap:4px"
+                                    title="Nhập Pixel ID thủ công">
+                                    🔧 Nhập Pixel ID thủ công
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="manual-toggle" onclick="toggleManualMode()">🔧 <span id="manual-toggle-text">Nhập thủ công (Advanced)</span></div>
+            <div class="manual-toggle" onclick="toggleManualMode()">🔧 <span id="manual-toggle-text">Nhập thủ công
+                    (Advanced)</span></div>
             <div id="manual-config" style="display:none;margin-top:12px">
                 <div class="form-grid">
                     <div class="form-group" style="grid-column:1/-1"><label>🔑 Facebook Access Token</label><input
                             type="password" id="cfg-token" class="inp" placeholder="EAAxxxxxxx..."></div>
-                    <div class="form-group"><label>🏢 Ad Account ID</label><input type="text" id="cfg-account" class="inp"
-                            placeholder="act_123456789"></div>
-                    <div class="form-group"><label>📄 Default Page ID</label><input type="text" id="cfg-page" class="inp"
-                            placeholder="1234567890"></div>
-                    <div class="form-group"><label>📍 Facebook Pixel ID</label><input type="text" id="cfg-pixel" class="inp"
-                            placeholder="123456789012345"></div>
+                    <div class="form-group"><label>🏢 Ad Account ID</label><input type="text" id="cfg-account"
+                            class="inp" placeholder="act_123456789"></div>
+                    <div class="form-group"><label>📄 Default Page ID</label><input type="text" id="cfg-page"
+                            class="inp" placeholder="1234567890"></div>
+                    <div class="form-group"><label>📍 Facebook Pixel ID</label><input type="text" id="cfg-pixel"
+                            class="inp" placeholder="123456789012345"></div>
                 </div>
             </div>
         </div>
@@ -1101,10 +1224,16 @@
             <div style="font-weight:700;font-size:13px;margin-bottom:16px">🤖 Cấu hình AI & Khác</div>
             <!-- AI Provider Toggle -->
             <div style="margin-bottom:16px">
-                <label style="display:block;font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:8px">🧠 Chọn AI Provider</label>
-                <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;max-width:340px">
-                    <button class="btn" id="btn-ai-gemini" onclick="switchAIProvider('gemini')" style="flex:1;border-radius:0;border:none;font-size:12px;padding:10px 16px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:700;transition:all .2s">✨ Gemini</button>
-                    <button class="btn" id="btn-ai-openai" onclick="switchAIProvider('openai')" style="flex:1;border-radius:0;border:none;font-size:12px;padding:10px 16px;background:var(--bg-input);color:var(--text-dim);font-weight:600;transition:all .2s">💬 ChatGPT</button>
+                <label style="display:block;font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:8px">🧠
+                    Chọn AI Provider</label>
+                <div
+                    style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;max-width:340px">
+                    <button class="btn" id="btn-ai-gemini" onclick="switchAIProvider('gemini')"
+                        style="flex:1;border-radius:0;border:none;font-size:12px;padding:10px 16px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:700;transition:all .2s">✨
+                        Gemini</button>
+                    <button class="btn" id="btn-ai-openai" onclick="switchAIProvider('openai')"
+                        style="flex:1;border-radius:0;border:none;font-size:12px;padding:10px 16px;background:var(--bg-input);color:var(--text-dim);font-weight:600;transition:all .2s">💬
+                        ChatGPT</button>
                 </div>
             </div>
             <!-- Gemini Config -->
@@ -1424,17 +1553,95 @@
                 fbPixels = data.data || [];
                 sdData['sd-pixel'] = fbPixels.map(p => ({ value: p.id, name: p.name, id: p.id }));
                 wrapper.querySelector('.sd-input').value = '';
-                wrapper.querySelector('.sd-input').placeholder = fbPixels.length ? '🔍 Tìm Pixel theo tên...' : '📭 Không có Pixel nào';
+                if (fbPixels.length) {
+                    wrapper.querySelector('.sd-input').placeholder = '🔍 Tìm Pixel theo tên...';
+                    hideManualPixel();
+                } else {
+                    wrapper.querySelector('.sd-input').placeholder = '📭 Không tìm thấy Pixel nào';
+                    showManualPixel(true); // auto-show with no-pixel context
+                }
                 sdRender('sd-pixel', '');
                 // Auto-select from saved config
                 const cfg = getConfig();
-                if (cfg.pixel) sdSelectByValue('sd-pixel', cfg.pixel);
+                if (cfg.pixel) {
+                    const found = sdSelectByValue('sd-pixel', cfg.pixel);
+                    if (!found && cfg.pixel) {
+                        // Pixel from config not in list — show manual with prefill
+                        showManualPixel(true);
+                        document.getElementById('cfg-pixel-inline').value = cfg.pixel;
+                        validatePixelId(document.getElementById('cfg-pixel-inline'));
+                    }
+                }
             } catch (err) {
                 wrapper.querySelector('.sd-input').value = '';
-                wrapper.querySelector('.sd-input').placeholder = '❌ Lỗi tải Pixels';
+                wrapper.querySelector('.sd-input').placeholder = '❌ Lỗi tải Pixels — hãy nhập thủ công';
                 sdData['sd-pixel'] = [];
+                showManualPixel(true);
                 console.error('[FB Connect] Pixels error:', err);
             }
+        }
+
+        function showManualPixel(autoShown = false) {
+            const sec = document.getElementById('manual-pixel-section');
+            const toggle = document.getElementById('manual-pixel-toggle');
+            if (!autoShown) {
+                // Manual trigger: change top message to neutral
+                sec.querySelector('span[style]').textContent = '✏️ Nhập Pixel ID thủ công';
+                sec.querySelector('span[style]').style.color = 'var(--text-dim)';
+                sec.style.background = 'rgba(255,255,255,.03)';
+                sec.style.borderColor = 'rgba(255,255,255,.1)';
+            } else {
+                sec.querySelector('span[style]').textContent = '⚠️ Không tìm thấy Pixel — Nhập thủ công';
+                sec.querySelector('span[style]').style.color = 'var(--accent)';
+                sec.style.background = 'rgba(249,115,22,.05)';
+                sec.style.borderColor = 'rgba(249,115,22,.3)';
+            }
+            sec.style.display = 'block';
+            if (toggle) toggle.style.display = 'none';
+            // Pre-fill from saved config
+            const cfg = getConfig();
+            if (cfg.pixel && !document.getElementById('cfg-pixel-inline').value) {
+                document.getElementById('cfg-pixel-inline').value = cfg.pixel;
+                validatePixelId(document.getElementById('cfg-pixel-inline'));
+            }
+        }
+
+        function hideManualPixel() {
+            const sec = document.getElementById('manual-pixel-section');
+            const toggle = document.getElementById('manual-pixel-toggle');
+            if (sec) sec.style.display = 'none';
+            if (toggle) toggle.style.display = 'block';
+        }
+
+        function validatePixelId(input) {
+            const val = input.value.trim();
+            const msg = document.getElementById('pixel-validate-msg');
+            if (!val) {
+                msg.innerHTML = '📌 Tìm Pixel ID trong <a href="https://business.facebook.com/events_manager" target="_blank" style="color:var(--accent)">Facebook Events Manager</a>';
+                msg.style.color = 'var(--text-dim)';
+                input.style.borderColor = '';
+            } else if (/^\d{10,20}$/.test(val)) {
+                msg.textContent = '✅ Format hợp lệ — ID gồm ' + val.length + ' chữ số';
+                msg.style.color = 'var(--green)';
+                input.style.borderColor = 'var(--green)';
+            } else {
+                msg.textContent = '⚠️ Pixel ID thường là 10–20 chữ số. Kiểm tra lại.';
+                msg.style.color = 'var(--yellow)';
+                input.style.borderColor = 'var(--yellow)';
+            }
+        }
+
+        function applyManualPixel() {
+            const val = document.getElementById('cfg-pixel-inline').value.trim();
+            if (!val) { showToast('⚠️ Vui lòng nhập Pixel ID', 'warning'); return; }
+            // Sync to both the main manual field and the hidden FB pixel field
+            document.getElementById('cfg-pixel').value = val;
+            document.getElementById('cfg-fb-pixel').value = val;
+            // Update dropdown display to show manually entered pixel
+            const inp = document.querySelector('#sd-pixel .sd-input');
+            if (inp) { inp.value = '✅ Pixel ID: ' + val; }
+            showToast('✅ Đã áp dụng Pixel ID: ' + val, 'success');
+            hideManualPixel();
         }
 
         function onFbPageSelect() {
