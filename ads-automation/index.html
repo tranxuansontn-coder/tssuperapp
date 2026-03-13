@@ -802,6 +802,80 @@
             background: rgba(255,255,255,.02);
             border-bottom: 1px solid var(--border)
         }
+
+        /* Schedule Toggle */
+        .schedule-section {
+            margin-top: 12px;
+            padding: 14px 16px;
+            background: rgba(139, 92, 246, .04);
+            border: 1px dashed rgba(139, 92, 246, .2);
+            border-radius: var(--radius-sm);
+            transition: all .3s
+        }
+        .schedule-section.active {
+            border-style: solid;
+            border-color: rgba(139, 92, 246, .3);
+            background: rgba(139, 92, 246, .06)
+        }
+        .schedule-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none
+        }
+        .schedule-toggle .switch {
+            position: relative;
+            width: 40px;
+            height: 22px;
+            background: var(--bg-input);
+            border-radius: 99px;
+            border: 1px solid var(--border);
+            transition: all .2s;
+            flex-shrink: 0
+        }
+        .schedule-toggle .switch::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            top: 2px;
+            left: 2px;
+            transition: all .2s
+        }
+        .schedule-toggle.on .switch {
+            background: rgba(139, 92, 246, .2);
+            border-color: var(--purple)
+        }
+        .schedule-toggle.on .switch::after {
+            background: var(--purple);
+            left: 20px
+        }
+        .schedule-toggle .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dim)
+        }
+        .schedule-toggle.on .label { color: var(--purple) }
+        .schedule-fields {
+            display: none;
+            margin-top: 12px;
+            gap: 12px
+        }
+        .schedule-fields.show {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            animation: fadeIn .3s ease
+        }
+        .schedule-fields .form-group label { color: var(--purple) }
+        .schedule-hint {
+            margin-top: 8px;
+            font-size: 10px;
+            color: var(--text-muted);
+            line-height: 1.5
+        }
     </style>
 </head>
 
@@ -869,6 +943,24 @@
             <div id="camp-name-preview"
                 style="margin-top:8px;padding:8px 12px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:12px;color:var(--text-dim);border:1px dashed rgba(255,255,255,0.1)">
                 📋 Tên Campaign: <span id="camp-name-value" style="color:var(--accent);font-weight:600">---</span>
+            </div>
+            <!-- Schedule Section -->
+            <div class="schedule-section" id="schedule-section">
+                <div class="schedule-toggle" id="schedule-toggle" onclick="toggleSchedule()">
+                    <div class="switch"></div>
+                    <div class="label">⏰ Hẹn giờ hoạt động Campaign</div>
+                </div>
+                <div class="schedule-fields" id="schedule-fields">
+                    <div class="form-group">
+                        <label>🟢 Bắt đầu</label>
+                        <input type="datetime-local" id="inp-start-time" class="inp" onchange="updateSchedulePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>🔴 Kết thúc</label>
+                        <input type="datetime-local" id="inp-end-time" class="inp" onchange="updateSchedulePreview()">
+                    </div>
+                </div>
+                <div class="schedule-hint" id="schedule-hint">💡 Tắt = Campaign tạo ở trạng thái PAUSED, bạn tự bật trên Ads Manager</div>
             </div>
             <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
                 <div class="form-group" style="flex:1;min-width:200px"><label>📄 Page</label>
@@ -1014,11 +1106,36 @@
         <!-- AI & Other Settings -->
         <div class="card fade-in" style="padding:20px;margin-bottom:16px;animation-delay:.03s">
             <div style="font-weight:700;font-size:13px;margin-bottom:16px">🤖 Cấu hình AI & Khác</div>
-            <div class="form-grid">
-                <div class="form-group"><label>🤖 Gemini API Key</label><input type="password" id="cfg-gemini"
+            <!-- AI Provider Toggle -->
+            <div style="margin-bottom:16px">
+                <label style="display:block;font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:8px">🧠 Chọn AI Provider</label>
+                <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;max-width:340px">
+                    <button class="btn" id="btn-ai-gemini" onclick="switchAIProvider('gemini')" style="flex:1;border-radius:0;border:none;font-size:12px;padding:10px 16px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-weight:700;transition:all .2s">✨ Gemini</button>
+                    <button class="btn" id="btn-ai-openai" onclick="switchAIProvider('openai')" style="flex:1;border-radius:0;border:none;font-size:12px;padding:10px 16px;background:var(--bg-input);color:var(--text-dim);font-weight:600;transition:all .2s">💬 ChatGPT</button>
+                </div>
+            </div>
+            <!-- Gemini Config -->
+            <div id="ai-config-gemini" class="form-grid" style="margin-bottom:12px">
+                <div class="form-group"><label>🔑 Gemini API Key</label><input type="password" id="cfg-gemini"
                         class="inp" placeholder="AIzaSyxxxxxx..."></div>
                 <div class="form-group"><label>🧠 Gemini Model</label><input type="text" id="cfg-model" class="inp"
                         value="gemini-1.5-flash-latest" placeholder="gemini-1.5-flash-latest"></div>
+            </div>
+            <!-- OpenAI Config -->
+            <div id="ai-config-openai" class="form-grid" style="margin-bottom:12px;display:none">
+                <div class="form-group"><label>🔑 OpenAI API Key</label><input type="password" id="cfg-openai"
+                        class="inp" placeholder="sk-xxxxxxxx..."></div>
+                <div class="form-group"><label>💬 ChatGPT Model</label>
+                    <select id="cfg-openai-model" class="inp">
+                        <option value="gpt-4o-mini" selected>GPT-4o Mini (nhanh, rẻ)</option>
+                        <option value="gpt-4o">GPT-4o (mạnh nhất)</option>
+                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo (rẻ nhất)</option>
+                    </select>
+                </div>
+            </div>
+            <input type="hidden" id="cfg-ai-provider" value="gemini">
+            <div class="form-grid">
                 <div class="form-group"><label>🎯 Conversion Event</label>
                     <select id="cfg-event" class="inp">
                         <option value="COMPLETE_REGISTRATION" selected>Complete Registration</option>
@@ -1461,8 +1578,11 @@
                 token: fbAccessToken || manualToken,
                 account: fbAccount || manualAccount,
                 page: fbPage || manualPage,
+                aiProvider: document.getElementById('cfg-ai-provider').value || 'gemini',
                 gemini: document.getElementById('cfg-gemini').value.trim(),
                 model: document.getElementById('cfg-model').value.trim() || 'gemini-1.5-flash-latest',
+                openai: document.getElementById('cfg-openai').value.trim(),
+                openaiModel: document.getElementById('cfg-openai-model').value || 'gpt-4o-mini',
                 pixel: fbPixel || manualPixel,
                 event: document.getElementById('cfg-event').value,
                 objective: document.getElementById('cfg-objective').value,
@@ -1482,6 +1602,9 @@
             document.getElementById('cfg-page').value = cfg.page || '';
             document.getElementById('cfg-gemini').value = cfg.gemini || '';
             document.getElementById('cfg-model').value = cfg.model || 'gemini-1.5-flash-latest';
+            document.getElementById('cfg-openai').value = cfg.openai || '';
+            if (cfg.openaiModel) document.getElementById('cfg-openai-model').value = cfg.openaiModel;
+            if (cfg.aiProvider) switchAIProvider(cfg.aiProvider);
             document.getElementById('cfg-pixel').value = cfg.pixel || '';
             if (cfg.event) document.getElementById('cfg-event').value = cfg.event;
             if (cfg.objective) document.getElementById('cfg-objective').value = cfg.objective;
@@ -1553,12 +1676,99 @@
     </div>`).join('');
         }
 
+        // ==================== AI PROVIDER ====================
+        function switchAIProvider(provider) {
+            document.getElementById('cfg-ai-provider').value = provider;
+            const isGemini = provider === 'gemini';
+            document.getElementById('ai-config-gemini').style.display = isGemini ? 'grid' : 'none';
+            document.getElementById('ai-config-openai').style.display = isGemini ? 'none' : 'grid';
+            // Toggle button styles
+            const btnG = document.getElementById('btn-ai-gemini');
+            const btnO = document.getElementById('btn-ai-openai');
+            if (isGemini) {
+                btnG.style.background = 'linear-gradient(135deg,#f97316,#ef4444)';
+                btnG.style.color = '#fff'; btnG.style.fontWeight = '700';
+                btnO.style.background = 'var(--bg-input)';
+                btnO.style.color = 'var(--text-dim)'; btnO.style.fontWeight = '600';
+            } else {
+                btnO.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+                btnO.style.color = '#fff'; btnO.style.fontWeight = '700';
+                btnG.style.background = 'var(--bg-input)';
+                btnG.style.color = 'var(--text-dim)'; btnG.style.fontWeight = '600';
+            }
+        }
+
+        // Unified AI call — supports Gemini & OpenAI
+        async function callAI(prompt, temperature = 0.7) {
+            const cfg = getConfig();
+            const provider = cfg.aiProvider || 'gemini';
+
+            if (provider === 'openai') {
+                if (!cfg.openai) throw new Error('Cần cấu hình OpenAI API Key trước!');
+                const model = cfg.openaiModel || 'gpt-4o-mini';
+                console.log(`[AdsAuto] Calling OpenAI API (${model})...`);
+                const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${cfg.openai}`
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [{ role: 'user', content: prompt }],
+                        temperature: temperature
+                    })
+                });
+                if (!resp.ok) {
+                    const errText = await resp.text();
+                    console.error('[AdsAuto] OpenAI Error:', resp.status, errText);
+                    throw new Error(`OpenAI API ${resp.status}: ${errText.slice(0, 200)}`);
+                }
+                const data = await resp.json();
+                if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+                const text = data.choices?.[0]?.message?.content;
+                if (!text) throw new Error('ChatGPT không trả về text.');
+                return text;
+            } else {
+                // Gemini
+                if (!cfg.gemini) throw new Error('Cần cấu hình Gemini API Key trước!');
+                const model = cfg.model || 'gemini-1.5-flash-latest';
+                console.log(`[AdsAuto] Calling Gemini API (${model})...`);
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${cfg.gemini}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { temperature: temperature }
+                    })
+                });
+                if (!resp.ok) {
+                    const errText = await resp.text();
+                    console.error('[AdsAuto] Gemini Error:', resp.status, errText);
+                    throw new Error(`Gemini API ${resp.status}: ${errText.slice(0, 200)}`);
+                }
+                const data = await resp.json();
+                if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error('Gemini không trả về text. Kiểm tra API Key hoặc quota.');
+                return text;
+            }
+        }
+
+        function getActiveAILabel() {
+            const cfg = getConfig();
+            if (cfg.aiProvider === 'openai') return `ChatGPT (${cfg.openaiModel || 'gpt-4o-mini'})`;
+            return `Gemini (${cfg.model || 'gemini-1.5-flash-latest'})`;
+        }
+
         // ==================== READ LANDING PAGE ====================
         async function readLandingPage() {
             const url = document.getElementById('inp-link').value.trim();
             if (!url) { showToast('Nhập Link (Landing Page) trước!', 'warning'); return; }
             const cfg = getConfig();
-            if (!cfg.gemini) { showToast('Cần cấu hình Gemini API Key trước!', 'warning'); switchTab('config'); return; }
+            const provider = cfg.aiProvider || 'gemini';
+            if (provider === 'gemini' && !cfg.gemini) { showToast('Cần cấu hình Gemini API Key trước!', 'warning'); switchTab('config'); return; }
+            if (provider === 'openai' && !cfg.openai) { showToast('Cần cấu hình OpenAI API Key trước!', 'warning'); switchTab('config'); return; }
 
             const btn = document.getElementById('btn-read-page');
             btn.disabled = true;
@@ -1596,10 +1806,8 @@
                     throw new Error('Landing page không có nội dung đủ. Thử nhập mô tả thủ công.');
                 }
 
-                btn.innerHTML = '<span class="spinner"></span> AI đang phân tích sản phẩm...';
+                btn.innerHTML = `<span class="spinner"></span> ${getActiveAILabel()} đang phân tích sản phẩm...`;
 
-                // Send to Gemini to extract product info
-                const modelName = cfg.model || 'gemini-1.5-flash-latest';
                 const prompt = `Analyze this landing page content and extract a concise product description for writing Facebook ad copy.
 
 PAGE CONTENT:
@@ -1613,17 +1821,7 @@ Return a product summary in this format (2-4 sentences, English):
 
 Just return the summary text, no markdown, no explanation.`;
 
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${cfg.gemini}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: { temperature: 0.3 }
-                    })
-                });
-                const data = await resp.json();
-                if (data.error) throw new Error(data.error.message);
-                const summary = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                const summary = await callAI(prompt, 0.3);
                 if (!summary) throw new Error('AI không thể phân tích trang.');
 
                 document.getElementById('inp-product').value = summary.trim();
@@ -1640,7 +1838,9 @@ Just return the summary text, no markdown, no explanation.`;
         // ==================== AI TEXT GENERATION ====================
         async function generateAllTexts() {
             const cfg = getConfig();
-            if (!cfg.gemini) { showToast('Cần cấu hình Gemini API Key trước!', 'warning'); switchTab('config'); return; }
+            const provider = cfg.aiProvider || 'gemini';
+            if (provider === 'gemini' && !cfg.gemini) { showToast('Cần cấu hình Gemini API Key trước!', 'warning'); switchTab('config'); return; }
+            if (provider === 'openai' && !cfg.openai) { showToast('Cần cấu hình OpenAI API Key trước!', 'warning'); switchTab('config'); return; }
             if (videoFiles.length === 0) { showToast('Chọn ít nhất 1 video!', 'warning'); return; }
 
             document.getElementById('btn-generate').disabled = true;
@@ -1669,35 +1869,8 @@ IMPORTANT: Return ONLY a valid JSON array, no markdown, no explanation.
 Format: [{"headline":"...","primary_text":"...","description":"..."}]
 Generate exactly ${videoFiles.length} objects.`;
 
-                console.log('[AdsAuto] Calling Gemini API...');
-                const modelName = cfg.model || 'gemini-1.5-flash-latest';
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${cfg.gemini}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: { temperature: 0.9 }
-                    })
-                });
-
-                if (!resp.ok) {
-                    const errText = await resp.text();
-                    console.error('[AdsAuto] API Error:', resp.status, errText);
-                    throw new Error(`API ${resp.status}: ${errText.slice(0, 200)}`);
-                }
-
-                const data = await resp.json();
-                console.log('[AdsAuto] Raw response:', JSON.stringify(data).slice(0, 500));
-
-                if (data.error) {
-                    throw new Error(data.error.message || JSON.stringify(data.error));
-                }
-
-                const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!rawText) {
-                    console.error('[AdsAuto] No text in response:', data);
-                    throw new Error('Gemini không trả về text. Kiểm tra API Key hoặc quota.');
-                }
+                console.log(`[AdsAuto] Calling ${getActiveAILabel()}...`);
+                const rawText = await callAI(prompt, 0.9);
 
                 console.log('[AdsAuto] Raw text:', rawText);
 
@@ -1767,6 +1940,62 @@ Generate exactly ${videoFiles.length} objects.`;
     </div>`).join('');
         }
 
+        // ==================== SCHEDULE ====================
+        function toggleSchedule() {
+            const toggle = document.getElementById('schedule-toggle');
+            const fields = document.getElementById('schedule-fields');
+            const section = document.getElementById('schedule-section');
+            const hint = document.getElementById('schedule-hint');
+            const isOn = toggle.classList.toggle('on');
+            fields.classList.toggle('show', isOn);
+            section.classList.toggle('active', isOn);
+            if (isOn) {
+                hint.textContent = '⏰ Campaign sẽ tự động hoạt động theo lịch trình đã đặt';
+                // Default: start = now + 1h, end = start + 7 days
+                const now = new Date();
+                const start = new Date(now.getTime() + 60 * 60 * 1000);
+                const end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
+                if (!document.getElementById('inp-start-time').value) {
+                    document.getElementById('inp-start-time').value = toLocalISOString(start);
+                }
+                if (!document.getElementById('inp-end-time').value) {
+                    document.getElementById('inp-end-time').value = toLocalISOString(end);
+                }
+            } else {
+                hint.textContent = '💡 Tắt = Campaign tạo ở trạng thái PAUSED, bạn tự bật trên Ads Manager';
+            }
+        }
+
+        function toLocalISOString(d) {
+            const pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        function getScheduleInfo() {
+            const isOn = document.getElementById('schedule-toggle').classList.contains('on');
+            if (!isOn) return null;
+            const startVal = document.getElementById('inp-start-time').value;
+            const endVal = document.getElementById('inp-end-time').value;
+            return {
+                startTime: startVal ? new Date(startVal).toISOString() : null,
+                endTime: endVal ? new Date(endVal).toISOString() : null
+            };
+        }
+
+        function updateSchedulePreview() {
+            // validation: end must be after start
+            const startVal = document.getElementById('inp-start-time').value;
+            const endVal = document.getElementById('inp-end-time').value;
+            if (startVal && endVal && new Date(endVal) <= new Date(startVal)) {
+                showToast('⚠️ Thời gian kết thúc phải sau thời gian bắt đầu!', 'warning');
+            }
+        }
+
+        function formatScheduleDisplay(isoStr) {
+            if (!isoStr) return '---';
+            return new Date(isoStr).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
         // ==================== PREVIEW ====================
         function showPreview() {
             const cfg = getConfig();
@@ -1777,6 +2006,19 @@ Generate exactly ${videoFiles.length} objects.`;
             const country = cfg.country || 'PH';
             const cta = cfg.cta || 'SHOP_NOW';
             const totalBudget = budget * videoFiles.length;
+            const schedule = getScheduleInfo();
+
+            let scheduleHTML = '';
+            if (schedule) {
+                scheduleHTML = `
+    <div style="margin-bottom:16px;padding:12px 16px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.2);border-radius:var(--radius-sm)">
+      <div style="font-weight:700;font-size:12px;color:var(--purple);margin-bottom:6px">⏰ Lịch trình hoạt động</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
+        <div><span style="color:var(--text-muted)">🟢 Bắt đầu:</span> <strong style="color:var(--green)">${formatScheduleDisplay(schedule.startTime)}</strong></div>
+        <div><span style="color:var(--text-muted)">🔴 Kết thúc:</span> <strong style="color:var(--red)">${formatScheduleDisplay(schedule.endTime)}</strong></div>
+      </div>
+    </div>`;
+            }
 
             document.getElementById('preview-content').innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:16px">
@@ -1785,14 +2027,15 @@ Generate exactly ${videoFiles.length} objects.`;
       <div class="preview-card card"><div class="preview-label">💰 Budget / Ad Set</div><div class="preview-value">${budget.toLocaleString()}đ</div></div>
       <div class="preview-card card"><div class="preview-label">💰 Tổng budget/ngày</div><div class="preview-value" style="color:var(--yellow)">${totalBudget.toLocaleString()}đ</div></div>
     </div>
+    ${scheduleHTML}
     <div class="structure-diagram">
       <div class="structure-camp">
         <div style="font-weight:800;font-size:13px;color:var(--accent)">📢 Campaign: Auto_${new Date().toISOString().slice(0, 10)}</div>
-        <div style="font-size:10px;color:var(--text-muted)">Objective: ${objective} · Status: PAUSED</div>
+        <div style="font-size:10px;color:var(--text-muted)">Objective: ${objective} · Status: ${schedule ? 'SCHEDULED ⏰' : 'PAUSED'}</div>
         ${videoFiles.map((v, i) => `
           <div class="structure-adset">
             <strong>Ad Set ${i + 1}:</strong> ${v.file.name} · 💰 ${budget.toLocaleString()}đ/ngày<br>
-            <span style="font-size:10px;color:var(--text-dim)">📌 ${v.headline} · CTA: ${cta}</span>
+            <span style="font-size:10px;color:var(--text-dim)">📌 ${v.headline} · CTA: ${cta}${schedule ? ' · ⏰ Scheduled' : ''}</span>
           </div>`).join('')}
       </div>
     </div>`;
@@ -1845,10 +2088,11 @@ Generate exactly ${videoFiles.length} objects.`;
                 addLog(`📋 Objective: ${objective} | Account: ${account}`, 'info');
 
                 // Facebook API - CBO: budget + bid strategy at campaign level
+                const schedule = getScheduleInfo();
                 const campBody = new URLSearchParams();
                 campBody.append('name', campaignName);
                 campBody.append('objective', objective);
-                campBody.append('status', 'PAUSED');
+                campBody.append('status', schedule ? 'PAUSED' : 'PAUSED');
                 campBody.append('special_ad_categories', 'NONE');
                 campBody.append('daily_budget', budget);
                 campBody.append('bid_strategy', 'LOWEST_COST_WITHOUT_CAP');
@@ -1913,6 +2157,17 @@ Generate exactly ${videoFiles.length} objects.`;
                     asParams.append('promoted_object', JSON.stringify({ pixel_id: activePixel, custom_event_type: cfg.event || 'PURCHASE' }));
                     asParams.append('targeting', JSON.stringify({ geo_locations: { countries: [country] } }));
                     asParams.append('status', 'PAUSED');
+                    // Schedule: start_time / end_time
+                    if (schedule) {
+                        if (schedule.startTime) {
+                            asParams.append('start_time', schedule.startTime);
+                            addLog(`${label} ⏰ Start: ${formatScheduleDisplay(schedule.startTime)}`, 'info');
+                        }
+                        if (schedule.endTime) {
+                            asParams.append('end_time', schedule.endTime);
+                            addLog(`${label} ⏰ End: ${formatScheduleDisplay(schedule.endTime)}`, 'info');
+                        }
+                    }
                     asParams.append('access_token', activeToken);
                     console.log('[AdsAuto] AdSet params:', Object.fromEntries(asParams));
                     const asResp = await fetch(`${FB_API}/${account}/adsets`, {
@@ -2008,11 +2263,20 @@ Generate exactly ${videoFiles.length} objects.`;
                 }
 
                 setProgress(100);
-                addLog(`🎉 HOÀN TẤT! Campaign với ${videoFiles.length} Ad Sets — Status: PAUSED`, 'success');
+                if (schedule) {
+                    addLog(`🎉 HOÀN TẤT! Campaign với ${videoFiles.length} Ad Sets — ⏰ SCHEDULED`, 'success');
+                    addLog(`⏰ Bắt đầu: ${formatScheduleDisplay(schedule.startTime)} → Kết thúc: ${formatScheduleDisplay(schedule.endTime)}`, 'info');
+                } else {
+                    addLog(`🎉 HOÀN TẤT! Campaign với ${videoFiles.length} Ad Sets — Status: PAUSED`, 'success');
+                }
 
                 // Save history
                 const hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-                hist.unshift({ name: campaignName, campaignId, adSets: adSetResults, budget, country, videoCount: videoFiles.length, createdAt: new Date().toISOString() });
+                const histEntry = { name: campaignName, campaignId, adSets: adSetResults, budget, country, videoCount: videoFiles.length, createdAt: new Date().toISOString() };
+                if (schedule) {
+                    histEntry.schedule = schedule;
+                }
+                hist.unshift(histEntry);
                 localStorage.setItem(HISTORY_KEY, JSON.stringify(hist.slice(0, 50)));
 
                 document.getElementById('launch-result').style.display = 'block';
@@ -2023,8 +2287,7 @@ Generate exactly ${videoFiles.length} objects.`;
           <strong>Campaign:</strong> ${campaignId}<br>
           <strong>Ad Sets:</strong> ${videoFiles.length}<br>
           <strong>Budget:</strong> ${(budget * videoFiles.length).toLocaleString()}đ/ngày<br>
-          <strong>Status:</strong> <span style="color:var(--yellow)">PAUSED</span> — 
-          <a href="https://www.facebook.com/adsmanager" target="_blank" style="color:var(--blue)">Bật trên Ads Manager →</a>
+          <strong>Status:</strong> ${schedule ? `<span style="color:var(--purple)">⏰ SCHEDULED</span> — Bắt đầu: ${formatScheduleDisplay(schedule.startTime)}` : `<span style="color:var(--yellow)">PAUSED</span> — <a href="https://www.facebook.com/adsmanager" target="_blank" style="color:var(--blue)">Bật trên Ads Manager →</a>`}
         </div>
       </div>`;
             } catch (err) {
@@ -2045,17 +2308,25 @@ Generate exactly ${videoFiles.length} objects.`;
             const hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
             const el = document.getElementById('history-list');
             if (hist.length === 0) { el.innerHTML = '<p style="color:var(--text-muted)">Chưa có campaigns</p>'; return; }
-            el.innerHTML = hist.map(h => `
+            el.innerHTML = hist.map(h => {
+                const hasSchedule = h.schedule && h.schedule.startTime;
+                const scheduleInfo = hasSchedule ? `<div style="font-size:10px;color:var(--purple);margin-top:2px">⏰ ${formatScheduleDisplay(h.schedule.startTime)} → ${formatScheduleDisplay(h.schedule.endTime)}</div>` : '';
+                const badge = hasSchedule
+                    ? `<span class="badge" style="background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.15)">⏰ SCHEDULED</span>`
+                    : `<span class="badge" style="background:var(--yellow-bg);color:var(--yellow);border:1px solid rgba(245,158,11,.15)">PAUSED</span>`;
+                return `
     <div class="history-item">
       <div>
         <div style="font-weight:700;font-size:13px">${h.name}</div>
         <div style="font-size:10px;color:var(--text-muted);margin-top:2px">
           🎬 ${h.videoCount || (h.adSets ? h.adSets.length : 1)} videos · 🌍 ${h.country} · 💰 ${(h.budget || 0).toLocaleString()}đ/adset/ngày
         </div>
+        ${scheduleInfo}
         <div style="font-size:10px;color:var(--text-muted)">Campaign: ${h.campaignId} · ${new Date(h.createdAt).toLocaleString('vi-VN')}</div>
       </div>
-      <span class="badge" style="background:var(--yellow-bg);color:var(--yellow);border:1px solid rgba(245,158,11,.15)">PAUSED</span>
-    </div>`).join('');
+      ${badge}
+    </div>`;
+            }).join('');
         }
 
         // ==================== INIT ====================
