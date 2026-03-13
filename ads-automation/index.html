@@ -865,8 +865,7 @@
             gap: 12px
         }
         .schedule-fields.show {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: block;
             animation: fadeIn .3s ease
         }
         .schedule-fields .form-group label { color: var(--purple) }
@@ -948,19 +947,16 @@
             <div class="schedule-section" id="schedule-section">
                 <div class="schedule-toggle" id="schedule-toggle" onclick="toggleSchedule()">
                     <div class="switch"></div>
-                    <div class="label">⏰ Hẹn giờ hoạt động Campaign</div>
+                    <div class="label">⏰ Hẹn ngày bắt đầu chạy</div>
                 </div>
                 <div class="schedule-fields" id="schedule-fields">
-                    <div class="form-group">
-                        <label>🟢 Bắt đầu</label>
-                        <input type="datetime-local" id="inp-start-time" class="inp" onchange="updateSchedulePreview()">
+                    <div class="form-group" style="max-width:300px">
+                        <label>📅 Ngày bắt đầu</label>
+                        <input type="date" id="inp-start-date" class="inp">
                     </div>
-                    <div class="form-group">
-                        <label>🔴 Kết thúc</label>
-                        <input type="datetime-local" id="inp-end-time" class="inp" onchange="updateSchedulePreview()">
-                    </div>
+                    <div style="margin-top:6px;font-size:10px;color:var(--purple);font-weight:600">💡 Campaign sẽ bắt đầu chạy từ 00:00 ngày đã chọn</div>
                 </div>
-                <div class="schedule-hint" id="schedule-hint">💡 Tắt = Campaign tạo ở trạng thái PAUSED, bạn tự bật trên Ads Manager</div>
+                <div class="schedule-hint" id="schedule-hint">💡 Tắt = Lên camp chạy luôn ngay lập tức</div>
             </div>
             <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
                 <div class="form-group" style="flex:1;min-width:200px"><label>📄 Page</label>
@@ -1007,14 +1003,11 @@
                 <div style="font-weight:700;font-size:13px;margin-bottom:12px">📋 Step 3 — Campaign Structure Preview
                 </div>
                 <div id="preview-content"></div>
-                <div
-                    style="margin-top:12px;padding:8px 12px;background:var(--yellow-bg);border:1px solid rgba(245,158,11,.15);border-radius:var(--radius-sm);font-size:11px;color:var(--yellow)">
-                    ⚠️ Tất cả sẽ được tạo với status <strong>PAUSED</strong> — bật trên Facebook Ads Manager khi sẵn
-                    sàng.
+                <div id="preview-status-msg"
+                    style="margin-top:12px;padding:8px 12px;border-radius:var(--radius-sm);font-size:11px">
                 </div>
                 <div style="margin-top:12px;display:flex;gap:8px">
-                    <button class="btn btn-green" id="btn-launch" onclick="launchCampaign()">🚀 Launch Campaign
-                        (PAUSED)</button>
+                    <button class="btn btn-green" id="btn-launch" onclick="launchCampaign()">🚀 Launch Campaign</button>
                     <button class="btn btn-ghost" onclick="goToStep(2)">← Quay lại sửa</button>
                 </div>
             </div>
@@ -1950,45 +1943,30 @@ Generate exactly ${videoFiles.length} objects.`;
             fields.classList.toggle('show', isOn);
             section.classList.toggle('active', isOn);
             if (isOn) {
-                hint.textContent = '⏰ Campaign sẽ tự động hoạt động theo lịch trình đã đặt';
-                // Default: start = now + 1h, end = start + 7 days
-                const now = new Date();
-                const start = new Date(now.getTime() + 60 * 60 * 1000);
-                const end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
-                if (!document.getElementById('inp-start-time').value) {
-                    document.getElementById('inp-start-time').value = toLocalISOString(start);
-                }
-                if (!document.getElementById('inp-end-time').value) {
-                    document.getElementById('inp-end-time').value = toLocalISOString(end);
+                hint.textContent = '⏰ Campaign sẽ bắt đầu chạy từ 00:00 ngày đã chọn';
+                // Default: tomorrow
+                if (!document.getElementById('inp-start-date').value) {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    const pad = n => String(n).padStart(2, '0');
+                    document.getElementById('inp-start-date').value = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}`;
                 }
             } else {
-                hint.textContent = '💡 Tắt = Campaign tạo ở trạng thái PAUSED, bạn tự bật trên Ads Manager';
+                hint.textContent = '💡 Tắt = Lên camp chạy luôn ngay lập tức';
             }
-        }
-
-        function toLocalISOString(d) {
-            const pad = n => String(n).padStart(2, '0');
-            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
         }
 
         function getScheduleInfo() {
             const isOn = document.getElementById('schedule-toggle').classList.contains('on');
             if (!isOn) return null;
-            const startVal = document.getElementById('inp-start-time').value;
-            const endVal = document.getElementById('inp-end-time').value;
+            const dateVal = document.getElementById('inp-start-date').value;
+            if (!dateVal) return null;
+            // Convert to ISO 8601 at 00:00 local time
+            const startDate = new Date(dateVal + 'T00:00:00');
             return {
-                startTime: startVal ? new Date(startVal).toISOString() : null,
-                endTime: endVal ? new Date(endVal).toISOString() : null
+                startTime: startDate.toISOString(),
+                startDateDisplay: startDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
             };
-        }
-
-        function updateSchedulePreview() {
-            // validation: end must be after start
-            const startVal = document.getElementById('inp-start-time').value;
-            const endVal = document.getElementById('inp-end-time').value;
-            if (startVal && endVal && new Date(endVal) <= new Date(startVal)) {
-                showToast('⚠️ Thời gian kết thúc phải sau thời gian bắt đầu!', 'warning');
-            }
         }
 
         function formatScheduleDisplay(isoStr) {
@@ -2012,13 +1990,25 @@ Generate exactly ${videoFiles.length} objects.`;
             if (schedule) {
                 scheduleHTML = `
     <div style="margin-bottom:16px;padding:12px 16px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.2);border-radius:var(--radius-sm)">
-      <div style="font-weight:700;font-size:12px;color:var(--purple);margin-bottom:6px">⏰ Lịch trình hoạt động</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
-        <div><span style="color:var(--text-muted)">🟢 Bắt đầu:</span> <strong style="color:var(--green)">${formatScheduleDisplay(schedule.startTime)}</strong></div>
-        <div><span style="color:var(--text-muted)">🔴 Kết thúc:</span> <strong style="color:var(--red)">${formatScheduleDisplay(schedule.endTime)}</strong></div>
-      </div>
+      <div style="font-weight:700;font-size:12px;color:var(--purple);margin-bottom:4px">⏰ Hẹn ngày bắt đầu</div>
+      <div style="font-size:13px">📅 Bắt đầu chạy từ: <strong style="color:var(--green)">${schedule.startDateDisplay}</strong> (00:00)</div>
     </div>`;
             }
+
+            // Update status message in Step 3
+            const statusEl = document.getElementById('preview-status-msg');
+            if (schedule) {
+                statusEl.style.background = 'rgba(139,92,246,.08)';
+                statusEl.style.border = '1px solid rgba(139,92,246,.15)';
+                statusEl.style.color = 'var(--purple)';
+                statusEl.innerHTML = `⏰ Campaign sẽ <strong>ACTIVE</strong> và bắt đầu chạy từ <strong>${schedule.startDateDisplay}</strong> (00:00)`;
+            } else {
+                statusEl.style.background = 'rgba(16,185,129,.08)';
+                statusEl.style.border = '1px solid rgba(16,185,129,.15)';
+                statusEl.style.color = 'var(--green)';
+                statusEl.innerHTML = `🚀 Campaign sẽ tạo <strong>ACTIVE</strong> và chạy ngay lập tức!`;
+            }
+            document.getElementById('btn-launch').innerHTML = schedule ? `🚀 Launch Campaign (⏰ ${schedule.startDateDisplay})` : '🚀 Launch Campaign (Chạy ngay)';
 
             document.getElementById('preview-content').innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:16px">
@@ -2031,11 +2021,11 @@ Generate exactly ${videoFiles.length} objects.`;
     <div class="structure-diagram">
       <div class="structure-camp">
         <div style="font-weight:800;font-size:13px;color:var(--accent)">📢 Campaign: Auto_${new Date().toISOString().slice(0, 10)}</div>
-        <div style="font-size:10px;color:var(--text-muted)">Objective: ${objective} · Status: ${schedule ? 'SCHEDULED ⏰' : 'PAUSED'}</div>
+        <div style="font-size:10px;color:var(--text-muted)">Objective: ${objective} · Status: ${schedule ? '⏰ Hẹn ' + schedule.startDateDisplay : 'ACTIVE 🚀'}</div>
         ${videoFiles.map((v, i) => `
           <div class="structure-adset">
             <strong>Ad Set ${i + 1}:</strong> ${v.file.name} · 💰 ${budget.toLocaleString()}đ/ngày<br>
-            <span style="font-size:10px;color:var(--text-dim)">📌 ${v.headline} · CTA: ${cta}${schedule ? ' · ⏰ Scheduled' : ''}</span>
+            <span style="font-size:10px;color:var(--text-dim)">📌 ${v.headline} · CTA: ${cta}</span>
           </div>`).join('')}
       </div>
     </div>`;
@@ -2092,7 +2082,7 @@ Generate exactly ${videoFiles.length} objects.`;
                 const campBody = new URLSearchParams();
                 campBody.append('name', campaignName);
                 campBody.append('objective', objective);
-                campBody.append('status', schedule ? 'PAUSED' : 'PAUSED');
+                campBody.append('status', 'ACTIVE');
                 campBody.append('special_ad_categories', 'NONE');
                 campBody.append('daily_budget', budget);
                 campBody.append('bid_strategy', 'LOWEST_COST_WITHOUT_CAP');
@@ -2156,17 +2146,11 @@ Generate exactly ${videoFiles.length} objects.`;
                     }
                     asParams.append('promoted_object', JSON.stringify({ pixel_id: activePixel, custom_event_type: cfg.event || 'PURCHASE' }));
                     asParams.append('targeting', JSON.stringify({ geo_locations: { countries: [country] } }));
-                    asParams.append('status', 'PAUSED');
-                    // Schedule: start_time / end_time
-                    if (schedule) {
-                        if (schedule.startTime) {
-                            asParams.append('start_time', schedule.startTime);
-                            addLog(`${label} ⏰ Start: ${formatScheduleDisplay(schedule.startTime)}`, 'info');
-                        }
-                        if (schedule.endTime) {
-                            asParams.append('end_time', schedule.endTime);
-                            addLog(`${label} ⏰ End: ${formatScheduleDisplay(schedule.endTime)}`, 'info');
-                        }
+                    asParams.append('status', 'ACTIVE');
+                    // Schedule: start_time only
+                    if (schedule && schedule.startTime) {
+                        asParams.append('start_time', schedule.startTime);
+                        addLog(`${label} ⏰ Bắt đầu chạy từ: ${schedule.startDateDisplay} (00:00)`, 'info');
                     }
                     asParams.append('access_token', activeToken);
                     console.log('[AdsAuto] AdSet params:', Object.fromEntries(asParams));
@@ -2248,7 +2232,7 @@ Generate exactly ${videoFiles.length} objects.`;
                     adParams.append('name', `Ad${i + 1}_${v.file.name.replace(/\.[^/.]+$/, '')}`);
                     adParams.append('adset_id', asData.id);
                     adParams.append('creative', JSON.stringify({ creative_id: crData.id }));
-                    adParams.append('status', 'PAUSED');
+                    adParams.append('status', 'ACTIVE');
                     adParams.append('access_token', activeToken);
                     const adResp = await fetch(`${FB_API}/${account}/ads`, {
                         method: 'POST',
@@ -2264,10 +2248,9 @@ Generate exactly ${videoFiles.length} objects.`;
 
                 setProgress(100);
                 if (schedule) {
-                    addLog(`🎉 HOÀN TẤT! Campaign với ${videoFiles.length} Ad Sets — ⏰ SCHEDULED`, 'success');
-                    addLog(`⏰ Bắt đầu: ${formatScheduleDisplay(schedule.startTime)} → Kết thúc: ${formatScheduleDisplay(schedule.endTime)}`, 'info');
+                    addLog(`🎉 HOÀN TẤT! Campaign với ${videoFiles.length} Ad Sets — ⏰ Chạy từ ${schedule.startDateDisplay}`, 'success');
                 } else {
-                    addLog(`🎉 HOÀN TẤT! Campaign với ${videoFiles.length} Ad Sets — Status: PAUSED`, 'success');
+                    addLog(`🎉 HOÀN TẤT! Campaign với ${videoFiles.length} Ad Sets — 🚀 Đang chạy!`, 'success');
                 }
 
                 // Save history
@@ -2287,7 +2270,8 @@ Generate exactly ${videoFiles.length} objects.`;
           <strong>Campaign:</strong> ${campaignId}<br>
           <strong>Ad Sets:</strong> ${videoFiles.length}<br>
           <strong>Budget:</strong> ${(budget * videoFiles.length).toLocaleString()}đ/ngày<br>
-          <strong>Status:</strong> ${schedule ? `<span style="color:var(--purple)">⏰ SCHEDULED</span> — Bắt đầu: ${formatScheduleDisplay(schedule.startTime)}` : `<span style="color:var(--yellow)">PAUSED</span> — <a href="https://www.facebook.com/adsmanager" target="_blank" style="color:var(--blue)">Bật trên Ads Manager →</a>`}
+          <strong>Status:</strong> ${schedule ? `<span style="color:var(--purple)">⏰ Chạy từ ${schedule.startDateDisplay}</span>` : `<span style="color:var(--green)">🚀 ACTIVE - Đang chạy</span>`} —
+          <a href="https://www.facebook.com/adsmanager" target="_blank" style="color:var(--blue)">Xem trên Ads Manager →</a>
         </div>
       </div>`;
             } catch (err) {
@@ -2310,10 +2294,10 @@ Generate exactly ${videoFiles.length} objects.`;
             if (hist.length === 0) { el.innerHTML = '<p style="color:var(--text-muted)">Chưa có campaigns</p>'; return; }
             el.innerHTML = hist.map(h => {
                 const hasSchedule = h.schedule && h.schedule.startTime;
-                const scheduleInfo = hasSchedule ? `<div style="font-size:10px;color:var(--purple);margin-top:2px">⏰ ${formatScheduleDisplay(h.schedule.startTime)} → ${formatScheduleDisplay(h.schedule.endTime)}</div>` : '';
+                const scheduleInfo = hasSchedule ? `<div style="font-size:10px;color:var(--purple);margin-top:2px">⏰ Bắt đầu: ${h.schedule.startDateDisplay || formatScheduleDisplay(h.schedule.startTime)}</div>` : '';
                 const badge = hasSchedule
-                    ? `<span class="badge" style="background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.15)">⏰ SCHEDULED</span>`
-                    : `<span class="badge" style="background:var(--yellow-bg);color:var(--yellow);border:1px solid rgba(245,158,11,.15)">PAUSED</span>`;
+                    ? `<span class="badge" style="background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.15)">⏰ ${h.schedule.startDateDisplay || 'Scheduled'}</span>`
+                    : `<span class="badge" style="background:var(--green-bg);color:var(--green);border:1px solid rgba(16,185,129,.15)">🚀 ACTIVE</span>`;
                 return `
     <div class="history-item">
       <div>
