@@ -628,17 +628,122 @@
                 grid-template-columns: 1fr
             }
         }
+
+        .btn-fb {
+            background: linear-gradient(135deg, #1877F2, #0d65d9);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(24, 119, 242, .2);
+            font-weight: 700
+        }
+        .btn-fb:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(24, 119, 242, .3) }
+        .btn-fb:disabled { opacity: .5; cursor: not-allowed; transform: none }
+
+        .btn-disconnect {
+            background: rgba(239, 68, 68, .1);
+            color: var(--red);
+            border: 1px solid rgba(239, 68, 68, .2);
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit
+        }
+        .btn-disconnect:hover { background: rgba(239, 68, 68, .2) }
+
+        .fb-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600
+        }
+        .fb-profile img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid rgba(24, 119, 242, .4)
+        }
+
+        .fb-connect-card {
+            padding: 16px;
+            border: 1px dashed rgba(24, 119, 242, .3);
+            border-radius: var(--radius-sm);
+            background: rgba(24, 119, 242, .03);
+            margin-bottom: 16px;
+            text-align: center
+        }
+        .fb-connect-card.connected {
+            border-style: solid;
+            border-color: rgba(16, 185, 129, .3);
+            background: rgba(16, 185, 129, .03);
+            text-align: left
+        }
+
+        .fb-select-group { margin-top: 12px }
+        .fb-select-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            margin-bottom: 6px
+        }
+        .fb-select-group select { width: 100% }
+
+        .fb-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px
+        }
+        .fb-status img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--green)
+        }
+        .fb-status .name {
+            font-weight: 700;
+            font-size: 14px
+        }
+        .fb-status .email {
+            font-size: 11px;
+            color: var(--text-dim)
+        }
+
+        .manual-toggle {
+            font-size: 11px;
+            color: var(--text-dim);
+            cursor: pointer;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px
+        }
+        .manual-toggle:hover { color: var(--text) }
     </style>
 </head>
 
 <body>
 
+    <div id="fb-root"></div>
     <div class="header">
         <div class="logo"><span style="font-size:22px">🚀</span>
-            <h1>Ads Automation</h1><span class="ver">v2.0</span>
+            <h1>Ads Automation</h1><span class="ver">v3.0</span>
         </div>
-        <div style="display:flex;align-items:center;gap:10px"><span
-                style="color:var(--green);font-size:11px;font-weight:600">● TS Global</span></div>
+        <div style="display:flex;align-items:center;gap:10px">
+            <div id="header-fb-disconnected">
+                <button class="btn btn-fb btn-sm" onclick="fbLogin()">🔗 Connect Facebook</button>
+            </div>
+            <div id="header-fb-connected" style="display:none">
+                <div class="fb-profile">
+                    <img id="header-fb-avatar" src="" alt="">
+                    <span id="header-fb-name"></span>
+                    <button class="btn-disconnect" onclick="fbLogout()">Disconnect</button>
+                </div>
+            </div>
+            <span style="color:var(--green);font-size:11px;font-weight:600">● TS Global</span>
+        </div>
     </div>
 
     <div class="tabs">
@@ -685,8 +790,11 @@
                 📋 Tên Campaign: <span id="camp-name-value" style="color:var(--accent);font-weight:600">---</span>
             </div>
             <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
-                <div class="form-group" style="flex:1;min-width:200px"><label>📄 Page ID</label><input type="text"
-                        id="inp-page" class="inp" placeholder="Page ID để chạy ads..."></div>
+                <div class="form-group" style="flex:1;min-width:200px"><label>📄 Page</label>
+                    <select id="inp-page" class="inp">
+                        <option value="">-- Chọn Page (connect FB trước) --</option>
+                    </select>
+                </div>
                 <div class="form-group" style="flex:1;min-width:200px"><label>🔗 Link (Landing Page)</label><input
                         type="text" id="inp-link" class="inp" placeholder="https://yoursite.com"></div>
             </div>
@@ -754,21 +862,70 @@
 
     <!-- CONFIG -->
     <div id="page-config" class="page">
+        <!-- Facebook Connect Card -->
         <div class="card fade-in" style="padding:20px;margin-bottom:16px">
-            <div style="font-weight:700;font-size:13px;margin-bottom:16px">⚙️ Cấu hình API</div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:16px">🔗 Kết nối Facebook</div>
+            <div id="fb-connect-area" class="fb-connect-card">
+                <div style="font-size:32px;margin-bottom:8px">📱</div>
+                <div style="font-size:13px;font-weight:600;margin-bottom:4px">Kết nối tài khoản Facebook</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px">Tự động lấy danh sách Pages, TKQC và Pixels</div>
+                <button class="btn btn-fb" onclick="fbLogin()">🔗 Connect with Facebook</button>
+            </div>
+            <div id="fb-connected-area" style="display:none">
+                <div class="fb-connect-card connected">
+                    <div class="fb-status">
+                        <img id="cfg-fb-avatar" src="" alt="">
+                        <div>
+                            <div class="name" id="cfg-fb-name"></div>
+                            <div class="email">✅ Đã kết nối</div>
+                        </div>
+                        <button class="btn-disconnect" onclick="fbLogout()" style="margin-left:auto">Disconnect</button>
+                    </div>
+                    <div class="form-grid" style="gap:12px">
+                        <div class="fb-select-group">
+                            <label>📄 Chọn Page</label>
+                            <select id="cfg-fb-page" class="inp" onchange="onFbPageSelect()">
+                                <option value="">-- Chọn Page --</option>
+                            </select>
+                        </div>
+                        <div class="fb-select-group">
+                            <label>🏢 Chọn Tài khoản QC</label>
+                            <select id="cfg-fb-account" class="inp" onchange="onFbAccountSelect()">
+                                <option value="">-- Chọn TKQC --</option>
+                            </select>
+                        </div>
+                        <div class="fb-select-group" style="grid-column:1/-1">
+                            <label>📍 Chọn Pixel</label>
+                            <select id="cfg-fb-pixel" class="inp">
+                                <option value="">-- Chọn Pixel (chọn TKQC trước) --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="manual-toggle" onclick="toggleManualMode()">🔧 <span id="manual-toggle-text">Nhập thủ công (Advanced)</span></div>
+            <div id="manual-config" style="display:none;margin-top:12px">
+                <div class="form-grid">
+                    <div class="form-group" style="grid-column:1/-1"><label>🔑 Facebook Access Token</label><input
+                            type="password" id="cfg-token" class="inp" placeholder="EAAxxxxxxx..."></div>
+                    <div class="form-group"><label>🏢 Ad Account ID</label><input type="text" id="cfg-account" class="inp"
+                            placeholder="act_123456789"></div>
+                    <div class="form-group"><label>📄 Default Page ID</label><input type="text" id="cfg-page" class="inp"
+                            placeholder="1234567890"></div>
+                    <div class="form-group"><label>📍 Facebook Pixel ID</label><input type="text" id="cfg-pixel" class="inp"
+                            placeholder="123456789012345"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI & Other Settings -->
+        <div class="card fade-in" style="padding:20px;margin-bottom:16px;animation-delay:.03s">
+            <div style="font-weight:700;font-size:13px;margin-bottom:16px">🤖 Cấu hình AI & Khác</div>
             <div class="form-grid">
-                <div class="form-group" style="grid-column:1/-1"><label>🔑 Facebook Access Token</label><input
-                        type="password" id="cfg-token" class="inp" placeholder="EAAxxxxxxx..."></div>
-                <div class="form-group"><label>🏢 Ad Account ID</label><input type="text" id="cfg-account" class="inp"
-                        placeholder="act_123456789"></div>
-                <div class="form-group"><label>📄 Default Page ID</label><input type="text" id="cfg-page" class="inp"
-                        placeholder="1234567890"></div>
                 <div class="form-group"><label>🤖 Gemini API Key</label><input type="password" id="cfg-gemini"
                         class="inp" placeholder="AIzaSyxxxxxx..."></div>
                 <div class="form-group"><label>🧠 Gemini Model</label><input type="text" id="cfg-model" class="inp"
                         value="gemini-1.5-flash-latest" placeholder="gemini-1.5-flash-latest"></div>
-                <div class="form-group"><label>📍 Facebook Pixel ID</label><input type="text" id="cfg-pixel" class="inp"
-                        placeholder="123456789012345"></div>
                 <div class="form-group"><label>🎯 Conversion Event</label>
                     <select id="cfg-event" class="inp">
                         <option value="COMPLETE_REGISTRATION" selected>Complete Registration</option>
@@ -834,6 +991,190 @@
         const CONFIG_KEY = 'ts_ads_config';
         const HISTORY_KEY = 'ts_ads_history';
         const FB_API = 'https://graph.facebook.com/v21.0';
+        const FB_APP_ID = '1415560070289924';
+        let fbAccessToken = '';
+        let fbUserInfo = null;
+        let fbPages = [];
+        let fbAdAccounts = [];
+        let fbPixels = [];
+
+        // ==================== FACEBOOK SDK ====================
+        window.fbAsyncInit = function () {
+            FB.init({ appId: FB_APP_ID, cookie: true, xfbml: true, version: 'v21.0' });
+            FB.getLoginStatus(function (resp) {
+                if (resp.status === 'connected') {
+                    fbAccessToken = resp.authResponse.accessToken;
+                    onFbConnected();
+                }
+            });
+        };
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id; js.async = true;
+            js.src = 'https://connect.facebook.net/en_US/sdk.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        function fbLogin() {
+            FB.login(function (resp) {
+                if (resp.authResponse) {
+                    fbAccessToken = resp.authResponse.accessToken;
+                    onFbConnected();
+                    showToast('✅ Đã kết nối Facebook!');
+                } else {
+                    showToast('❌ Không thể kết nối Facebook', 'error');
+                }
+            }, { scope: 'pages_show_list,ads_management,ads_read,business_management' });
+        }
+
+        function fbLogout() {
+            FB.logout(function () {
+                fbAccessToken = '';
+                fbUserInfo = null;
+                fbPages = [];
+                fbAdAccounts = [];
+                fbPixels = [];
+                updateFbUI(false);
+                showToast('🔌 Đã ngắt kết nối Facebook');
+            });
+        }
+
+        async function onFbConnected() {
+            try {
+                // Get user info
+                const userResp = await fetch(`${FB_API}/me?fields=name,picture.width(100)&access_token=${fbAccessToken}`);
+                fbUserInfo = await userResp.json();
+                updateFbUI(true);
+
+                // Load pages & ad accounts in parallel
+                const [pagesResp, accountsResp] = await Promise.all([
+                    fetch(`${FB_API}/me/accounts?fields=name,id,access_token&limit=100&access_token=${fbAccessToken}`),
+                    fetch(`${FB_API}/me/adaccounts?fields=name,account_id,account_status&limit=100&access_token=${fbAccessToken}`)
+                ]);
+                const pagesData = await pagesResp.json();
+                const accountsData = await accountsResp.json();
+
+                fbPages = pagesData.data || [];
+                fbAdAccounts = (accountsData.data || []).filter(a => a.account_status === 1); // only active
+
+                populatePageDropdowns();
+                populateAccountDropdown();
+
+                // Auto-select from saved config
+                const cfg = getConfig();
+                if (cfg.page) {
+                    setDropdownValue('cfg-fb-page', cfg.page);
+                    setDropdownValue('inp-page', cfg.page);
+                }
+                if (cfg.account) {
+                    const accId = cfg.account.replace('act_', '');
+                    setDropdownValue('cfg-fb-account', 'act_' + accId);
+                    onFbAccountSelect();
+                }
+
+                // Save token to config
+                cfg.token = fbAccessToken;
+                localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+
+            } catch (err) {
+                console.error('[FB Connect] Error:', err);
+                showToast('❌ Lỗi tải dữ liệu Facebook: ' + err.message, 'error');
+            }
+        }
+
+        function updateFbUI(connected) {
+            document.getElementById('fb-connect-area').style.display = connected ? 'none' : 'block';
+            document.getElementById('fb-connected-area').style.display = connected ? 'block' : 'none';
+            document.getElementById('header-fb-disconnected').style.display = connected ? 'none' : 'block';
+            document.getElementById('header-fb-connected').style.display = connected ? 'flex' : 'none';
+
+            if (connected && fbUserInfo) {
+                const avatarUrl = fbUserInfo.picture?.data?.url || '';
+                document.getElementById('cfg-fb-name').textContent = fbUserInfo.name;
+                document.getElementById('cfg-fb-avatar').src = avatarUrl;
+                document.getElementById('header-fb-name').textContent = fbUserInfo.name;
+                document.getElementById('header-fb-avatar').src = avatarUrl;
+            }
+
+            // Reset dropdowns when disconnected
+            if (!connected) {
+                ['cfg-fb-page', 'cfg-fb-account', 'cfg-fb-pixel', 'inp-page'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = `<option value="">-- ${id.includes('page') ? 'Chọn Page' : id.includes('account') ? 'Chọn TKQC' : 'Chọn Pixel'} --</option>`;
+                });
+            }
+        }
+
+        function populatePageDropdowns() {
+            const options = fbPages.map(p => `<option value="${p.id}" data-token="${p.access_token || ''}">${p.name} (${p.id})</option>`).join('');
+            const defaultOpt = '<option value="">-- Chọn Page --</option>';
+            document.getElementById('cfg-fb-page').innerHTML = defaultOpt + options;
+            document.getElementById('inp-page').innerHTML = defaultOpt + options;
+        }
+
+        function populateAccountDropdown() {
+            const el = document.getElementById('cfg-fb-account');
+            el.innerHTML = '<option value="">-- Chọn TKQC --</option>' +
+                fbAdAccounts.map(a => `<option value="act_${a.account_id}">${a.name || 'TKQC'} (act_${a.account_id})</option>`).join('');
+        }
+
+        async function populatePixelDropdown(accountId) {
+            const el = document.getElementById('cfg-fb-pixel');
+            el.innerHTML = '<option value="">⏳ Đang tải Pixels...</option>';
+            try {
+                const resp = await fetch(`${FB_API}/${accountId}/adspixels?fields=name,id&access_token=${fbAccessToken}`);
+                const data = await resp.json();
+                fbPixels = data.data || [];
+                if (fbPixels.length === 0) {
+                    el.innerHTML = '<option value="">-- Không có Pixel nào --</option>';
+                } else {
+                    el.innerHTML = '<option value="">-- Chọn Pixel --</option>' +
+                        fbPixels.map(p => `<option value="${p.id}">${p.name} (${p.id})</option>`).join('');
+                    // Auto-select from saved config
+                    const cfg = getConfig();
+                    if (cfg.pixel) setDropdownValue('cfg-fb-pixel', cfg.pixel);
+                }
+            } catch (err) {
+                el.innerHTML = '<option value="">❌ Lỗi tải Pixels</option>';
+                console.error('[FB Connect] Pixels error:', err);
+            }
+        }
+
+        function onFbPageSelect() {
+            const val = document.getElementById('cfg-fb-page').value;
+            // Sync to inp-page dropdown
+            setDropdownValue('inp-page', val);
+        }
+
+        function onFbAccountSelect() {
+            const val = document.getElementById('cfg-fb-account').value;
+            if (val) {
+                populatePixelDropdown(val);
+            } else {
+                document.getElementById('cfg-fb-pixel').innerHTML = '<option value="">-- Chọn Pixel (chọn TKQC trước) --</option>';
+            }
+        }
+
+        function setDropdownValue(id, value) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            for (let i = 0; i < el.options.length; i++) {
+                if (el.options[i].value === value) { el.selectedIndex = i; return; }
+            }
+        }
+
+        function toggleManualMode() {
+            const el = document.getElementById('manual-config');
+            const txt = document.getElementById('manual-toggle-text');
+            if (el.style.display === 'none') {
+                el.style.display = 'block';
+                txt.textContent = 'Ẩn nhập thủ công';
+            } else {
+                el.style.display = 'none';
+                txt.textContent = 'Nhập thủ công (Advanced)';
+            }
+        }
 
         // ==================== HELPERS ====================
         function showToast(msg, type = 'success') {
@@ -909,13 +1250,22 @@
 
         // ==================== CONFIG ====================
         function saveConfig() {
+            // FB dropdowns have priority, fallback to manual inputs
+            const fbPage = document.getElementById('cfg-fb-page').value;
+            const fbAccount = document.getElementById('cfg-fb-account').value;
+            const fbPixel = document.getElementById('cfg-fb-pixel').value;
+            const manualPage = document.getElementById('cfg-page').value.trim();
+            const manualAccount = document.getElementById('cfg-account').value.trim();
+            const manualPixel = document.getElementById('cfg-pixel').value.trim();
+            const manualToken = document.getElementById('cfg-token').value.trim();
+
             const cfg = {
-                token: document.getElementById('cfg-token').value.trim(),
-                account: document.getElementById('cfg-account').value.trim(),
-                page: document.getElementById('cfg-page').value.trim(),
+                token: fbAccessToken || manualToken,
+                account: fbAccount || manualAccount,
+                page: fbPage || manualPage,
                 gemini: document.getElementById('cfg-gemini').value.trim(),
                 model: document.getElementById('cfg-model').value.trim() || 'gemini-1.5-flash-latest',
-                pixel: document.getElementById('cfg-pixel').value.trim(),
+                pixel: fbPixel || manualPixel,
                 event: document.getElementById('cfg-event').value,
                 objective: document.getElementById('cfg-objective').value,
                 budget: parseInt(document.getElementById('cfg-budget').value) || 200000,
@@ -928,6 +1278,7 @@
 
         function loadConfig() {
             const cfg = getConfig();
+            // Manual fields (always populate for fallback)
             document.getElementById('cfg-token').value = cfg.token || '';
             document.getElementById('cfg-account').value = cfg.account || '';
             document.getElementById('cfg-page').value = cfg.page || '';
@@ -939,7 +1290,12 @@
             document.getElementById('cfg-budget').value = cfg.budget || 200000;
             document.getElementById('cfg-country').value = cfg.country || 'PH';
             if (cfg.cta) document.getElementById('cfg-cta').value = cfg.cta;
-            if (cfg.page) document.getElementById('inp-page').value = cfg.page;
+            // Also set page on create tab (if not FB-connected, use saved value)
+            if (cfg.page) setDropdownValue('inp-page', cfg.page);
+            // If FB connected, sync FB dropdowns from saved config
+            if (fbAccessToken && cfg.page) setDropdownValue('cfg-fb-page', cfg.page);
+            if (fbAccessToken && cfg.account) setDropdownValue('cfg-fb-account', cfg.account);
+            if (fbAccessToken && cfg.pixel) setDropdownValue('cfg-fb-pixel', cfg.pixel);
         }
 
         // ==================== MULTI FILE UPLOAD ====================
@@ -1248,15 +1604,24 @@ Generate exactly ${videoFiles.length} objects.`;
         // ==================== LAUNCH ====================
         async function launchCampaign() {
             const cfg = getConfig();
-            if (!cfg.token || !cfg.account) { showToast('Cần cấu hình Access Token và Ad Account!', 'error'); switchTab('config'); return; }
+            // Use FB-connected token (priority) or manual token from config
+            const activeToken = fbAccessToken || cfg.token;
+            // Use FB dropdown account (priority) or manual config
+            const fbAccount = document.getElementById('cfg-fb-account').value;
+            const activeAccount = fbAccount || cfg.account;
+            // Use FB dropdown pixel (priority) or manual config
+            const fbPixel = document.getElementById('cfg-fb-pixel').value;
+            const activePixel = fbPixel || cfg.pixel;
 
-            const pageId = document.getElementById('inp-page').value || cfg.page;
+            if (!activeToken || !activeAccount) { showToast('Cần kết nối Facebook hoặc nhập Access Token + Ad Account!', 'error'); switchTab('config'); return; }
+
+            const pageId = document.getElementById('inp-page').value || document.getElementById('cfg-fb-page').value || cfg.page;
             const link = document.getElementById('inp-link').value || 'https://www.facebook.com';
             const budget = cfg.budget || 200000;
             const country = cfg.country || 'PH';
             const cta = cfg.cta || 'SHOP_NOW';
             const objective = cfg.objective || 'OUTCOME_SALES';
-            const account = cfg.account.startsWith('act_') ? cfg.account : 'act_' + cfg.account;
+            const account = activeAccount.startsWith('act_') ? activeAccount : 'act_' + activeAccount;
             // Campaign naming: mã_mkt + mã_hàng + tuỳ_chỉnh
             const mktCode = document.getElementById('inp-mkt')?.value?.trim() || '';
             const productCode = document.getElementById('inp-product-code')?.value?.trim() || '';
@@ -1289,7 +1654,7 @@ Generate exactly ${videoFiles.length} objects.`;
                 campBody.append('special_ad_categories', 'NONE');
                 campBody.append('daily_budget', budget);
                 campBody.append('bid_strategy', 'LOWEST_COST_WITHOUT_CAP');
-                campBody.append('access_token', cfg.token);
+                campBody.append('access_token', activeToken);
 
                 console.log('[AdsAuto] Campaign params:', Object.fromEntries(campBody));
                 const campResp = await fetch(`${FB_API}/${account}/campaigns`, {
@@ -1321,7 +1686,7 @@ Generate exactly ${videoFiles.length} objects.`;
                     const vForm = new FormData();
                     vForm.append('source', v.file);
                     vForm.append('title', v.file.name);
-                    vForm.append('access_token', cfg.token);
+                    vForm.append('access_token', activeToken);
                     const vResp = await fetch(`${FB_API}/${account}/advideos`, { method: 'POST', body: vForm });
                     const vData = await vResp.json();
                     console.log('[AdsAuto] Video upload response:', vData);
@@ -1344,13 +1709,13 @@ Generate exactly ${videoFiles.length} objects.`;
                     asParams.append('billing_event', 'IMPRESSIONS');
                     asParams.append('optimization_goal', 'OFFSITE_CONVERSIONS');
                     // promoted_object is REQUIRED for Conversions objective
-                    if (!cfg.pixel) {
-                        throw new Error('Pixel ID là bắt buộc cho Conversion campaign! Vào Cấu hình → nhập Pixel ID.');
+                    if (!activePixel) {
+                        throw new Error('Pixel ID là bắt buộc cho Conversion campaign! Vào Cấu hình → chọn Pixel hoặc nhập Pixel ID.');
                     }
-                    asParams.append('promoted_object', JSON.stringify({ pixel_id: cfg.pixel, custom_event_type: cfg.event || 'PURCHASE' }));
+                    asParams.append('promoted_object', JSON.stringify({ pixel_id: activePixel, custom_event_type: cfg.event || 'PURCHASE' }));
                     asParams.append('targeting', JSON.stringify({ geo_locations: { countries: [country] } }));
                     asParams.append('status', 'PAUSED');
-                    asParams.append('access_token', cfg.token);
+                    asParams.append('access_token', activeToken);
                     console.log('[AdsAuto] AdSet params:', Object.fromEntries(asParams));
                     const asResp = await fetch(`${FB_API}/${account}/adsets`, {
                         method: 'POST',
@@ -1375,7 +1740,7 @@ Generate exactly ${videoFiles.length} objects.`;
                     // Get video thumbnail from Facebook
                     let thumbUrl = '';
                     try {
-                        const thumbResp = await fetch(`${FB_API}/${vData.id}/thumbnails?access_token=${cfg.token}`);
+                        const thumbResp = await fetch(`${FB_API}/${vData.id}/thumbnails?access_token=${activeToken}`);
                         const thumbData = await thumbResp.json();
                         thumbUrl = thumbData.data?.[0]?.uri || '';
                         if (thumbUrl) addLog(`${label} 🖼️ Thumbnail: OK`, 'success');
@@ -1384,7 +1749,7 @@ Generate exactly ${videoFiles.length} objects.`;
                     // If no thumbnail, try video picture
                     if (!thumbUrl) {
                         try {
-                            const picResp = await fetch(`${FB_API}/${vData.id}?fields=picture&access_token=${cfg.token}`);
+                            const picResp = await fetch(`${FB_API}/${vData.id}?fields=picture&access_token=${activeToken}`);
                             const picData = await picResp.json();
                             thumbUrl = picData.picture || '';
                         } catch (e) { console.log('[AdsAuto] Picture fetch failed:', e); }
@@ -1406,7 +1771,7 @@ Generate exactly ${videoFiles.length} objects.`;
                         page_id: pageId,
                         video_data: videoDataObj
                     }));
-                    crParams.append('access_token', cfg.token);
+                    crParams.append('access_token', activeToken);
                     console.log('[AdsAuto] Creative params:', Object.fromEntries(crParams));
                     const crResp = await fetch(`${FB_API}/${account}/adcreatives`, {
                         method: 'POST',
@@ -1431,7 +1796,7 @@ Generate exactly ${videoFiles.length} objects.`;
                     adParams.append('adset_id', asData.id);
                     adParams.append('creative', JSON.stringify({ creative_id: crData.id }));
                     adParams.append('status', 'PAUSED');
-                    adParams.append('access_token', cfg.token);
+                    adParams.append('access_token', activeToken);
                     const adResp = await fetch(`${FB_API}/${account}/ads`, {
                         method: 'POST',
                         body: adParams
