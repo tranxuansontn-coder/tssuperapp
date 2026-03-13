@@ -465,29 +465,45 @@
             addLog(`🔄 Đang tải campaigns từ ${accounts.length} tài khoản...`, 'info');
 
             try {
+                // Helper: fetch ALL pages from a paginated FB API endpoint
+                async function fetchAllPages(url) {
+                    let allData = [];
+                    let nextUrl = url;
+                    while (nextUrl) {
+                        const resp = await fetch(nextUrl);
+                        const json = await resp.json();
+                        if (json.error) throw new Error(json.error.message);
+                        if (json.data) allData = allData.concat(json.data);
+                        nextUrl = json.paging?.next || null;
+                    }
+                    return allData;
+                }
+
                 const allCampaigns = [];
                 for (const account of accounts) {
-                    const fields = 'id,name,status,daily_budget,lifetime_budget,objective,created_time';
-                    const resp = await fetch(`${FB_API}/${account}/campaigns?fields=${fields}&limit=100&access_token=${fbAccessToken}`);
-                    const data = await resp.json();
-                    if (data.error) { addLog(`❌ ${account}: ${data.error.message}`, 'error'); continue; }
-                    const camps = (data.data || []).map(c => ({ ...c, _account: account }));
-                    addLog(`📊 ${account}: ${camps.length} campaigns`, 'info');
+                    try {
+                        // Fetch ALL campaigns (auto-paginate)
+                        const fields = 'id,name,status,daily_budget,lifetime_budget,objective,created_time';
+                        const campUrl = `${FB_API}/${account}/campaigns?fields=${fields}&limit=500&access_token=${fbAccessToken}`;
+                        const campData = await fetchAllPages(campUrl);
+                        const camps = campData.map(c => ({ ...c, _account: account }));
+                        addLog(`📊 ${account}: ${camps.length} campaigns`, 'info');
 
-                    // Fetch insights
-                    const insFields = 'campaign_id,spend,cost_per_action_type,actions';
-                    const insResp = await fetch(`${FB_API}/${account}/insights?fields=${insFields}&level=campaign${dateParams}&limit=500&access_token=${fbAccessToken}`);
-                    const insData = await insResp.json();
-                    const insMap = {};
-                    if (insData.data) {
-                        insData.data.forEach(ins => {
+                        // Fetch ALL insights (auto-paginate)
+                        const insFields = 'campaign_id,spend,cost_per_action_type,actions';
+                        const insUrl = `${FB_API}/${account}/insights?fields=${insFields}&level=campaign${dateParams}&limit=500&access_token=${fbAccessToken}`;
+                        const insData = await fetchAllPages(insUrl);
+                        const insMap = {};
+                        insData.forEach(ins => {
                             const cpa = ins.cost_per_action_type?.find(a => a.action_type === 'offsite_conversion.fb_pixel_complete_registration' || a.action_type === 'complete_registration');
                             const results = ins.actions?.find(a => a.action_type === 'offsite_conversion.fb_pixel_complete_registration' || a.action_type === 'complete_registration');
                             insMap[ins.campaign_id] = { spend: parseFloat(ins.spend || 0), cpa: cpa ? parseFloat(cpa.value) : null, results: results ? parseInt(results.value) : 0 };
                         });
+                        camps.forEach(c => { c._insights = insMap[c.id] || null; });
+                        allCampaigns.push(...camps);
+                    } catch (accErr) {
+                        addLog(`❌ ${account}: ${accErr.message}`, 'error');
                     }
-                    camps.forEach(c => { c._insights = insMap[c.id] || null; });
-                    allCampaigns.push(...camps);
                 }
                 campaigns = allCampaigns;
                 addLog(`✅ Tổng cộng ${campaigns.length} campaigns từ ${accounts.length} tài khoản`, 'success');
