@@ -149,12 +149,19 @@
 
         /* AI Section */
         .ai-config-bar { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; padding:12px 16px; background:rgba(139,92,246,.04); border:1px solid rgba(139,92,246,.15); border-radius:10px; margin-bottom:16px; }
-        .ai-config-bar .form-group { flex:1; min-width:200px; }
+        .ai-config-bar .form-group { flex:1; min-width:180px; }
         .ai-config-bar label { font-size:11px; color:rgba(139,92,246,.8); margin-bottom:4px; display:block; font-weight:600; }
         .btn-ai { background:linear-gradient(135deg,#8b5cf6,#6366f1); color:#fff; padding:10px 20px; font-size:13px; font-weight:700; border:none; border-radius:8px; cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; gap:8px; transition:all .2s; }
         .btn-ai:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(139,92,246,.3); }
         .btn-ai:disabled { opacity:.5; cursor:not-allowed; transform:none; }
         .ai-result { margin-top:16px; }
+        .btn-test-ai { background:rgba(139,92,246,.1); color:rgba(139,92,246,.9); border:1px solid rgba(139,92,246,.25); padding:7px 12px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; gap:5px; transition:all .2s; white-space:nowrap; align-self:flex-end; }
+        .btn-test-ai:hover { background:rgba(139,92,246,.2); border-color:rgba(139,92,246,.5); }
+        .btn-test-ai:disabled { opacity:.4; cursor:not-allowed; }
+        .ai-model-status { font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px; display:none; align-self:flex-end; margin-bottom:2px; white-space:nowrap; }
+        .ai-model-status.ok { background:rgba(16,185,129,.15); color:var(--success); border:1px solid rgba(16,185,129,.2); display:flex; align-items:center; gap:4px; }
+        .ai-model-status.error { background:rgba(239,68,68,.15); color:var(--danger); border:1px solid rgba(239,68,68,.2); display:flex; align-items:center; gap:4px; }
+        .ai-model-status.testing { background:rgba(59,130,246,.1); color:var(--accent2); border:1px solid rgba(59,130,246,.2); display:flex; align-items:center; gap:4px; }
         .ai-rec { padding:14px 16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; margin-bottom:10px; display:flex; gap:12px; align-items:center; transition:all .2s; }
         .ai-rec:hover { border-color:rgba(139,92,246,.3); }
         .ai-rec .ai-check { width:18px; height:18px; accent-color:#8b5cf6; cursor:pointer; flex-shrink:0; }
@@ -287,6 +294,22 @@
                 <div class="form-group">
                     <label>🔑 Gemini API Key</label>
                     <input type="password" class="inp" id="cfg-gemini" placeholder="AIzaSyxxxxxx...">
+                </div>
+                <div class="form-group" style="min-width:200px;max-width:280px">
+                    <label>🤖 Model AI</label>
+                    <select class="inp" id="cfg-ai-model" onchange="onAiModelChange()">
+                        <option value="gemini-2.5-flash">⚡ gemini-2.5-flash (Nhanh)</option>
+                        <option value="gemini-2.5-pro">🧠 gemini-2.5-pro (Mạnh nhất)</option>
+                        <option value="gemini-2.5-pro-exp-03-25">🧪 gemini-2.5-pro-exp-03-25</option>
+                        <option value="gemini-2.0-flash">⚡ gemini-2.0-flash</option>
+                        <option value="gemini-2.0-flash-lite">🪶 gemini-2.0-flash-lite</option>
+                        <option value="gemini-1.5-pro">🔵 gemini-1.5-pro</option>
+                        <option value="gemini-1.5-flash">🟢 gemini-1.5-flash</option>
+                    </select>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px;align-self:flex-end">
+                    <button class="btn-test-ai" id="btn-test-ai" onclick="testAiModel()" disabled title="Kiểm tra model trước khi phân tích">🧪 Test Model</button>
+                    <span class="ai-model-status" id="ai-model-status"></span>
                 </div>
                 <button class="btn-ai" id="btn-ai-analyze" onclick="aiAnalyze()" disabled>🤖 Phân tích & Đề xuất</button>
             </div>
@@ -776,10 +799,68 @@
 
         // ===== AI ANALYSIS =====
         let aiRecommendations = [];
-        function loadGeminiKey() { document.getElementById('cfg-gemini').value = localStorage.getItem('adsRules_gemini') || ''; }
+        function loadGeminiKey() {
+            document.getElementById('cfg-gemini').value = localStorage.getItem('adsRules_gemini') || '';
+            const savedModel = localStorage.getItem('adsRules_ai_model');
+            if (savedModel) {
+                const sel = document.getElementById('cfg-ai-model');
+                if ([...sel.options].some(o => o.value === savedModel)) sel.value = savedModel;
+            }
+            updateTestAiBtn();
+        }
         function saveGeminiKey() { localStorage.setItem('adsRules_gemini', document.getElementById('cfg-gemini').value.trim()); }
         function updateAiBtn() { document.getElementById('btn-ai-analyze').disabled = !campaigns.length || !document.getElementById('cfg-gemini').value.trim(); }
-        document.addEventListener('input', e => { if (e.target.id === 'cfg-gemini') { saveGeminiKey(); updateAiBtn(); } });
+        function updateTestAiBtn() { document.getElementById('btn-test-ai').disabled = !document.getElementById('cfg-gemini').value.trim(); }
+        function onAiModelChange() {
+            localStorage.setItem('adsRules_ai_model', document.getElementById('cfg-ai-model').value);
+            setAiModelStatus(''); // reset status khi đổi model
+        }
+        function setAiModelStatus(state, msg) {
+            const el = document.getElementById('ai-model-status');
+            el.className = 'ai-model-status';
+            if (!state) { el.style.display = 'none'; return; }
+            el.classList.add(state);
+            el.innerHTML = {
+                'ok':      `✅ ${msg || 'Sẵn sàng'}`,
+                'error':   `❌ ${msg || 'Lỗi'}`,
+                'testing': `⏳ Đang test...`
+            }[state] || msg;
+        }
+        async function testAiModel() {
+            const key = document.getElementById('cfg-gemini').value.trim();
+            const model = document.getElementById('cfg-ai-model').value;
+            if (!key) { showToast('❌ Nhập Gemini API Key trước!', 'error'); return; }
+            const btn = document.getElementById('btn-test-ai');
+            btn.disabled = true;
+            setAiModelStatus('testing');
+            try {
+                const resp = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+                    { method:'POST', headers:{'Content-Type':'application/json'},
+                      body: JSON.stringify({ contents:[{parts:[{text:'Reply OK'}]}], generationConfig:{maxOutputTokens:5} }) }
+                );
+                const data = await resp.json();
+                if (data.error) {
+                    const errMsg = data.error.message;
+                    setAiModelStatus('error', errMsg.length > 35 ? errMsg.slice(0,35)+'…' : errMsg);
+                    addLog(`❌ Test model ${model}: ${errMsg}`, 'error');
+                } else {
+                    setAiModelStatus('ok', 'Sẵn sàng ✓');
+                    addLog(`✅ Model ${model}: OK`, 'success');
+                }
+            } catch(e) {
+                setAiModelStatus('error', 'Không kết nối được');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        document.addEventListener('input', e => {
+            if (e.target.id === 'cfg-gemini') {
+                saveGeminiKey(); updateAiBtn();
+                updateTestAiBtn();
+                setAiModelStatus('');
+            }
+        });
 
         async function aiAnalyze() {
             const key = document.getElementById('cfg-gemini').value.trim();
@@ -815,7 +896,9 @@ TRẢ VỀ JSON ARRAY, mỗi item có format:
 Chỉ trả về JSON array, không markdown, không giải thích thêm.`;
 
             try {
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${key}`, {
+                const model = document.getElementById('cfg-ai-model').value;
+                localStorage.setItem('adsRules_ai_model', model);
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.3 } })
