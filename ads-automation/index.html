@@ -958,6 +958,143 @@
             color: var(--text-muted);
             line-height: 1.5
         }
+
+        /* ── Win Content Library ── */
+        .win-library-section {
+            margin-top: 12px;
+            border: 1px solid rgba(245, 158, 11, .2);
+            border-radius: var(--radius-sm);
+            background: rgba(245, 158, 11, .03);
+            overflow: hidden;
+            transition: border-color .2s
+        }
+
+        .win-library-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            cursor: pointer;
+            user-select: none;
+            gap: 8px
+        }
+
+        .win-library-header:hover { background: rgba(245,158,11,.04) }
+
+        .win-toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .win-switch {
+            position: relative;
+            width: 36px;
+            height: 20px;
+            background: var(--bg-input);
+            border-radius: 99px;
+            border: 1px solid var(--border);
+            transition: all .2s;
+            flex-shrink: 0;
+            cursor: pointer
+        }
+
+        .win-switch::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            top: 2px;
+            left: 2px;
+            transition: all .2s
+        }
+
+        .win-switch.on {
+            background: rgba(245, 158, 11, .25);
+            border-color: var(--yellow)
+        }
+
+        .win-switch.on::after {
+            background: var(--yellow);
+            left: 18px
+        }
+
+        .win-badge {
+            background: rgba(245, 158, 11, .15);
+            color: var(--yellow);
+            border: 1px solid rgba(245, 158, 11, .2);
+            padding: 1px 8px;
+            border-radius: 99px;
+            font-size: 10px;
+            font-weight: 700
+        }
+
+        .win-panel {
+            display: none;
+            padding: 0 14px 14px;
+            border-top: 1px solid rgba(245, 158, 11, .1)
+        }
+
+        .win-panel.open { display: block }
+
+        .win-add-box {
+            background: rgba(255, 255, 255, .02);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-top: 12px
+        }
+
+        .win-item {
+            background: rgba(245, 158, 11, .05);
+            border: 1px solid rgba(245, 158, 11, .12);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            margin-top: 8px;
+            position: relative;
+            animation: fadeIn .25s ease
+        }
+
+        .win-item-text {
+            font-size: 12px;
+            color: var(--text);
+            line-height: 1.5;
+            white-space: pre-wrap;
+            max-height: 56px;
+            overflow: hidden
+        }
+
+        .win-item-text.expanded { max-height: none }
+
+        .win-item-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px
+        }
+
+        .win-del {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 13px;
+            padding: 1px 5px;
+            border-radius: 4px;
+            transition: all .15s
+        }
+
+        .win-del:hover { background: rgba(239,68,68,.15); color: var(--red) }
+
+        .win-expand {
+            font-size: 10px;
+            color: var(--yellow);
+            cursor: pointer;
+            margin-top: 3px;
+            display: inline-block
+        }
     </style>
 </head>
 
@@ -1060,7 +1197,68 @@
                 <textarea id="inp-product" class="inp" rows="3"
                     placeholder="Nhập mô tả sản phẩm hoặc bấm nút bên dưới để AI tự đọc từ Landing Page..."></textarea>
             </div>
-            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <!-- ── Win Content Library ── -->
+            <div class="win-library-section" id="win-library-section">
+                <div class="win-library-header" onclick="winTogglePanel()">
+                    <div class="win-toggle-row">
+                        <div class="win-switch" id="win-switch" onclick="event.stopPropagation();winToggleContext()"></div>
+                        <span style="font-size:13px">🏆</span>
+                        <div>
+                            <div style="font-size:12px;font-weight:700;color:var(--text)">Học từ Win Content</div>
+                            <div style="font-size:10px;color:var(--text-dim)" id="win-sub">Bật để AI học theo mẫu ads đã win</div>
+                        </div>
+                        <span class="win-badge" id="win-count-badge">0 mẫu</span>
+                    </div>
+                    <span id="win-arrow" style="color:var(--text-muted);font-size:12px;transition:transform .3s">▼</span>
+                </div>
+
+                <div class="win-panel" id="win-panel">
+
+                    <!-- AUTO: Kéo từ Meta Ads -->
+                    <div style="margin-top:12px;padding:12px 14px;background:rgba(24,119,242,.05);border:1px solid rgba(24,119,242,.15);border-radius:var(--radius-sm)">
+                        <div style="font-size:11px;font-weight:700;color:#4d9cf5;margin-bottom:8px">🔗 Tự động kéo Win Ads từ tài khoản Meta</div>
+                        <div style="font-size:10px;color:var(--text-dim);margin-bottom:10px">Kết nối Facebook trước, chọn TKQC → bấm Sync để tự động lấy các ads có CTR cao nhất về Win Library.</div>
+                        <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+                            <div>
+                                <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px">CTR tối thiểu (%)</div>
+                                <input type="number" id="win-min-ctr" class="inp" value="1.5" step="0.1" min="0" style="width:90px;font-size:12px;padding:7px 10px">
+                            </div>
+                            <div>
+                                <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px">Lấy tối đa</div>
+                                <select id="win-meta-limit" class="inp" style="width:80px;font-size:12px;padding:7px 10px">
+                                    <option value="10">10 ads</option>
+                                    <option value="20" selected>20 ads</option>
+                                    <option value="50">50 ads</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-ghost btn-sm" id="btn-win-sync" onclick="winSyncFromMeta()" style="white-space:nowrap;border-color:rgba(24,119,242,.4);color:#4d9cf5;font-weight:700">
+                                🔗 Sync Win Ads từ Meta
+                            </button>
+                        </div>
+                        <div id="win-sync-status" style="margin-top:8px;font-size:11px;color:var(--text-dim);display:none"></div>
+                    </div>
+
+                    <!-- MANUAL: Thêm tay -->
+                    <div class="win-add-box">
+                        <div style="font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:8px">✏️ Hoặc thêm thủ công</div>
+                        <textarea id="win-input" class="inp" rows="2"
+                            placeholder="Paste nội dung ads đã chạy tốt vào đây..."></textarea>
+                        <div style="display:flex;gap:8px;margin-top:8px;align-items:flex-end">
+                            <div style="flex:1">
+                                <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px">CTR (%)</div>
+                                <input type="number" id="win-ctr" class="inp" placeholder="vd: 3.5" step="0.1" min="0" style="font-size:12px;padding:7px 10px">
+                            </div>
+                            <button class="btn btn-ghost btn-sm" onclick="winAddItem()" style="white-space:nowrap;border-color:rgba(245,158,11,.3);color:var(--yellow)">💾 Lưu</button>
+                        </div>
+                    </div>
+
+                    <!-- List -->
+                    <div id="win-list" style="margin-top:4px"></div>
+                    <div id="win-empty" style="text-align:center;padding:16px;font-size:11px;color:var(--text-muted)">Chưa có mẫu win nào.<br>Bấm <strong style="color:#4d9cf5">Sync từ Meta</strong> để tự động kéo về! 🔗</div>
+                </div>
+            </div>
+
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
                 <button class="btn btn-ghost btn-sm" id="btn-read-page" onclick="readLandingPage()"
                     style="white-space:nowrap">🔍 AI đọc Landing Page</button>
                 <button class="btn btn-primary" id="btn-generate" onclick="generateAllTexts()" disabled
@@ -1270,6 +1468,22 @@
                     </select>
                 </div>
             </div>
+
+            <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.1);margin:16px 0">
+
+            <div style="margin-bottom:12px;padding:12px;background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.2);border-radius:6px">
+                <label style="font-size:12px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px;color:var(--yellow)">
+                    <span style="font-size:14px">🔥</span> Firebase Database URL (Kho Win Content Chung)
+                </label>
+                <div style="font-size:10px;color:var(--text-dim);margin-bottom:8px">Link Realtime Database do công ty cấp (Ví dụ: https://project-id.firebaseio.com/win_library). Để trống nếu muốn lưu cá nhân trên máy.</div>
+                <input type="text" id="cfg-firebase-url" class="inp" placeholder="https://....firebaseio.com/win" style="border-color:rgba(217,119,6,.3)">
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:16px">
+                <button class="btn btn-primary" onclick="saveAIConfig()">💾 Lưu Cấu hình Phần này</button>
+            </div>
+            <div id="ai-cfg-toast"
+                style="font-size:11px;color:var(--green);margin-top:8px;display:none;font-weight:600">✅ Đã lưu cấu hình AI & DB!</div>
         </div>
         <div class="card fade-in" style="padding:20px;margin-bottom:16px;animation-delay:.06s">
             <div style="font-weight:700;font-size:13px;margin-bottom:16px">📊 Default Campaign Settings</div>
@@ -1791,6 +2005,23 @@
                 cta: document.getElementById('cfg-cta').value
             };
             localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+
+            // Extra Configurations outside of main obj (for UI compatibility)
+            localStorage.setItem('ts_gemini_key', document.getElementById('cfg-gemini').value.trim());
+            localStorage.setItem('ts_openai_key', document.getElementById('cfg-openai').value.trim());
+            
+            // Format Firebase URL
+            const fbInput = document.getElementById('cfg-firebase-url');
+            if (fbInput) {
+                let dbUrl = fbInput.value.trim();
+                if(dbUrl.includes('firebaseapp.com')) { dbUrl = dbUrl.replace('firebaseapp.com', 'firebaseio.com'); }
+                if(dbUrl.endsWith('/')) dbUrl = dbUrl.slice(0, -1);
+                if(dbUrl.endsWith('.json')) dbUrl = dbUrl.slice(0, -5); 
+                localStorage.setItem('ts_firebase_url', dbUrl);
+                // Render lại Library
+                if (typeof winRender === 'function') winRender();
+            }
+
             showToast('💾 Đã lưu cấu hình!');
         }
 
@@ -1811,6 +2042,9 @@
             document.getElementById('cfg-budget').value = cfg.budget || 200000;
             document.getElementById('cfg-country').value = cfg.country || 'PH';
             if (cfg.cta) document.getElementById('cfg-cta').value = cfg.cta;
+            
+            if(document.getElementById('cfg-firebase-url')) document.getElementById('cfg-firebase-url').value = localStorage.getItem('ts_firebase_url') || '';
+
             // Also set page on create tab (if not FB-connected, use saved value)
             if (cfg.page) setDropdownValue('inp-page', cfg.page);
             // If FB connected, sync FB dropdowns from saved config
@@ -2050,17 +2284,25 @@ Just return the summary text, no markdown, no explanation.`;
                 const productDesc = document.getElementById('inp-product').value.trim();
                 const landingPage = document.getElementById('inp-link').value.trim();
 
+                // Build win context if enabled
+                const winCtx = await winGetContext();
+
                 const prompt = `You are an expert Facebook Ads copywriter. Generate ad copy for ${videoFiles.length} video ads.
 
 TARGET MARKET: Philippines
 ${productDesc ? `PRODUCT INFO: ${productDesc}` : 'PRODUCT: General e-commerce product'}
-${landingPage ? `LANDING PAGE: ${landingPage}` : ''}
+${landingPage ? `LANDING PAGE: ${landingPage}` : ''}${winCtx ? `
+
+---
+WIN CONTENT REFERENCE (analyze these high-performing ad samples and replicate their HOOK style, CTA patterns, emotional triggers, and sentence structure — but write ENTIRELY NEW content for the product above):
+${winCtx}
+---` : ''}
 
 RULES:
 - Write in English (Philippines market)
 - Mention specific product features/benefits from the product info above
 - Use emojis, create urgency, include call to action
-- Each ad copy must be UNIQUE with different angles (e.g. benefit, social proof, urgency, emotional)
+- Each ad copy must be UNIQUE with different angles (e.g. benefit, social proof, urgency, emotional)${winCtx ? '\n- LEARN from the win content patterns above: hook style, CTA structure, urgency phrasing' : ''}
 - headline: max 40 chars, catchy
 - primary_text: 2-3 sentences, compelling with emoji
 - description: max 30 chars
@@ -2122,7 +2364,364 @@ Generate exactly ${videoFiles.length} objects.`;
                 showToast('⚠️ Bạn có thể nhập text thủ công', 'warning');
             }
             document.getElementById('btn-generate').disabled = false;
-            document.getElementById('btn-generate').innerHTML = '🤖 Generate Ad Text cho tất cả videos (AI)';
+            document.getElementById('btn-generate').innerHTML = '🤖 Generate Ad Text (AI)';
+        }
+
+        // ==================== WIN CONTENT LIBRARY (FIREBASE) ====================
+        const WIN_KEY = 'ts_win_library'; // Fallback nếu user chưa cấu hình Firebase
+        let winContextOn = false;
+        let winPanelOpen = false;
+
+        function getFirebaseAPI() {
+            const url = localStorage.getItem('ts_firebase_url');
+            if(!url) return null;
+            return `${url}.json`;
+        }
+        
+        function getFirebaseItemAPI(id) {
+            const url = localStorage.getItem('ts_firebase_url');
+            if(!url) return null;
+            return `${url}/${id}.json`;
+        }
+
+        async function winLoad() {
+            const apiUrl = getFirebaseAPI();
+            if (!apiUrl) {
+                // Return local storage if no Firebase configured
+                return JSON.parse(localStorage.getItem(WIN_KEY) || '[]');
+            }
+
+            try {
+                const resp = await fetch(apiUrl);
+                if (!resp.ok) return [];
+                const data = await resp.json();
+                if (!data) return [];
+                
+                // Firebase REST returns object: { "-Oxyz": { content: "...", ctr: 2.1 }, "-Oabc": { ... } }
+                // Convert to array of objects with id injected
+                const items = Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                }));
+                // Sort by descending CTR, then by Creation date
+                items.sort((a, b) => {
+                    const ctrA = parseFloat(a.ctr) || 0;
+                    const ctrB = parseFloat(b.ctr) || 0;
+                    if (ctrA !== ctrB) return ctrB - ctrA;
+                    // Sort by id reverse alphabetical for creation time fallback
+                    return b.id.localeCompare(a.id);
+                });
+                return items;
+            } catch (err) {
+                console.error('[Firebase DB] Lỗi load data:', err);
+                return JSON.parse(localStorage.getItem(WIN_KEY) || '[]'); // Fallback
+            }
+        }
+
+        async function winGetContext() {
+            if (!winContextOn) return '';
+            const items = await winLoad();
+            if (!items.length) return '';
+            return items.slice(0, 5).map((w, i) => {
+                const ctrTag = w.ctr ? ` [CTR: ${w.ctr}%]` : '';
+                return `Sample ${i + 1}${ctrTag}:\n${w.content}`;
+            }).join('\n\n');
+        }
+
+        async function winRender() {
+            const listEl = document.getElementById('win-list');
+            const isFirebase = !!getFirebaseAPI();
+            listEl.innerHTML = `<div style="padding:12px;text-align:center;color:var(--text-dim);font-size:11px"><span class="spinner"></span> Đang tải thư viện Win Content chung ${isFirebase ? '(Cloud)' : '(Local)'}...</div>`;
+
+            const items = await winLoad();
+            const badge = document.getElementById('win-count-badge');
+            const sub = document.getElementById('win-sub');
+            const empty = document.getElementById('win-empty');
+
+            badge.textContent = `${items.length} mẫu`;
+
+            if (items.length === 0) {
+                sub.textContent = 'Bật để AI học theo mẫu ads đã win';
+                empty.style.display = '';
+                if(!isFirebase) {
+                    empty.innerHTML += `<br><span style="color:var(--yellow);font-size:10px">⚠️ Đang dùng LocalStorage cá nhân. Hãy vào tab Cấu hình nhập Link Firebase để xài chung toàn cty.</span>`;
+                }
+                listEl.innerHTML = '';
+                // Disable context if no items
+                winContextOn = false;
+                winUpdateSwitch();
+            } else {
+                sub.textContent = winContextOn
+                    ? `✅ AI đang học từ ${Math.min(items.length, 5)} mẫu win`
+                    : `${items.length} mẫu sẵn sàng — bật để AI học theo`;
+                empty.style.display = 'none';
+            }
+
+            listEl.innerHTML = items.map((w, i) => {
+                const ctrBadge = w.ctr ? `<span class="win-badge" style="font-size:9px">${w.ctr}% CTR</span>` : '';
+                const dateStr = w.date || w.created_at || '';
+                const itemId = w.id || i; // Use Firebase ID if available, else index
+                
+                return `<div class="win-item" id="wi-${itemId}">
+                    <div class="win-item-meta">
+                        <div style="display:flex;gap:6px;align-items:center">
+                            <span style="font-size:11px">🏆</span>
+                            ${ctrBadge}
+                            <span style="font-size:10px;color:var(--text-muted)">${dateStr.split('T')[0]}</span>
+                        </div>
+                        <button class="win-del" onclick="winDelete('${itemId}')" title="Xóa toàn hệ thống">✕</button>
+                    </div>
+                    <div class="win-item-text" id="wt-${itemId}">${w.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+                    <span class="win-expand" onclick="winExpand('${itemId}', this)">▸ Xem thêm</span>
+                </div>`;
+            }).join('');
+        }
+
+        function winUpdateSwitch() {
+            const sw = document.getElementById('win-switch');
+            if (winContextOn) sw.classList.add('on');
+            else sw.classList.remove('on');
+        }
+
+        async function winToggleContext() {
+            const items = await winLoad();
+            if (!items.length) { showToast('Thư viện dùng chung chưa có mẫu win nào!', 'warning'); return; }
+            winContextOn = !winContextOn;
+            winUpdateSwitch();
+            winRender();
+            const genBtn = document.getElementById('btn-generate');
+            if (winContextOn) {
+                genBtn.innerHTML = '🏆 Generate (Win Mode)';
+            } else {
+                genBtn.innerHTML = '🤖 Generate Ad Text (AI)';
+            }
+        }
+
+        function winTogglePanel() {
+            winPanelOpen = !winPanelOpen;
+            document.getElementById('win-panel').classList.toggle('open', winPanelOpen);
+            document.getElementById('win-arrow').style.transform = winPanelOpen ? 'rotate(180deg)' : '';
+            if(winPanelOpen) winRender(); // Tải mới nhất mỗi lần mở panel
+        }
+
+        async function winAddItem() {
+            const content = document.getElementById('win-input').value.trim();
+            if (!content) { showToast('Nhập nội dung content win!', 'warning'); return; }
+            const ctr = parseFloat(document.getElementById('win-ctr').value) || null;
+            
+            const btnAdd = document.getElementById('btn-win-add');
+            btnAdd.disabled = true;
+            btnAdd.innerHTML = '⏳ Lưu...';
+
+            try {
+                const payload = { 
+                    content, 
+                    source: 'manual', 
+                    notes: 'Nhập thủ công',
+                    date: new Date().toISOString()
+                };
+                if (ctr) payload.ctr = Math.round(ctr * 100) / 100;
+
+                const apiUrl = getFirebaseAPI();
+                if (apiUrl) {
+                    await fetch(apiUrl, {
+                        method: 'POST', // POST via REST creates a push ID object automatically
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    showToast('✅ Đã lưu lên Clound Firebase thành công!');
+                } else {
+                    // Fallback local storage
+                    const items = JSON.parse(localStorage.getItem(WIN_KEY) || '[]');
+                    items.unshift(payload);
+                    localStorage.setItem(WIN_KEY, JSON.stringify(items));
+                    showToast('✅ Đã lưu vào máy tính (Local)!');
+                }
+                
+                document.getElementById('win-input').value = '';
+                document.getElementById('win-ctr').value = '';
+                await winRender();
+            } catch (err) {
+                showToast('❌ Lỗi lưu Data: ' + err.message, 'error');
+                console.error('[Firebase Add]', err);
+            }
+
+            btnAdd.disabled = false;
+            btnAdd.innerHTML = '💾 Lưu';
+        }
+
+        async function winDelete(id) {
+            if (!confirm('Bạn có chắc muốn xóa mẫu này KHỎI CƠ SỞ DỮ LIỆU CHUNG không? Toàn bộ công ty sẽ không thấy nữa.')) return;
+            try {
+                const itemApiUrl = getFirebaseItemAPI(id);
+                if (itemApiUrl) {
+                    await fetch(itemApiUrl, { method: 'DELETE' }); // Delete by ID
+                } else {
+                    // Fallback Local
+                    const idx = parseInt(id);
+                    const items = JSON.parse(localStorage.getItem(WIN_KEY) || '[]');
+                    items.splice(idx, 1);
+                    localStorage.setItem(WIN_KEY, JSON.stringify(items));
+                }
+                
+                const items = await winLoad();
+                if (winContextOn && items.length === 0) {
+                    winContextOn = false;
+                    document.getElementById('btn-generate').innerHTML = '🤖 Generate Ad Text (AI)';
+                }
+                await winRender();
+                showToast('Đã xóa khỏi hệ thống', 'success');
+            } catch (err) {
+                showToast('❌ Lỗi xóa Data: ' + err.message, 'error');
+            }
+        }
+
+        function winExpand(idx, btn) {
+            const el = document.getElementById('wt-' + idx);
+            const exp = el.classList.toggle('expanded');
+            btn.textContent = exp ? '▴ Thu gọn' : '▸ Xem thêm';
+        }
+
+        // Init win library on load
+        winRender();
+
+        // ==================== WIN SYNC FROM META ADS API ====================
+        async function winSyncFromMeta() {
+            if (!fbAccessToken) {
+                showToast('Kết nối Facebook trước ở tab ⚙️ Cấu hình!', 'warning');
+                return;
+            }
+            const accountId = document.getElementById('cfg-fb-account').value ||
+                              document.getElementById('cfg-account')?.value?.trim();
+            if (!accountId) {
+                showToast('Chọn Tài khoản quảng cáo (TKQC) trước!', 'warning');
+                return;
+            }
+
+            const minCTR  = parseFloat(document.getElementById('win-min-ctr').value) || 1.5;
+            const limit   = parseInt(document.getElementById('win-meta-limit').value)  || 20;
+            const btn     = document.getElementById('btn-win-sync');
+            const status  = document.getElementById('win-sync-status');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Đang kéo dữ liệu...';
+            status.style.display = 'block';
+            status.style.color   = 'var(--text-dim)';
+            status.textContent   = '⏳ Đang lấy danh sách ads từ Meta...';
+
+            try {
+                // Step 1: Fetch ads with insights (CTR) in last 30 days
+                const url = `${FB_API}/${accountId}/ads` +
+                    `?fields=name,creative{title,body,object_story_spec,effective_object_story_id}` +
+                    `,insights.date_preset(last_30d){ctr,impressions,clicks,spend}` +
+                    `&effective_status=["ACTIVE","PAUSED","ARCHIVED"]` +
+                    `&limit=200` +
+                    `&access_token=${fbAccessToken}`;
+
+                const resp = await fetch(url);
+                const data = await resp.json();
+
+                if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+
+                const ads = data.data || [];
+                status.textContent = `📊 Phân tích ${ads.length} ads...`;
+
+                // Step 2: Filter by CTR and extract text
+                const winners = [];
+                for (const ad of ads) {
+                    const ins = ad.insights?.data?.[0];
+                    if (!ins) continue;
+                    const ctr = parseFloat(ins.ctr) || 0;
+                    if (ctr < minCTR) continue;
+
+                    // Extract ad copy text
+                    const cr = ad.creative || {};
+                    const spec = cr.object_story_spec || {};
+                    const linkData = spec.link_data || spec.video_data || {};
+
+                    const headline  = cr.title       || linkData.name        || '';
+                    const primary   = linkData.message || cr.body            || '';
+                    const desc      = linkData.description || '';
+
+                    const text = [headline, primary, desc].filter(Boolean).join('\n');
+                    if (!text.trim() || text.trim().length < 5) continue;
+
+                    winners.push({
+                        ad_id: ad.id,
+                        text,
+                        ctr: Math.round(ctr * 100) / 100,
+                        impressions: ins.impressions,
+                        ad_name: ad.name
+                    });
+                }
+
+                // Sort by CTR desc, take top N
+                winners.sort((a, b) => b.ctr - a.ctr);
+                const topWinners = winners.slice(0, limit);
+
+                if (topWinners.length === 0) {
+                    status.style.color = 'var(--yellow)';
+                    status.textContent = `⚠️ Không tìm thấy ad nào có CTR ≥ ${minCTR}% trong 30 ngày qua. Thử giảm CTR tối thiểu.`;
+                    btn.disabled = false;
+                    btn.innerHTML = '🔗 Sync Win Ads từ Meta';
+                    return;
+                }
+
+                // Step 3: Add to shared Database via API
+                // First get existing items to avoid syncing duplicates
+                const existing = await winLoad();
+                const existingIds = new Set(existing.map(w => w.ad_id || w.notes).filter(Boolean)); // try notes if ad_id was saved there
+                let addedCount = 0;
+
+                const apiUrl = getFirebaseAPI();
+
+                for (const w of topWinners) {
+                    if (existingIds.has(w.ad_id) || existingIds.has(`ad_id: ${w.ad_id}`)) continue;
+                    
+                    const payload = {
+                        content: w.text,
+                        ctr: w.ctr,
+                        source: 'meta',
+                        notes: `ad_id: ${w.ad_id} | ad_name: ${w.ad_name}`, // Using notes field to store ad_id since backend accepts it
+                        date: new Date().toISOString()
+                    };
+
+                    try {
+                        if (apiUrl) {
+                            await fetch(apiUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                        } else {
+                            existing.push(payload);
+                            localStorage.setItem(WIN_KEY, JSON.stringify(existing));
+                        }
+                        addedCount++;
+                    } catch (e) {
+                         console.error('[WinSync DB Add]', e);
+                    }
+                }
+
+                await winRender();
+
+                const dbTotal = await winLoad();
+                status.style.color = 'var(--green)';
+                status.textContent = addedCount > 0
+                    ? `✅ Đã đồng bộ lên DB chung! (+${addedCount} win ads mới từ Meta). Tổng công ty: ${dbTotal.length} mẫu.`
+                    : `ℹ️ ${topWinners.length} ads win đã có sẵn trong Database. Không có mẫu mới.`;
+
+                if (addedCount > 0) showToast(`✅ Đồng bộ Meta -> DB thành công!`, 'success');
+
+            } catch (err) {
+                status.style.color = 'var(--red)';
+                status.textContent = '❌ Lỗi: ' + err.message;
+                showToast('❌ ' + err.message, 'error');
+                console.error('[WinSync Meta -> API]', err);
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '🔗 Sync Win Ads từ Meta';
         }
 
         function renderTextCards() {
