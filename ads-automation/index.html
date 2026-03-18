@@ -1507,11 +1507,17 @@
                 </div>
             </div>
 
-            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
                 <button class="btn btn-ghost btn-sm" id="btn-read-page" onclick="readLandingPage()"
                     style="white-space:nowrap">🔍 AI đọc Landing Page</button>
-                <button class="btn btn-primary" id="btn-generate" onclick="generateAllTexts()" disabled
-                    style="white-space:nowrap">🤖 Generate Ad Text (AI)</button>
+                <div style="display:flex;align-items:flex-end;gap:6px">
+                    <div>
+                        <div style="font-size:10px;color:var(--text-dim);margin-bottom:3px">🔢 Số biến thể text</div>
+                        <input type="number" id="inp-variations" class="inp" value="0" min="0" max="50" step="1" style="width:70px;font-size:12px;padding:7px 10px;text-align:center" title="0 = theo số video. Nhập số lớn hơn để AI tạo nhiều biến thể">
+                    </div>
+                    <button class="btn btn-primary" id="btn-generate" onclick="generateAllTexts()" disabled
+                        style="white-space:nowrap">🤖 Generate Ad Text (AI)</button>
+                </div>
             </div>
         </div>
 
@@ -2603,8 +2609,13 @@ Just return the summary text, no markdown, no explanation.`;
             if (provider === 'openai' && !cfg.openai) { showToast('Cần cấu hình OpenAI API Key trước!', 'warning'); switchTab('config'); return; }
             if (videoFiles.length === 0) { showToast('Chọn ít nhất 1 video!', 'warning'); return; }
 
+            // Determine number of variations to generate
+            const variationInput = parseInt(document.getElementById('inp-variations')?.value) || 0;
+            const originalVideos = [...videoFiles]; // Save original video list
+            const totalVariations = variationInput > 0 ? variationInput : videoFiles.length;
+
             document.getElementById('btn-generate').disabled = true;
-            document.getElementById('btn-generate').innerHTML = '<span class="spinner"></span> Đang generate cho ' + videoFiles.length + ' videos...';
+            document.getElementById('btn-generate').innerHTML = `<span class="spinner"></span> Đang generate ${totalVariations} biến thể...`;
 
             try {
                 const productDesc = document.getElementById('inp-product').value.trim();
@@ -2622,7 +2633,7 @@ The "primary_text" field MUST follow this exact structure/formula:
 ${formulaText}
 ===== END FORMULA =====` : '';
 
-                const prompt = `You are an expert Facebook Ads copywriter. Generate ad copy for ${videoFiles.length} video ads.
+                const prompt = `You are an expert Facebook Ads copywriter. Generate ${totalVariations} UNIQUE ad copy variations.
 
 TARGET MARKET: Philippines
 ${productDesc ? `PRODUCT INFO: ${productDesc}` : 'PRODUCT: General e-commerce product'}
@@ -2637,26 +2648,25 @@ RULES:
 - Write in English (Philippines market)
 - Mention specific product features/benefits from the product info above
 - Use emojis, create urgency, include call to action
-- Each ad copy must be UNIQUE with different angles (e.g. benefit, social proof, urgency, emotional)${winCtx ? '\n- LEARN from the win content patterns above: hook style, CTA structure, urgency phrasing' : ''}${formulaText ? '\n- The primary_text MUST follow the Content Formula structure above. Do NOT deviate from it.' : ''}
+- Each ad copy must be UNIQUE with COMPLETELY DIFFERENT angles, hooks, and selling points${winCtx ? '\n- LEARN from the win content patterns above: hook style, CTA structure, urgency phrasing' : ''}${formulaText ? '\n- The primary_text MUST follow the Content Formula structure above. Do NOT deviate from it.' : ''}
 - Do NOT prefix any line with numbers like "1.", "2.", "3.", etc. Write flowing text, not numbered lists.
 - headline: max 40 chars, catchy
 - primary_text: 2-3 sentences, compelling with emoji
 - description: max 30 chars
+- Use different angles for each variation: benefit, social proof, urgency, emotional, scarcity, comparison, authority, curiosity
 
 IMPORTANT: Return ONLY a valid JSON array, no markdown, no explanation.
 Format: [{"headline":"...","primary_text":"...","description":"..."}]
-Generate exactly ${videoFiles.length} objects.`;
+Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
 
-                console.log(`[AdsAuto] Calling ${getActiveAILabel()}...`);
+                console.log(`[AdsAuto] Calling ${getActiveAILabel()} for ${totalVariations} variations...`);
                 const rawText = await callAI(prompt, 0.9);
 
                 console.log('[AdsAuto] Raw text:', rawText);
 
                 // Extract JSON from response - handle markdown code blocks & extra text
                 let jsonStr = rawText;
-                // Remove markdown code fences
                 jsonStr = jsonStr.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
-                // Find the JSON array
                 const arrMatch = jsonStr.match(/\[[\s\S]*\]/);
                 if (!arrMatch) {
                     console.error('[AdsAuto] Cannot find JSON array in:', jsonStr);
@@ -2678,10 +2688,23 @@ Generate exactly ${videoFiles.length} objects.`;
 
                 console.log('[AdsAuto] Parsed results:', results);
 
-                // Map results to videos - handle case where AI returns fewer items
-                // Helper: strip leading numbers like "1. ", "2. " from text
                 const stripLeadingNumber = (s) => s ? s.replace(/^\d+\.\s*/, '') : '';
 
+                // If user requested more variations than videos, expand videoFiles
+                if (totalVariations > originalVideos.length) {
+                    videoFiles = [];
+                    for (let i = 0; i < totalVariations; i++) {
+                        const srcVideo = originalVideos[i % originalVideos.length];
+                        videoFiles.push({
+                            file: srcVideo.file,
+                            headline: '',
+                            primary: '',
+                            desc: ''
+                        });
+                    }
+                }
+
+                // Map results to expanded videoFiles
                 for (let i = 0; i < videoFiles.length; i++) {
                     const r = results[i] || results[results.length - 1] || {};
                     videoFiles[i].headline = stripLeadingNumber(r.headline || r.title || '');
@@ -2692,7 +2715,7 @@ Generate exactly ${videoFiles.length} objects.`;
                 const filled = videoFiles.filter(v => v.headline || v.primary).length;
                 switchPreviewMode(previewMode);
                 goToStep(2);
-                showToast(`🤖 AI đã generate text cho ${filled}/${videoFiles.length} videos!`);
+                showToast(`🤖 AI đã generate ${filled} biến thể từ ${originalVideos.length} videos!`);
 
             } catch (err) {
                 showToast('❌ Lỗi AI: ' + err.message, 'error');
