@@ -1429,6 +1429,23 @@
                 <textarea id="inp-product" class="inp" rows="3"
                     placeholder="Nhập mô tả sản phẩm hoặc bấm nút bên dưới để AI tự đọc từ Landing Page..."></textarea>
             </div>
+            <!-- ── Content Formula ── -->
+            <div class="card" style="padding:14px;margin-top:12px;border:1px solid rgba(168,85,247,.15);background:rgba(168,85,247,.03)">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+                    <span style="font-size:14px">📐</span>
+                    <div style="font-size:12px;font-weight:700;color:var(--text)">Content Formula (Cấu trúc content AI viết)</div>
+                </div>
+                <div style="font-size:10px;color:var(--text-dim);margin-bottom:10px">Chọn template có sẵn hoặc tự viết công thức. AI sẽ viết content ĐÚNG theo cấu trúc này.</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="formula-presets">
+                    <button class="btn btn-sm" onclick="selectFormulaPreset('longform_ph')" id="fp-longform_ph" style="font-size:11px;padding:5px 10px;border:1px solid rgba(168,85,247,.3);background:rgba(168,85,247,.15);color:#c084fc;font-weight:600">📱 Long-form FB (PH)</button>
+                    <button class="btn btn-sm" onclick="selectFormulaPreset('shortform')" id="fp-shortform" style="font-size:11px;padding:5px 10px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-dim)">⚡ Short-form</button>
+                    <button class="btn btn-sm" onclick="selectFormulaPreset('review')" id="fp-review" style="font-size:11px;padding:5px 10px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-dim)">⭐ Review Style</button>
+                    <button class="btn btn-sm" onclick="selectFormulaPreset('problem')" id="fp-problem" style="font-size:11px;padding:5px 10px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-dim)">🔧 Problem/Solution</button>
+                    <button class="btn btn-sm" onclick="selectFormulaPreset('custom')" id="fp-custom" style="font-size:11px;padding:5px 10px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-dim)">✏️ Custom</button>
+                </div>
+                <textarea id="formula-text" class="inp" rows="4" style="font-size:11px;line-height:1.6;border-color:rgba(168,85,247,.2)" onchange="saveFormula()" placeholder="Viết cấu trúc content ở đây..."></textarea>
+                <div style="font-size:10px;color:var(--text-muted);margin-top:6px">💡 AI sẽ viết primary_text theo đúng cấu trúc trên. Headline và Description vẫn tự động tối ưu.</div>
+            </div>
             <!-- ── Win Content Library ── -->
             <div class="win-library-section" id="win-library-section">
                 <div class="win-library-header" onclick="winTogglePanel()">
@@ -1783,7 +1800,69 @@
         let currentStep = 1;
         const CONFIG_KEY = 'ts_ads_config';
         const HISTORY_KEY = 'ts_ads_history';
+        const FORMULA_KEY = 'ts_ads_formula';
         const FB_API = 'https://graph.facebook.com/v21.0';
+
+        // ==================== CONTENT FORMULA ====================
+        const formulaPresets = {
+            longform_ph: `Viết bằng tiếng Filipino/Tagalog, dạng long-form Facebook post:\n\n1. 🔥 TÊN SẢN PHẨM + HEADLINE MẠNH (giật tít, gây tò mò)\n2. 😫 NỖI ĐAU KHÁCH HÀNG — vấn đề họ đang gặp / thứ họ đang cần\n3. ✅ CÔNG DỤNG + ĐIỂM NỔI BẬT sản phẩm (liệt kê 3-5 bullets)\n4. 🛒 CÂU GIẬT MUA HÀNG — urgency, promo, free shipping, limited stock\n5. 🔗 LINK BÁN HÀNG + #hashtag liên quan`,
+            shortform: `Viết ngắn gọn, dưới 100 từ:\n\n1. 🪝 HOOK — câu mở đầu gây chú ý (dưới 10 từ)\n2. ✅ BENEFIT — lợi ích chính sản phẩm (1-2 câu)\n3. 👉 CTA — kêu gọi hành động rõ ràng`,
+            review: `Viết dạng review/testimonial:\n\n1. 💬 "I tried..." — mở đầu như trải nghiệm thật\n2. 📈 KẾT QUẢ — kết quả cụ thể sau khi dùng\n3. ⭐ RECOMMEND — lý do khuyên dùng\n4. 👉 CTA — kêu gọi mua/thử`,
+            problem: `Viết theo cấu trúc Problem/Solution:\n\n1. ❓ VẤN ĐỀ — nêu pain point khách hàng đang gặp\n2. 💡 GIẢI PHÁP — giới thiệu sản phẩm như giải pháp\n3. 📊 BẰNG CHỨNG — social proof, số liệu, review\n4. 🎁 PROMO — khuyến mãi, giảm giá, quà tặng\n5. 👉 CTA — kêu gọi hành động cụ thể`,
+            custom: ''
+        };
+        let activeFormulaPreset = 'longform_ph';
+
+        function selectFormulaPreset(key) {
+            activeFormulaPreset = key;
+            // Update active button styling
+            document.querySelectorAll('#formula-presets button').forEach(btn => {
+                btn.style.background = 'var(--bg-input)';
+                btn.style.borderColor = 'var(--border)';
+                btn.style.color = 'var(--text-dim)';
+            });
+            const activeBtn = document.getElementById('fp-' + key);
+            if (activeBtn) {
+                activeBtn.style.background = 'rgba(168,85,247,.15)';
+                activeBtn.style.borderColor = 'rgba(168,85,247,.3)';
+                activeBtn.style.color = '#c084fc';
+            }
+            // Set textarea to preset content (only if not custom)
+            const textarea = document.getElementById('formula-text');
+            if (key !== 'custom') {
+                textarea.value = formulaPresets[key] || '';
+            } else {
+                // Load saved custom formula or empty
+                const saved = localStorage.getItem(FORMULA_KEY + '_custom');
+                textarea.value = saved || '';
+            }
+            saveFormula();
+        }
+
+        function saveFormula() {
+            const text = document.getElementById('formula-text')?.value || '';
+            localStorage.setItem(FORMULA_KEY, JSON.stringify({ preset: activeFormulaPreset, text }));
+            if (activeFormulaPreset === 'custom') {
+                localStorage.setItem(FORMULA_KEY + '_custom', text);
+            }
+        }
+
+        function loadFormula() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(FORMULA_KEY));
+                if (saved) {
+                    activeFormulaPreset = saved.preset || 'longform_ph';
+                    document.getElementById('formula-text').value = saved.text || formulaPresets[activeFormulaPreset] || '';
+                    selectFormulaPreset(activeFormulaPreset);
+                    return;
+                }
+            } catch (e) { }
+            // Default: load longform_ph
+            selectFormulaPreset('longform_ph');
+        }
+
+        // Load formula on page load
+        document.addEventListener('DOMContentLoaded', () => { setTimeout(loadFormula, 100); });
         const FB_APP_ID = '1415560070289924';
         let fbAccessToken = '';
         let fbUserInfo = null;
@@ -2534,6 +2613,15 @@ Just return the summary text, no markdown, no explanation.`;
                 // Build win context if enabled
                 const winCtx = await winGetContext();
 
+                // Get content formula if set
+                const formulaText = document.getElementById('formula-text')?.value?.trim() || '';
+                const formulaBlock = formulaText ? `
+
+===== CONTENT FORMULA (BẮT BUỘC THEO ĐÚNG CẤU TRÚC NÀY) =====
+The "primary_text" field MUST follow this exact structure/formula:
+${formulaText}
+===== END FORMULA =====` : '';
+
                 const prompt = `You are an expert Facebook Ads copywriter. Generate ad copy for ${videoFiles.length} video ads.
 
 TARGET MARKET: Philippines
@@ -2543,13 +2631,13 @@ ${landingPage ? `LANDING PAGE: ${landingPage}` : ''}${winCtx ? `
 ---
 WIN CONTENT REFERENCE (analyze these high-performing ad samples and replicate their HOOK style, CTA patterns, emotional triggers, and sentence structure — but write ENTIRELY NEW content for the product above):
 ${winCtx}
----` : ''}
+---` : ''}${formulaBlock}
 
 RULES:
 - Write in English (Philippines market)
 - Mention specific product features/benefits from the product info above
 - Use emojis, create urgency, include call to action
-- Each ad copy must be UNIQUE with different angles (e.g. benefit, social proof, urgency, emotional)${winCtx ? '\n- LEARN from the win content patterns above: hook style, CTA structure, urgency phrasing' : ''}
+- Each ad copy must be UNIQUE with different angles (e.g. benefit, social proof, urgency, emotional)${winCtx ? '\n- LEARN from the win content patterns above: hook style, CTA structure, urgency phrasing' : ''}${formulaText ? '\n- The primary_text MUST follow the Content Formula structure above. Do NOT deviate from it.' : ''}
 - Do NOT prefix any line with numbers like "1.", "2.", "3.", etc. Write flowing text, not numbered lists.
 - headline: max 40 chars, catchy
 - primary_text: 2-3 sentences, compelling with emoji
