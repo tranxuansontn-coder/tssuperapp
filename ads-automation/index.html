@@ -2357,6 +2357,15 @@
             showToast('💾 Đã lưu cấu hình!');
         }
 
+        function saveAIConfig() {
+            saveConfig();
+            const toast = document.getElementById('ai-cfg-toast');
+            if (toast) {
+                toast.style.display = 'block';
+                setTimeout(() => toast.style.display = 'none', 3000);
+            }
+        }
+
         function loadConfig() {
             const cfg = getConfig();
             // Manual fields (always populate for fallback)
