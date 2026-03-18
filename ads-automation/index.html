@@ -2986,7 +2986,7 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
                     `?fields=name,creative{title,body,object_story_spec,effective_object_story_id}` +
                     `,insights.date_preset(last_30d){ctr,impressions,clicks,spend}` +
                     `&effective_status=["ACTIVE","PAUSED","ARCHIVED"]` +
-                    `&limit=200` +
+                    `&limit=50` +
                     `&access_token=${fbAccessToken}`;
 
                 const resp = await fetch(url);
