@@ -1095,6 +1095,238 @@
             margin-top: 3px;
             display: inline-block
         }
+
+        /* ==================== FB AD PREVIEW ==================== */
+        .fb-preview-toggle {
+            display: inline-flex;
+            background: var(--bg-input);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .fb-preview-toggle button {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            padding: 6px 14px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            font-family: inherit;
+        }
+        .fb-preview-toggle button.active {
+            background: var(--accent);
+            color: #fff;
+        }
+        .fb-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin-top: 12px;
+        }
+        @media (max-width: 1400px) { .fb-preview-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 1100px) { .fb-preview-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 800px) { .fb-preview-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 500px) { .fb-preview-grid { grid-template-columns: 1fr; } }
+
+        .fb-ad-card {
+            background: #242526;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255,255,255,.08);
+            transition: transform .2s, box-shadow .2s;
+            animation: fadeIn .3s ease;
+        }
+        .fb-ad-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,.3);
+        }
+        .fb-ad-card .fb-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(0,0,0,.65);
+            border: none;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity .2s, background .2s;
+        }
+        .fb-ad-card:hover .fb-remove { opacity: 1; }
+        .fb-ad-card .fb-remove:hover { background: var(--red); }
+
+        .fb-ad-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px 6px;
+        }
+        .fb-ad-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .fb-ad-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .fb-ad-page-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #e4e6eb;
+            line-height: 1.2;
+        }
+        .fb-ad-sponsored {
+            font-size: 10px;
+            color: #b0b3b8;
+        }
+
+        .fb-ad-body {
+            padding: 4px 12px 8px;
+            font-size: 12px;
+            color: #e4e6eb;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .fb-ad-body .fb-see-more {
+            color: #b0b3b8;
+            cursor: pointer;
+        }
+
+        .fb-ad-media {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #18191a;
+            position: relative;
+            overflow: hidden;
+        }
+        .fb-ad-media video,
+        .fb-ad-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .fb-ad-media .fb-play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            background: rgba(0,0,0,.55);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .fb-ad-media .fb-play-btn::after {
+            content: '';
+            border-style: solid;
+            border-width: 10px 0 10px 18px;
+            border-color: transparent transparent transparent #fff;
+            margin-left: 3px;
+        }
+        .fb-ad-media .fb-duration {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0,0,0,.7);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .fb-ad-link-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: #3a3b3c;
+        }
+        .fb-ad-link-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .fb-ad-domain {
+            font-size: 10px;
+            color: #b0b3b8;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+        }
+        .fb-ad-headline {
+            font-size: 12px;
+            font-weight: 700;
+            color: #e4e6eb;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .fb-ad-desc {
+            font-size: 10px;
+            color: #b0b3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .fb-ad-cta {
+            background: rgba(255,255,255,.1);
+            color: #e4e6eb;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: default;
+            white-space: nowrap;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .fb-ad-actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 4px 8px 6px;
+            border-top: 1px solid rgba(255,255,255,.08);
+        }
+        .fb-ad-actions span {
+            font-size: 11px;
+            color: #b0b3b8;
+            cursor: default;
+            padding: 5px 0;
+        }
+
+        .fb-preview-counter {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+        .fb-preview-counter .count {
+            color: var(--green);
+            font-weight: 700;
+        }
     </style>
 </head>
 
@@ -1193,28 +1425,11 @@
                         type="text" id="inp-link" class="inp" placeholder="https://yoursite.com"></div>
             </div>
             <div style="margin-top:12px" class="form-group">
-                <label>📦 Mô tả sản phẩm / Insight (AI sẽ dựa vào đây để viết nội dung)</label>
+                <label>📦 Mô tả sản phẩm (AI sẽ dựa vào đây để viết ad text)</label>
                 <textarea id="inp-product" class="inp" rows="3"
-                    placeholder="Nhập insight sản phẩm, USP, target audience... hoặc bấm nút bên dưới để AI tự đọc từ Landing Page..."></textarea>
+                    placeholder="Nhập mô tả sản phẩm hoặc bấm nút bên dưới để AI tự đọc từ Landing Page..."></textarea>
             </div>
-            <!-- ── Content Formula ── -->
-            <div style="margin-top:12px;border:1px solid rgba(139,92,246,.2);border-radius:var(--radius-sm);background:rgba(139,92,246,.03);overflow:hidden">
-                <div style="padding:12px 14px">
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-                        <div style="font-size:12px;font-weight:700;color:var(--text)">📐 Content Formula (Cấu trúc content AI viết)</div>
-                    </div>
-                    <div style="font-size:10px;color:var(--text-dim);margin-bottom:10px">Chọn template có sẵn hoặc tự viết công thức. AI sẽ viết content ĐÚNG theo cấu trúc này.</div>
-                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-                        <button class="btn btn-sm btn-ghost formula-preset" onclick="loadFormula('longform_ph')" style="font-size:10px;border-color:rgba(139,92,246,.3);color:var(--purple)">📱 Long-form FB (PH)</button>
-                        <button class="btn btn-sm btn-ghost formula-preset" onclick="loadFormula('shortform')" style="font-size:10px">⚡ Short-form</button>
-                        <button class="btn btn-sm btn-ghost formula-preset" onclick="loadFormula('review_style')" style="font-size:10px">⭐ Review Style</button>
-                        <button class="btn btn-sm btn-ghost formula-preset" onclick="loadFormula('problem_solution')" style="font-size:10px">🔧 Problem/Solution</button>
-                        <button class="btn btn-sm btn-ghost formula-preset" onclick="loadFormula('custom')" style="font-size:10px;border-color:rgba(249,115,22,.3);color:var(--accent)">✏️ Custom</button>
-                    </div>
-                    <textarea id="inp-formula" class="inp" rows="6" style="font-size:12px;line-height:1.8;border-color:rgba(139,92,246,.2)" placeholder="Nhập cấu trúc content..."></textarea>
-                    <div style="margin-top:6px;font-size:10px;color:var(--text-muted)">💡 AI sẽ viết primary_text theo đúng cấu trúc trên. Headline và Description vẫn tự động tối ưu.</div>
-                </div>
-            </div>
+            <!-- ── Win Content Library ── -->
             <div class="win-library-section" id="win-library-section">
                 <div class="win-library-header" onclick="winTogglePanel()">
                     <div class="win-toggle-row">
@@ -1257,44 +1472,15 @@
 
                     <!-- MANUAL: Thêm tay -->
                     <div class="win-add-box">
-                        <div style="font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:8px">✏️ Hoặc thêm thủ công (Structured)</div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-                            <div>
-                                <div style="font-size:10px;color:var(--accent);margin-bottom:4px;font-weight:600">📌 Headline</div>
-                                <input type="text" id="win-headline" class="inp" placeholder="vd: 🔥 Flash Sale - 50% OFF Today!" style="font-size:12px;padding:7px 10px">
-                            </div>
-                            <div>
-                                <div style="font-size:10px;color:var(--accent);margin-bottom:4px;font-weight:600">📋 Description</div>
-                                <input type="text" id="win-desc" class="inp" placeholder="vd: Shop Now - Free Shipping" style="font-size:12px;padding:7px 10px">
-                            </div>
-                        </div>
-                        <div style="margin-bottom:8px">
-                            <div style="font-size:10px;color:var(--accent);margin-bottom:4px;font-weight:600">📝 Primary Text (nội dung chính)</div>
-                            <textarea id="win-primary" class="inp" rows="2" placeholder="Paste nội dung ads chính đã chạy tốt vào đây..."></textarea>
-                        </div>
-                        <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
-                            <div style="flex:1;min-width:100px">
-                                <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px">🎯 Hook Type</div>
-                                <select id="win-hook" class="inp" style="font-size:12px;padding:7px 10px">
-                                    <option value="">-- Chọn --</option>
-                                    <option value="urgency">⚡ Urgency (gấp gáp)</option>
-                                    <option value="social_proof">⭐ Social Proof</option>
-                                    <option value="benefit">💎 Benefit (lợi ích)</option>
-                                    <option value="emotional">💖 Emotional</option>
-                                    <option value="promotion">🎁 Promotion (KM)</option>
-                                    <option value="curiosity">🤔 Curiosity</option>
-                                    <option value="problem_solution">🔧 Problem/Solution</option>
-                                </select>
-                            </div>
-                            <div style="flex:1;min-width:100px">
-                                <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px">📦 Sản phẩm</div>
-                                <input type="text" id="win-product" class="inp" placeholder="vd: car wiper" style="font-size:12px;padding:7px 10px">
-                            </div>
-                            <div style="min-width:70px">
+                        <div style="font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:8px">✏️ Hoặc thêm thủ công</div>
+                        <textarea id="win-input" class="inp" rows="2"
+                            placeholder="Paste nội dung ads đã chạy tốt vào đây..."></textarea>
+                        <div style="display:flex;gap:8px;margin-top:8px;align-items:flex-end">
+                            <div style="flex:1">
                                 <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px">CTR (%)</div>
                                 <input type="number" id="win-ctr" class="inp" placeholder="vd: 3.5" step="0.1" min="0" style="font-size:12px;padding:7px 10px">
                             </div>
-                            <button class="btn btn-ghost btn-sm" id="btn-win-add" onclick="winAddItem()" style="white-space:nowrap;border-color:rgba(245,158,11,.3);color:var(--yellow)">💾 Lưu</button>
+                            <button class="btn btn-ghost btn-sm" onclick="winAddItem()" style="white-space:nowrap;border-color:rgba(245,158,11,.3);color:var(--yellow)">💾 Lưu</button>
                         </div>
                     </div>
 
@@ -1315,10 +1501,25 @@
         <!-- STEP 2: AI Text per video -->
         <div id="step-text" style="display:none">
             <div class="card fade-in" style="padding:20px;margin-bottom:16px">
-                <div style="font-weight:700;font-size:13px;margin-bottom:4px">🤖 Step 2 — Ad Text cho từng video</div>
-                <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px">AI đã generate text riêng cho mỗi
-                    video. Bạn có thể chỉnh sửa.</div>
-                <div id="text-cards"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                    <div>
+                        <div style="font-weight:700;font-size:13px;margin-bottom:2px">🤖 Step 2 — Ad Preview</div>
+                        <div style="font-size:11px;color:var(--text-dim)">Xem demo & loại bỏ bài ads không cần thiết</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <div class="fb-preview-counter" id="fb-counter"></div>
+                        <div class="fb-preview-toggle" id="view-toggle">
+                            <button onclick="switchPreviewMode('fb')" class="active" id="btn-mode-fb">📱 FB Preview</button>
+                            <button onclick="switchPreviewMode('text')" id="btn-mode-text">📝 Text</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="fb-preview-container">
+                    <div class="fb-preview-grid" id="fb-preview-grid"></div>
+                </div>
+                <div id="text-cards-container" style="display:none">
+                    <div id="text-cards"></div>
+                </div>
                 <div style="margin-top:12px;display:flex;gap:8px">
                     <button class="btn btn-ghost btn-sm" onclick="generateAllTexts()">🔄 Generate lại tất cả</button>
                     <button class="btn btn-primary" onclick="showPreview()">📋 Preview Campaign Structure</button>
@@ -1960,85 +2161,6 @@
             setTimeout(() => t.remove(), 4000);
         }
 
-        // ==================== CONTENT FORMULA ====================
-        const FORMULA_KEY = 'ts_ads_formula';
-        const FORMULA_PRESETS = {
-            longform_ph: `Viết bằng tiếng Filipino/Tagalog, dạng long-form Facebook post:
-
-1. 🔥 TÊN SẢN PHẨM + HEADLINE MẠNH (giật tít, gây tò mò)
-2. 😩 NỖI ĐAU KHÁCH HÀNG — vấn đề họ đang gặp / thứ họ đang cần
-3. ✅ CÔNG DỤNG + ĐIỂM NỔI BẬT sản phẩm (liệt kê 3-5 bullets)
-4. 🛒 CÂU GIẬT MUA HÀNG — urgency, promo, free shipping, limited stock
-5. 🔗 LINK BÁN HÀNG + #hashtag liên quan
-
-Tone: thân thiện, dễ hiểu, nhiều emoji. Mỗi section cách 1 dòng trống.`,
-
-            shortform: `Viết ngắn gọn, súc tích bằng tiếng Anh (Philippines):
-
-1. 🔥 Hook mạnh (1 câu gây tò mò hoặc shock)
-2. ✨ Benefit chính (1-2 câu)
-3. ⚡ CTA + urgency (1 câu)
-
-Tổng dưới 100 từ. Nhiều emoji.`,
-
-            review_style: `Viết dạng review/testimonial bằng tiếng Anh (Philippines):
-
-1. ⭐ Mở đầu kiểu "I tried this..." hoặc "After using for X days..."
-2. 😱 Kết quả bất ngờ — before/after
-3. 💯 Tại sao recommend — 2-3 điểm nổi bật
-4. 🛒 CTA — "Get yours at..." + link
-
-Tone: chân thật, như người dùng thật review. Dùng emoji tự nhiên.`,
-
-            problem_solution: `Viết bằng tiếng Anh (Philippines), dạng Problem → Solution:
-
-1. ❌ VẤN ĐỀ — mô tả nỗi đau thường gặp (2-3 câu cảm xúc)
-2. 💡 GIẢI PHÁP — giới thiệu sản phẩm như câu trả lời hoàn hảo
-3. ✅ BẰNG CHỨNG — features/specs/testimonials (3-4 bullets)
-4. 🔥 PROMO — giá ưu đãi, limited time, free shipping
-5. 👇 CTA + LINK mua hàng
-
-Mỗi phần cách 1 dòng trống. Dùng emoji đầu mỗi dòng.`
-        };
-
-        function loadFormula(preset) {
-            const el = document.getElementById('inp-formula');
-            if (preset === 'custom') {
-                el.value = '';
-                el.focus();
-                el.placeholder = 'Tự viết công thức content của bạn ở đây...\n\n1. [Phần 1]\n2. [Phần 2]\n3. [Phần 3]\n...';
-            } else if (FORMULA_PRESETS[preset]) {
-                el.value = FORMULA_PRESETS[preset];
-            }
-            // Save to localStorage
-            localStorage.setItem(FORMULA_KEY, el.value);
-            // Highlight active preset button
-            document.querySelectorAll('.formula-preset').forEach(btn => {
-                btn.style.background = '';
-                btn.style.color = '';
-            });
-            const activeBtn = event?.target;
-            if (activeBtn) {
-                activeBtn.style.background = 'rgba(139,92,246,.15)';
-                activeBtn.style.color = 'var(--purple)';
-            }
-            showToast(`📐 Đã tải formula: ${preset === 'custom' ? 'Custom' : preset}`);
-        }
-
-        // Auto-save formula on change
-        document.getElementById('inp-formula')?.addEventListener('input', function() {
-            localStorage.setItem(FORMULA_KEY, this.value);
-        });
-
-        // Load saved formula on init
-        (function initFormula() {
-            const saved = localStorage.getItem(FORMULA_KEY);
-            if (saved) {
-                const el = document.getElementById('inp-formula');
-                if (el) el.value = saved;
-            }
-        })();
-
         function switchTab(name) {
             document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['create', 'config', 'history'][i] === name));
             document.querySelectorAll('.page').forEach(p => p.classList.toggle('show', p.id === 'page-' + name));
@@ -2412,37 +2534,26 @@ Just return the summary text, no markdown, no explanation.`;
                 // Build win context if enabled
                 const winCtx = await winGetContext();
 
-                // Get content formula
-                const formula = document.getElementById('inp-formula').value.trim();
-
                 const prompt = `You are an expert Facebook Ads copywriter. Generate ad copy for ${videoFiles.length} video ads.
 
 TARGET MARKET: Philippines
-${productDesc ? `PRODUCT INFO / INSIGHT:\n${productDesc}` : 'PRODUCT: General e-commerce product'}
+${productDesc ? `PRODUCT INFO: ${productDesc}` : 'PRODUCT: General e-commerce product'}
 ${landingPage ? `LANDING PAGE: ${landingPage}` : ''}${winCtx ? `
 
 ---
-WIN CONTENT REFERENCE — HIGH-PERFORMING ADS (structured format):
-Study each sample's writing style, emotional triggers, CTA patterns, and sentence structure.
-Replicate their patterns — but write ENTIRELY NEW unique content for the product above.
-
+WIN CONTENT REFERENCE (analyze these high-performing ad samples and replicate their HOOK style, CTA patterns, emotional triggers, and sentence structure — but write ENTIRELY NEW content for the product above):
 ${winCtx}
----` : ''}${formula ? `
-
-===== CONTENT FORMULA (BẮT BUỘC THEO ĐÚNG CẤU TRÚC NÀY) =====
-The "primary_text" field MUST follow this exact structure/formula:
-${formula}
-===== END FORMULA =====
-IMPORTANT: Write the primary_text following the formula structure above EXACTLY. Each numbered section should be a separate paragraph/block in the primary_text. Use emojis and the target language as specified in the formula.` : ''}
+---` : ''}
 
 RULES:
-- Write in ${formula && /tagalog|filipino|phillippin|tiếng phi/i.test(formula) ? 'Tagalog/Filipino' : 'English'} (Philippines market)
+- Write in English (Philippines market)
 - Mention specific product features/benefits from the product info above
 - Use emojis, create urgency, include call to action
-- Each ad copy must be UNIQUE with different angles (e.g. benefit, social proof, urgency, emotional)${winCtx ? '\n- Study the win content samples above — match their writing style and hook patterns.' : ''}${formula ? '\n- CRITICAL: primary_text MUST follow the Content Formula structure above. Do NOT ignore any section in the formula.' : ''}
-- headline: max 40 chars, catchy, in the target language
-- primary_text: ${formula ? 'Follow the CONTENT FORMULA structure exactly' : '2-3 sentences, compelling with emoji'}
-- description: max 30 chars, concise CTA
+- Each ad copy must be UNIQUE with different angles (e.g. benefit, social proof, urgency, emotional)${winCtx ? '\n- LEARN from the win content patterns above: hook style, CTA structure, urgency phrasing' : ''}
+- Do NOT prefix any line with numbers like "1.", "2.", "3.", etc. Write flowing text, not numbered lists.
+- headline: max 40 chars, catchy
+- primary_text: 2-3 sentences, compelling with emoji
+- description: max 30 chars
 
 IMPORTANT: Return ONLY a valid JSON array, no markdown, no explanation.
 Format: [{"headline":"...","primary_text":"...","description":"..."}]
@@ -2480,15 +2591,18 @@ Generate exactly ${videoFiles.length} objects.`;
                 console.log('[AdsAuto] Parsed results:', results);
 
                 // Map results to videos - handle case where AI returns fewer items
+                // Helper: strip leading numbers like "1. ", "2. " from text
+                const stripLeadingNumber = (s) => s ? s.replace(/^\d+\.\s*/, '') : '';
+
                 for (let i = 0; i < videoFiles.length; i++) {
                     const r = results[i] || results[results.length - 1] || {};
-                    videoFiles[i].headline = r.headline || r.title || '';
-                    videoFiles[i].primary = r.primary_text || r.primaryText || r.text || r.body || '';
-                    videoFiles[i].desc = r.description || r.desc || '';
+                    videoFiles[i].headline = stripLeadingNumber(r.headline || r.title || '');
+                    videoFiles[i].primary = (r.primary_text || r.primaryText || r.text || r.body || '').split('\n').map(line => stripLeadingNumber(line)).join('\n');
+                    videoFiles[i].desc = stripLeadingNumber(r.description || r.desc || '');
                 }
 
                 const filled = videoFiles.filter(v => v.headline || v.primary).length;
-                renderTextCards();
+                switchPreviewMode(previewMode);
                 goToStep(2);
                 showToast(`🤖 AI đã generate text cho ${filled}/${videoFiles.length} videos!`);
 
@@ -2496,7 +2610,7 @@ Generate exactly ${videoFiles.length} objects.`;
                 showToast('❌ Lỗi AI: ' + err.message, 'error');
                 console.error('[AdsAuto] Error:', err);
                 // Still show step 2 so user can manually fill in
-                renderTextCards();
+                switchPreviewMode(previewMode);
                 goToStep(2);
                 showToast('⚠️ Bạn có thể nhập text thủ công', 'warning');
             }
@@ -2560,22 +2674,8 @@ Generate exactly ${videoFiles.length} objects.`;
             const items = await winLoad();
             if (!items.length) return '';
             return items.slice(0, 5).map((w, i) => {
-                const ctrTag = w.ctr ? `CTR: ${w.ctr}%` : '';
-                const hookTag = w.hook_type ? `Hook: ${w.hook_type}` : '';
-                const impTag = w.impressions ? `${(parseInt(w.impressions)/1000).toFixed(0)}K imp` : '';
-                const meta = [ctrTag, hookTag, impTag].filter(Boolean).join(' | ');
-                const metaStr = meta ? ` [${meta}]` : '';
-
-                // Structured format if available
-                if (w.headline || w.primary_text || w.description) {
-                    let parts = [`Sample ${i + 1}${metaStr}:`];
-                    if (w.headline) parts.push(`  HEADLINE: ${w.headline}`);
-                    if (w.primary_text) parts.push(`  PRIMARY TEXT: ${w.primary_text}`);
-                    if (w.description) parts.push(`  DESCRIPTION: ${w.description}`);
-                    return parts.join('\n');
-                }
-                // Fallback for old data with only content field
-                return `Sample ${i + 1}${metaStr}:\n${w.content}`;
+                const ctrTag = w.ctr ? ` [CTR: ${w.ctr}%]` : '';
+                return `Sample ${i + 1}${ctrTag}:\n${w.content}`;
             }).join('\n\n');
         }
 
@@ -2610,37 +2710,19 @@ Generate exactly ${videoFiles.length} objects.`;
 
             listEl.innerHTML = items.map((w, i) => {
                 const ctrBadge = w.ctr ? `<span class="win-badge" style="font-size:9px">${w.ctr}% CTR</span>` : '';
-                const hookBadge = w.hook_type ? `<span class="win-badge" style="font-size:9px;background:rgba(139,92,246,.15);color:var(--purple);border-color:rgba(139,92,246,.2)">${w.hook_type}</span>` : '';
-                const productBadge = w.product ? `<span style="font-size:9px;color:var(--text-muted)">📦 ${esc(w.product)}</span>` : '';
                 const dateStr = w.date || w.created_at || '';
-                const itemId = w.id || i;
-                const srcIcon = w.source === 'meta' ? '🔗' : '✏️';
-                
-                // Structured display
-                let bodyHtml = '';
-                if (w.headline || w.primary_text || w.description) {
-                    bodyHtml = '<div style="font-size:11px;line-height:1.6">';
-                    if (w.headline) bodyHtml += `<div><span style="color:var(--accent);font-weight:600;font-size:10px">HEADLINE:</span> ${esc(w.headline)}</div>`;
-                    if (w.primary_text) bodyHtml += `<div style="margin-top:3px"><span style="color:var(--blue);font-weight:600;font-size:10px">PRIMARY:</span> ${esc(w.primary_text)}</div>`;
-                    if (w.description) bodyHtml += `<div style="margin-top:3px"><span style="color:var(--green);font-weight:600;font-size:10px">DESC:</span> ${esc(w.description)}</div>`;
-                    bodyHtml += '</div>';
-                } else {
-                    // Fallback for old data
-                    bodyHtml = `<div class="win-item-text" id="wt-${itemId}">${esc(w.content || '')}</div>`;
-                }
+                const itemId = w.id || i; // Use Firebase ID if available, else index
                 
                 return `<div class="win-item" id="wi-${itemId}">
                     <div class="win-item-meta">
-                        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-                            <span style="font-size:11px">${srcIcon}</span>
+                        <div style="display:flex;gap:6px;align-items:center">
+                            <span style="font-size:11px">🏆</span>
                             ${ctrBadge}
-                            ${hookBadge}
-                            ${productBadge}
                             <span style="font-size:10px;color:var(--text-muted)">${dateStr.split('T')[0]}</span>
                         </div>
                         <button class="win-del" onclick="winDelete('${itemId}')" title="Xóa toàn hệ thống">✕</button>
                     </div>
-                    ${bodyHtml}
+                    <div class="win-item-text" id="wt-${itemId}">${w.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
                     <span class="win-expand" onclick="winExpand('${itemId}', this)">▸ Xem thêm</span>
                 </div>`;
             }).join('');
@@ -2673,48 +2755,20 @@ Generate exactly ${videoFiles.length} objects.`;
             if(winPanelOpen) winRender(); // Tải mới nhất mỗi lần mở panel
         }
 
-        function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-        function detectHookType(text) {
-            const t = (text || '').toLowerCase();
-            if (/limited|hurry|last chance|don't miss|ending soon|only \d|flash sale|today only|act now/i.test(t)) return 'urgency';
-            if (/\d+\+?\s*(customers|reviews|sold|happy|satisfied|people|orders|rating|stars)/i.test(t)) return 'social_proof';
-            if (/save|discount|off|free shipping|bogo|buy \d|coupon|promo|deal|sale/i.test(t)) return 'promotion';
-            if (/tired|struggle|hate|annoying|frustrat|problem|sick of|say goodbye/i.test(t)) return 'problem_solution';
-            if (/love|dream|perfect|amazing|beautiful|happy|transform|life.?changing/i.test(t)) return 'emotional';
-            if (/discover|secret|imagine|what if|did you know|surprising/i.test(t)) return 'curiosity';
-            if (/durable|premium|quality|long.?lasting|waterproof|powerful|efficient/i.test(t)) return 'benefit';
-            return '';
-        }
-
         async function winAddItem() {
-            const headline = document.getElementById('win-headline').value.trim();
-            const primary = document.getElementById('win-primary').value.trim();
-            const desc = document.getElementById('win-desc').value.trim();
-            const hookType = document.getElementById('win-hook').value;
-            const product = document.getElementById('win-product').value.trim();
+            const content = document.getElementById('win-input').value.trim();
+            if (!content) { showToast('Nhập nội dung content win!', 'warning'); return; }
             const ctr = parseFloat(document.getElementById('win-ctr').value) || null;
-            
-            if (!headline && !primary) { showToast('Nhập ít nhất Headline hoặc Primary Text!', 'warning'); return; }
             
             const btnAdd = document.getElementById('btn-win-add');
             btnAdd.disabled = true;
             btnAdd.innerHTML = '⏳ Lưu...';
 
             try {
-                // Auto-detect hook type if not selected
-                const detectedHook = hookType || detectHookType(headline + ' ' + primary);
-                // Build backward-compatible content field
-                const content = [headline, primary, desc].filter(Boolean).join('\n');
-
-                const payload = {
-                    headline: headline || '',
-                    primary_text: primary || '',
-                    description: desc || '',
-                    content, // backward compat
-                    hook_type: detectedHook,
-                    product: product || '',
-                    source: 'manual',
+                const payload = { 
+                    content, 
+                    source: 'manual', 
+                    notes: 'Nhập thủ công',
                     date: new Date().toISOString()
                 };
                 if (ctr) payload.ctr = Math.round(ctr * 100) / 100;
@@ -2722,23 +2776,20 @@ Generate exactly ${videoFiles.length} objects.`;
                 const apiUrl = getFirebaseAPI();
                 if (apiUrl) {
                     await fetch(apiUrl, {
-                        method: 'POST',
+                        method: 'POST', // POST via REST creates a push ID object automatically
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
-                    showToast('✅ Đã lưu lên Cloud Firebase thành công!');
+                    showToast('✅ Đã lưu lên Clound Firebase thành công!');
                 } else {
+                    // Fallback local storage
                     const items = JSON.parse(localStorage.getItem(WIN_KEY) || '[]');
                     items.unshift(payload);
                     localStorage.setItem(WIN_KEY, JSON.stringify(items));
                     showToast('✅ Đã lưu vào máy tính (Local)!');
                 }
                 
-                document.getElementById('win-headline').value = '';
-                document.getElementById('win-primary').value = '';
-                document.getElementById('win-desc').value = '';
-                document.getElementById('win-hook').value = '';
-                document.getElementById('win-product').value = '';
+                document.getElementById('win-input').value = '';
                 document.getElementById('win-ctr').value = '';
                 await winRender();
             } catch (err) {
@@ -2834,7 +2885,7 @@ Generate exactly ${videoFiles.length} objects.`;
                     const ctr = parseFloat(ins.ctr) || 0;
                     if (ctr < minCTR) continue;
 
-                    // Extract ad copy text — structured
+                    // Extract ad copy text
                     const cr = ad.creative || {};
                     const spec = cr.object_story_spec || {};
                     const linkData = spec.link_data || spec.video_data || {};
@@ -2846,16 +2897,9 @@ Generate exactly ${videoFiles.length} objects.`;
                     const text = [headline, primary, desc].filter(Boolean).join('\n');
                     if (!text.trim() || text.trim().length < 5) continue;
 
-                    // Auto-detect hook type from content
-                    const detectedHook = detectHookType(headline + ' ' + primary);
-
                     winners.push({
                         ad_id: ad.id,
-                        headline,
-                        primary_text: primary,
-                        description: desc,
-                        text, // backward compat
-                        hook_type: detectedHook,
+                        text,
                         ctr: Math.round(ctr * 100) / 100,
                         impressions: ins.impressions,
                         ad_name: ad.name
@@ -2886,16 +2930,10 @@ Generate exactly ${videoFiles.length} objects.`;
                     if (existingIds.has(w.ad_id) || existingIds.has(`ad_id: ${w.ad_id}`)) continue;
                     
                     const payload = {
-                        headline: w.headline || '',
-                        primary_text: w.primary_text || '',
-                        description: w.description || '',
-                        content: w.text, // backward compat
-                        hook_type: w.hook_type || '',
+                        content: w.text,
                         ctr: w.ctr,
-                        impressions: w.impressions || '',
                         source: 'meta',
-                        ad_id: w.ad_id,
-                        notes: `ad_id: ${w.ad_id} | ad_name: ${w.ad_name}`,
+                        notes: `ad_id: ${w.ad_id} | ad_name: ${w.ad_name}`, // Using notes field to store ad_id since backend accepts it
                         date: new Date().toISOString()
                     };
 
@@ -2937,6 +2975,18 @@ Generate exactly ${videoFiles.length} objects.`;
             btn.innerHTML = '🔗 Sync Win Ads từ Meta';
         }
 
+        let previewMode = 'fb'; // 'fb' or 'text'
+
+        function switchPreviewMode(mode) {
+            previewMode = mode;
+            document.getElementById('btn-mode-fb').classList.toggle('active', mode === 'fb');
+            document.getElementById('btn-mode-text').classList.toggle('active', mode === 'text');
+            document.getElementById('fb-preview-container').style.display = mode === 'fb' ? '' : 'none';
+            document.getElementById('text-cards-container').style.display = mode === 'text' ? '' : 'none';
+            if (mode === 'fb') renderFBPreview();
+            else renderTextCards();
+        }
+
         function renderTextCards() {
             document.getElementById('text-cards').innerHTML = videoFiles.map((v, i) => `
     <div class="card" style="padding:14px;margin-bottom:10px;border-left:3px solid var(--blue)">
@@ -2950,6 +3000,133 @@ Generate exactly ${videoFiles.length} objects.`;
         <div class="form-group" style="grid-column:1/-1"><label>📝 Primary Text</label><textarea class="inp txt-pr" data-idx="${i}" rows="2" onchange="videoFiles[${i}].primary=this.value">${v.primary}</textarea></div>
       </div>
     </div>`).join('');
+            updateFBCounter();
+        }
+
+        function getPageDisplayName() {
+            // Try to get from dropdown selection
+            const sdItems = sdData['sd-page-create'] || sdData['sd-page'] || [];
+            const pageId = document.getElementById('inp-page')?.value;
+            if (pageId) {
+                const found = sdItems.find(it => it.value === pageId);
+                if (found) return found.name;
+            }
+            // Fallback to first page in list
+            if (sdItems.length > 0) return sdItems[0].name;
+            // Fallback to FB user name
+            if (typeof fbUserInfo !== 'undefined' && fbUserInfo?.name) return fbUserInfo.name;
+            return 'Your Page';
+        }
+
+        function getPageAvatarHTML() {
+            // Try to get page picture via Graph API
+            const pageId = document.getElementById('inp-page')?.value;
+            if (pageId && typeof fbAccessToken !== 'undefined' && fbAccessToken) {
+                return `<img src="https://graph.facebook.com/${pageId}/picture?type=small&access_token=${fbAccessToken}" onerror="this.style.display='none';this.parentElement.textContent='📄'">`;
+            }
+            // Fallback to initials
+            const name = getPageDisplayName();
+            return name.charAt(0).toUpperCase();
+        }
+
+        function getDomainFromLink() {
+            const link = document.getElementById('inp-link')?.value?.trim() || '';
+            try {
+                return new URL(link).hostname.replace('www.', '');
+            } catch (e) {
+                return link ? link.split('/')[2]?.replace('www.', '') || 'yoursite.com' : 'yoursite.com';
+            }
+        }
+
+        function getCTALabel() {
+            const cfg = getConfig();
+            const cta = cfg.cta || 'SHOP_NOW';
+            const map = {
+                'SHOP_NOW': 'Mua ngay',
+                'LEARN_MORE': 'Tìm hiểu thêm',
+                'SIGN_UP': 'Đăng ký',
+                'SUBSCRIBE': 'Đăng ký',
+                'CONTACT_US': 'Liên hệ',
+                'ORDER_NOW': 'Đặt hàng ngay',
+                'GET_OFFER': 'Nhận ưu đãi',
+                'BUY_NOW': 'Mua ngay'
+            };
+            return map[cta] || cta.replace(/_/g, ' ');
+        }
+
+        function truncateText(text, maxLen) {
+            if (!text || text.length <= maxLen) return text || '';
+            return text.slice(0, maxLen) + '... <span class="fb-see-more">Xem thêm</span>';
+        }
+
+        function renderFBPreview() {
+            const grid = document.getElementById('fb-preview-grid');
+            const pageName = getPageDisplayName();
+            const avatarHTML = getPageAvatarHTML();
+            const domain = getDomainFromLink();
+            const ctaLabel = getCTALabel();
+
+            grid.innerHTML = videoFiles.map((v, i) => {
+                // Create object URL for video thumbnail
+                const videoUrl = URL.createObjectURL(v.file);
+                const primaryHTML = truncateText((v.primary || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'), 120);
+                const headlineText = (v.headline || 'Headline').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+                const descText = (v.desc || '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+                return `<div class="fb-ad-card" id="fb-card-${i}">
+                    <button class="fb-remove" onclick="removeAdPreview(${i})" title="Bỏ bài ads này">✕</button>
+                    <div class="fb-ad-header">
+                        <div class="fb-ad-avatar">${avatarHTML}</div>
+                        <div>
+                            <div class="fb-ad-page-name">${pageName}</div>
+                            <div class="fb-ad-sponsored">Quảng cáo · 🌐</div>
+                        </div>
+                    </div>
+                    <div class="fb-ad-body">${primaryHTML}</div>
+                    <div class="fb-ad-media">
+                        <video src="${videoUrl}" muted preload="metadata" onloadedmetadata="this.currentTime=1"></video>
+                        <div class="fb-play-btn"></div>
+                    </div>
+                    <div class="fb-ad-link-bar">
+                        <div class="fb-ad-link-info">
+                            <div class="fb-ad-domain">${domain}</div>
+                            <div class="fb-ad-headline">${headlineText}</div>
+                            ${descText ? `<div class="fb-ad-desc">${descText}</div>` : ''}
+                        </div>
+                        <button class="fb-ad-cta">${ctaLabel}</button>
+                    </div>
+                    <div class="fb-ad-actions">
+                        <span>👍 Thích</span>
+                        <span>💬 Bình luận</span>
+                        <span>↗️ Chia sẻ</span>
+                    </div>
+                </div>`;
+            }).join('');
+
+            updateFBCounter();
+        }
+
+        function removeAdPreview(idx) {
+            videoFiles.splice(idx, 1);
+            if (previewMode === 'fb') renderFBPreview();
+            else renderTextCards();
+            // If no videos left, go back to step 1
+            if (videoFiles.length === 0) {
+                goToStep(1);
+                document.getElementById('btn-generate').disabled = true;
+                renderVideoList();
+                showToast('Đã bỏ tất cả bài ads', 'warning');
+            } else {
+                renderVideoList();
+                showToast(`Đã bỏ 1 bài · Còn ${videoFiles.length} bài`, 'info');
+            }
+        }
+
+        function updateFBCounter() {
+            const el = document.getElementById('fb-counter');
+            if (el) {
+                el.innerHTML = `📊 <span class="count">${videoFiles.length}</span> bài ads`;
+            }
         }
 
         // ==================== SCHEDULE ====================
