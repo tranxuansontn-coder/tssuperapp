@@ -192,6 +192,7 @@ const TOPBAR_LABELS = {
     image: { icon: 'fa-image', label: 'Sửa ảnh & Dịch ảnh' },
     video: { icon: 'fa-film', label: 'Bóc băng Video' },
     scorer: { icon: 'fa-star', label: 'Chấm Điểm & Set Giá' },
+    productfinder: { icon: 'fa-box-open', label: 'Sản phẩm tìm được' },
     overtime: { icon: 'fa-clock', label: 'OT Tracker' },
     users: { icon: 'fa-users-gear', label: 'Quản lý nhân viên' },
     doanhso: { icon: 'fa-chart-bar', label: 'Doanh số cá nhân' },
