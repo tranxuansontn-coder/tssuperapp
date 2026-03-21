@@ -3216,7 +3216,8 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
 
         function truncateText(text, maxLen) {
             if (!text || text.length <= maxLen) return text || '';
-            return text.slice(0, maxLen) + '... <span class="fb-see-more">Xem thêm</span>';
+            const truncated = text.slice(0, maxLen) + '... <span class="fb-see-more">Xem thêm</span>';
+            return `<span data-full-text="${text.replace(/"/g, '&quot;')}">${truncated}</span>`;
         }
 
         function renderFBPreview() {
@@ -3229,7 +3230,8 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
             grid.innerHTML = videoFiles.map((v, i) => {
                 // Create object URL for video thumbnail
                 const videoUrl = URL.createObjectURL(v.file);
-                const primaryHTML = truncateText((v.primary || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'), 120);
+                const primaryText = (v.primary || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                const primaryHTML = primaryText.length > 120 ? truncateText(primaryText, 120) : primaryText;
                 const headlineText = (v.headline || 'Headline').replace(/&/g,'&amp;').replace(/</g,'&lt;');
                 const descText = (v.desc || '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
 
@@ -3264,6 +3266,24 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
             }).join('');
 
             updateFBCounter();
+
+            // Add event listeners for "Xem thêm" functionality
+            setTimeout(() => {
+                document.querySelectorAll('.fb-see-more').forEach(span => {
+                    span.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const bodyDiv = this.closest('.fb-ad-body');
+                        if (!bodyDiv) return;
+
+                        const wrapper = this.closest('span[data-full-text]');
+                        const fullText = wrapper ? wrapper.getAttribute('data-full-text') : null;
+                        if (fullText) {
+                            // Show full text with proper HTML escaping
+                            bodyDiv.innerHTML = fullText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g, '<br>');
+                        }
+                    });
+                });
+            }, 100);
         }
 
         function removeAdPreview(idx) {
