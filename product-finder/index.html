@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản Phẩm Tìm Được - TS Global</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg-deep: #0a0f1a;
+            --bg-card: #111827;
+            --bg-input: #1a2332;
+            --border: rgba(255, 255, 255, .06);
+            --text: #e5e7eb;
+            --text-dim: #94a3b8;
+            --text-muted: #4b5563;
+            --accent: #14b8a6;
+            --accent-2: #0ea5e9;
+            --accent-glow: rgba(20, 184, 166, .18);
+            --green: #10b981;
+            --green-bg: rgba(16, 185, 129, .1);
+            --yellow: #f59e0b;
+            --yellow-bg: rgba(245, 158, 11, .1);
+            --red: #ef4444;
+            --red-bg: rgba(239, 68, 68, .1);
+            --blue-bg: rgba(59, 130, 246, .1);
+            --radius: 12px;
+            --radius-sm: 8px
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: radial-gradient(circle at top right, rgba(20, 184, 166, .08), transparent 30%), var(--bg-deep);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5
+        }
+
+        .tabs {
+            display: flex;
+            gap: 2px;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(17, 24, 39, .72);
+            position: sticky;
+            top: 0;
+            z-index: 10
+        }
+
+        .tab {
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dim);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all .2s;
+            white-space: nowrap;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent)
+        }
+
+        .page {
+            display: none;
+            padding: 20px 24px 28px
+        }
+
+        .page.show {
+            display: block
+        }
+
+        .hero,
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius)
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(20, 184, 166, .16), rgba(14, 165, 233, .12));
+            border-color: rgba(20, 184, 166, .22);
+            padding: 22px 24px;
+            margin-bottom: 18px
+        }
+
+        .hero h1 {
+            font-size: 24px;
+            margin-bottom: 6px
+        }
+
+        .hero p,
+        .muted {
+            color: var(--text-dim)
+        }
+
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px
+        }
+
+        .stat {
+            padding: 16px 18px
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 8px
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1
+        }
+
+        .inp,
+        textarea.inp {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            color: var(--text);
+            font-size: 14px;
+            width: 100%;
+            outline: none
+        }
+
+        .inp:focus,
+        textarea.inp:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow)
+        }
+
+        textarea.inp {
+            min-height: 96px;
+            resize: vertical
+        }
+
+        select.inp {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px
+        }
+
+        .actions,
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 13px;
+            border: none;
+            cursor: pointer
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff
+        }
+
+        .btn-ghost {
+            background: var(--bg-input);
+            color: var(--text);
+            border: 1px solid var(--border)
+        }
+
+        .btn-approve {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid rgba(16, 185, 129, .22)
+        }
+
+        .btn-reject {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid rgba(239, 68, 68, .22)
+        }
+
+        .btn-reward {
+            background: var(--blue-bg);
+            color: #7dd3fc;
+            border: 1px solid rgba(59, 130, 246, .22)
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 11px
+        }
+
+        .tbl-wrap {
+            overflow-x: auto
+        }
+
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px
+        }
+
+        .tbl th {
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .tbl td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top
+        }
+
+        .text-r {
+            text-align: right
+        }
+
+        .text-c {
+            text-align: center
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700
+        }
+
+        .badge-pending {
+            background: var(--yellow-bg);
+            color: var(--yellow)
+        }
+
+        .badge-approved {
+            background: var(--green-bg);
+            color: var(--green)
+        }
+
+        .badge-rejected {
+            background: var(--red-bg);
+            color: var(--red)
+        }
+
+        .badge-reward {
+            background: var(--blue-bg);
+            color: #7dd3fc
+        }
+
+        .badge-none {
+            background: rgba(148, 163, 184, .1);
+            color: #cbd5e1
+        }
+
+        .link {
+            color: #7dd3fc;
+            text-decoration: none;
+            word-break: break-all
+        }
+
+        .footer {
+            padding: 16px 24px 24px;
+            color: var(--text-muted);
+            font-size: 12px
+        }
+
+        .toast-box {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .toast {
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #fff;
+            background: rgba(15, 23, 42, .92);
+            border: 1px solid rgba(255, 255, 255, .08)
+        }
+
+        @media (max-width: 900px) {
+            .form-grid {
+                grid-template-columns: 1fr
+            }
+
+            .page {
+                padding: 16px
+            }
+
+            .tabs {
+                padding: 0 12px;
+                overflow-x: auto
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('submit')">📝 Nhập sản phẩm</button>
+        <button class="tab" onclick="switchTab('history')">📋 Tổng hợp tháng</button>
+        <button class="tab" onclick="switchTab('admin')">👨‍💼 Admin check thưởng</button>
+    </div>
+
+    <div id="page-submit" class="page show">
+        <div class="hero">
+            <h1>Nhật ký sản phẩm tìm được mỗi ngày</h1>
+            <p>Nhân viên nhập các sản phẩm đã tìm được trong ngày. Cuối tháng admin có thể lọc, duyệt, và đánh dấu
+                sản phẩm nào đủ điều kiện tính thưởng.</p>
+        </div>
+
+        <div class="card" style="padding:20px;margin-bottom:16px">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>👤 Nhân viên</label>
+                    <select id="inp-user" class="inp" onchange="loadMySubmissions()"></select>
+                </div>
+                <div class="form-group">
+                    <label>📅 Ngày tìm</label>
+                    <input type="date" id="inp-date" class="inp">
+                </div>
+                <div class="form-group full">
+                    <label>📦 Tên sản phẩm</label>
+                    <input type="text" id="inp-name" class="inp" placeholder="Ví dụ: Giá đỡ điện thoại gắn xe máy">
+                </div>
+                <div class="form-group">
+                    <label>🔎 Nguồn tìm</label>
+                    <select id="inp-source" class="inp">
+                        <option value="Facebook">Facebook</option>
+                        <option value="TikTok">TikTok</option>
+                        <option value="Douyin">Douyin</option>
+                        <option value="1688">1688</option>
+                        <option value="Shopee">Shopee</option>
+                        <option value="Alibaba">Alibaba</option>
+                        <option value="Khác">Khác</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>💸 Giá nhập tham khảo (PHP)</label>
+                    <input type="number" id="inp-price" class="inp" placeholder="127" min="0">
+                </div>
+                <div class="form-group full">
+                    <label>🔗 Link sản phẩm / link tham khảo</label>
+                    <input type="url" id="inp-link" class="inp" placeholder="https://...">
+                </div>
+                <div class="form-group full">
+                    <label>🗒️ Ghi chú</label>
+                    <textarea id="inp-notes" class="inp"
+                        placeholder="Có video tốt, dễ test ads, đang ít đối thủ, có thể dùng cho PH..."></textarea>
+                </div>
+            </div>
+            <div class="actions" style="margin-top:16px">
+                <button class="btn btn-primary" onclick="submitProduct()">🚀 Lưu sản phẩm</button>
+                <button class="btn btn-ghost" onclick="resetForm()">↺ Làm mới</button>
+            </div>
+        </div>
+
+        <div class="card" style="padding:18px">
+            <div style="font-weight:800;font-size:14px;margin-bottom:12px">📌 10 sản phẩm gần nhất của nhân viên đã
+                chọn</div>
+            <div id="my-submissions" class="muted">Chưa có dữ liệu</div>
+        </div>
+    </div>
+
+    <div id="page-history" class="page">
+        <div class="grid-stats">
+            <div class="card stat">
+                <div class="stat-label">Tổng sản phẩm</div>
+                <div class="stat-value" id="hs-total">0</div>
+            </div>
+            <div class="card stat">
+                <div class="stat-label">Đã duyệt</div>
+                <div class="stat-value" id="hs-approved" style="color:var(--green)">0</div>
+            </div>
+            <div class="card stat">
+                <div class="stat-label">Đủ điều kiện thưởng</div>
+                <div class="stat-value" id="hs-reward" style="color:#7dd3fc">0</div>
+            </div>
+            <div class="card stat">
+                <div class="stat-label">Nhân viên có sản phẩm đạt</div>
+                <div class="stat-value" id="hs-people" style="color:var(--yellow)">0</div>
+            </div>
+        </div>
+
+        <div class="card" style="padding:16px;margin-bottom:16px">
+            <div class="filter-bar">
+                <label>📅 Tháng:</label>
+                <input type="month" id="hist-month" class="inp" style="max-width:180px">
+                <label>👤 Nhân viên:</label>
+                <select id="hist-user" class="inp" style="max-width:240px"></select>
+                <button class="btn btn-ghost btn-sm" onclick="loadHistory()">🔍 Xem tổng hợp</button>
+            </div>
+        </div>
+
+        <div class="card" style="overflow:hidden">
+            <div style="padding:14px 18px;border-bottom:1px solid var(--border);font-weight:800">🏆 Xếp hạng theo số
+                sản phẩm đủ điều kiện thưởng</div>
+            <div class="tbl-wrap">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nhân viên</th>
+                            <th class="text-r">Tổng sản phẩm</th>
+                            <th class="text-r">Đã duyệt</th>
+                            <th class="text-r">Đủ thưởng</th>
+                            <th class="text-r">Tỷ lệ đạt</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hist-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-admin" class="page">
+        <div id="admin-login" class="card" style="padding:24px;max-width:420px;margin:40px auto">
+            <div style="font-weight:800;font-size:16px;margin-bottom:12px">🔐 Đăng nhập admin</div>
+            <input type="password" id="admin-pw" class="inp" placeholder="Nhập mật khẩu..."
+                onkeydown="if(event.key==='Enter')adminLogin()">
+            <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="adminLogin()">Đăng nhập
+                admin</button>
+        </div>
+
+        <div id="admin-dash" style="display:none">
+            <div class="grid-stats">
+                <div class="card stat">
+                    <div class="stat-label">Chờ duyệt</div>
+                    <div class="stat-value" id="ad-pending" style="color:var(--yellow)">0</div>
+                </div>
+                <div class="card stat">
+                    <div class="stat-label">Đã duyệt</div>
+                    <div class="stat-value" id="ad-approved" style="color:var(--green)">0</div>
+                </div>
+                <div class="card stat">
+                    <div class="stat-label">Đủ thưởng</div>
+                    <div class="stat-value" id="ad-reward" style="color:#7dd3fc">0</div>
+                </div>
+                <div class="card stat">
+                    <div class="stat-label">Từ chối</div>
+                    <div class="stat-value" id="ad-rejected" style="color:var(--red)">0</div>
+                </div>
+            </div>
+
+            <div class="card" style="padding:16px;margin-bottom:16px">
+                <div class="filter-bar">
+                    <label>📅 Tháng:</label>
+                    <input type="month" id="admin-month" class="inp" style="max-width:180px">
+                    <label>📊 Trạng thái:</label>
+                    <select id="admin-status" class="inp" style="max-width:180px">
+                        <option value="">Tất cả</option>
+                        <option value="pending">Chờ duyệt</option>
+                        <option value="approved">Đã duyệt</option>
+                        <option value="rejected">Từ chối</option>
+                    </select>
+                    <label>🎁 Thưởng:</label>
+                    <select id="admin-reward" class="inp" style="max-width:180px">
+                        <option value="">Tất cả</option>
+                        <option value="qualified">Đủ điều kiện</option>
+                        <option value="not_qualified">Không đủ điều kiện</option>
+                        <option value="pending">Chưa check</option>
+                    </select>
+                    <button class="btn btn-ghost btn-sm" onclick="loadAdminData()">🔄 Tải dữ liệu</button>
+                </div>
+            </div>
+
+            <div class="card" style="overflow:hidden">
+                <div style="padding:14px 18px;border-bottom:1px solid var(--border);font-weight:800">🧾 Danh sách sản
+                    phẩm để check cuối tháng</div>
+                <div class="tbl-wrap">
+                    <table class="tbl">
+                        <thead>
+                            <tr>
+                                <th>Nhân viên</th>
+                                <th>Ngày</th>
+                                <th>Sản phẩm</th>
+                                <th>Nguồn</th>
+                                <th>Link</th>
+                                <th>Giá nhập</th>
+                                <th>Trạng thái</th>
+                                <th>Thưởng</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-box" id="toast-box"></div>
+    <div class="footer">TS Global · Product Finder Log</div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        if (!firebase.apps.length) firebase.initializeApp({
+            apiKey: "AIzaSyCC83ANMEUhotAgetLng366fRu-ub26a_0",
+            authDomain: "ts-global-super-app.firebaseapp.com",
+            projectId: "ts-global-super-app",
+            storageBucket: "ts-global-super-app.firebasestorage.app",
+            messagingSenderId: "4116358702",
+            appId: "1:4116358702:web:c13bbdaae217dd986f71ff"
+        });
+
+        const db = firebase.firestore();
+        const COL = 'daily_found_products';
+        const ADMIN_PW = 'tsglobal2026';
+        const STAFF = ['Cao Sơn', 'Phương', 'Linh', 'Huyền', 'Trang', 'Ngọc', 'Dũng', 'Hà', 'Mai'];
+        let isAdmin = false;
+
+        function showToast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.className = `toast toast-${type}`;
+            t.textContent = msg;
+            document.getElementById('toast-box').appendChild(t);
+            setTimeout(() => t.remove(), 4000);
+        }
+
+        function switchTab(name) {
+            document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['submit', 'history', 'admin'][i] === name));
+            document.querySelectorAll('.page').forEach(p => p.classList.toggle('show', p.id === 'page-' + name));
+            if (name === 'history') loadHistory();
+            if (name === 'admin' && isAdmin) loadAdminData();
+        }
+
+        function statusBadge(status) {
+            const map = {
+                pending: ['badge-pending', '⏳ Chờ duyệt'],
+                approved: ['badge-approved', '✅ Đã duyệt'],
+                rejected: ['badge-rejected', '❌ Từ chối']
+            };
+            const [cls, label] = map[status] || map.pending;
+            return `<span class="badge ${cls}">${label}</span>`;
+        }
+
+        function rewardBadge(status) {
+            const map = {
+                qualified: ['badge-reward', '🎁 Đủ điều kiện'],
+                not_qualified: ['badge-rejected', 'Không đủ'],
+                pending: ['badge-none', 'Chưa check']
+            };
+            const [cls, label] = map[status] || map.pending;
+            return `<span class="badge ${cls}">${label}</span>`;
+        }
+
+        async function populateStaff() {
+            const userSel = document.getElementById('inp-user');
+            const histUser = document.getElementById('hist-user');
+            userSel.innerHTML = '<option value="">Chọn nhân viên</option>';
+            histUser.innerHTML = '<option value="">Tất cả</option>';
+            let staffList = [...STAFF];
+            try {
+                const snap = await db.collection('users').where('active', '==', true).get();
+                const dbStaff = snap.docs
+                    .map(d => d.data())
+                    .filter(u => u && u.full_name && u.role !== 'admin')
+                    .map(u => u.full_name);
+                if (dbStaff.length) staffList = [...new Set(dbStaff)];
+            } catch (err) {
+                console.error('Load staff fallback:', err);
+            }
+            staffList.forEach(name => {
+                const o1 = document.createElement('option');
+                o1.value = name;
+                o1.textContent = name;
+                userSel.appendChild(o1);
+                const o2 = document.createElement('option');
+                o2.value = name;
+                o2.textContent = name;
+                histUser.appendChild(o2);
+            });
+        }
+
+        function resetForm() {
+            document.getElementById('inp-name').value = '';
+            document.getElementById('inp-link').value = '';
+            document.getElementById('inp-price').value = '';
+            document.getElementById('inp-notes').value = '';
+            document.getElementById('inp-source').value = 'Facebook';
+        }
+
+        async function submitProduct() {
+            const name = document.getElementById('inp-user').value;
+            const date = document.getElementById('inp-date').value;
+            const productName = document.getElementById('inp-name').value.trim();
+            const source = document.getElementById('inp-source').value;
+            const productLink = document.getElementById('inp-link').value.trim();
+            const importPrice = parseFloat(document.getElementById('inp-price').value) || 0;
+            const notes = document.getElementById('inp-notes').value.trim();
+            if (!name) return showToast('Chọn nhân viên trước');
+            if (!date) return showToast('Chọn ngày tìm sản phẩm');
+            if (!productName) return showToast('Nhập tên sản phẩm');
+            await db.collection(COL).add({
+                name, date, productName, source, productLink, importPrice, notes,
+                status: 'pending', rewardStatus: 'pending', submittedAt: new Date().toISOString()
+            });
+            showToast('Đã lưu sản phẩm');
+            resetForm();
+            loadMySubmissions();
+            loadHistory();
+        }
+
+        async function loadMySubmissions() {
+            const name = document.getElementById('inp-user').value;
+            const el = document.getElementById('my-submissions');
+            if (!name) {
+                el.innerHTML = 'Chọn nhân viên để xem dữ liệu gần nhất';
+                return;
+            }
+            const snap = await db.collection(COL).where('name', '==', name).orderBy('submittedAt', 'desc').limit(10).get();
+            if (snap.empty) {
+                el.innerHTML = 'Chưa có dữ liệu';
+                return;
+            }
+            el.innerHTML = snap.docs.map(d => {
+                const r = d.data();
+                const price = r.importPrice ? `${r.importPrice.toLocaleString('vi-VN')} PHP` : '—';
+                return `<div style="padding:12px 14px;background:var(--bg-input);border:1px solid var(--border);border-radius:10px;margin-bottom:8px">
+                    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                        <strong>${r.productName}</strong>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap">${statusBadge(r.status)} ${rewardBadge(r.rewardStatus)}</div>
+                    </div>
+                    <div class="muted" style="font-size:12px;margin-top:4px">${r.date} · ${r.source} · Giá nhập: ${price}</div>
+                    <div style="margin-top:6px">${r.productLink ? `<a class="link" href="${r.productLink}" target="_blank" rel="noreferrer">${r.productLink}</a>` : '<span class="muted">Chưa có link</span>'}</div>
+                    ${r.notes ? `<div style="margin-top:6px;color:var(--text-dim)">${r.notes}</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        async function loadHistory() {
+            const month = document.getElementById('hist-month').value;
+            const user = document.getElementById('hist-user').value;
+            if (!month) return;
+            const snap = await db.collection(COL).where('date', '>=', month + '-01').where('date', '<=', month + '-31').get();
+            let docs = snap.docs.map(d => d.data());
+            if (user) docs = docs.filter(d => d.name === user);
+            const grouped = {};
+            docs.forEach(d => {
+                if (!grouped[d.name]) grouped[d.name] = { name: d.name, total: 0, approved: 0, reward: 0 };
+                grouped[d.name].total++;
+                if (d.status === 'approved') grouped[d.name].approved++;
+                if (d.rewardStatus === 'qualified') grouped[d.name].reward++;
+            });
+            const rows = Object.values(grouped).sort((a, b) => b.reward - a.reward || b.approved - a.approved || b.total - a.total);
+            document.getElementById('hs-total').textContent = docs.length;
+            document.getElementById('hs-approved').textContent = docs.filter(d => d.status === 'approved').length;
+            document.getElementById('hs-reward').textContent = docs.filter(d => d.rewardStatus === 'qualified').length;
+            document.getElementById('hs-people').textContent = rows.filter(r => r.reward > 0).length;
+            const tbody = document.getElementById('hist-tbody');
+            if (rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-c muted" style="padding:20px">Không có dữ liệu</td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.map((r, idx) => `<tr><td>${idx + 1}</td><td style="font-weight:700">${r.name}</td><td class="text-r">${r.total}</td><td class="text-r">${r.approved}</td><td class="text-r" style="color:#7dd3fc;font-weight:700">${r.reward}</td><td class="text-r">${r.total > 0 ? Math.round((r.reward / r.total) * 100) : 0}%</td></tr>`).join('');
+        }
+
+        function adminLogin() {
+            if (document.getElementById('admin-pw').value !== ADMIN_PW) {
+                showToast('Sai mật khẩu admin');
+                return;
+            }
+            isAdmin = true;
+            document.getElementById('admin-login').style.display = 'none';
+            document.getElementById('admin-dash').style.display = 'block';
+            showToast('Đăng nhập admin thành công');
+            loadAdminData();
+        }
+
+        async function updateDoc(id, updates, msg) {
+            await db.collection(COL).doc(id).update(updates);
+            showToast(msg);
+            loadAdminData();
+            if (document.getElementById('inp-user').value) loadMySubmissions();
+            loadHistory();
+        }
+
+        async function loadAdminData() {
+            if (!isAdmin) return;
+            const month = document.getElementById('admin-month').value;
+            const status = document.getElementById('admin-status').value;
+            const reward = document.getElementById('admin-reward').value;
+            if (!month) return;
+            const snap = await db.collection(COL).where('date', '>=', month + '-01').where('date', '<=', month + '-31').get();
+            let docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            if (status) docs = docs.filter(d => d.status === status);
+            if (reward) docs = docs.filter(d => d.rewardStatus === reward);
+            docs.sort((a, b) => (b.submittedAt || '').localeCompare(a.submittedAt || ''));
+            document.getElementById('ad-pending').textContent = docs.filter(d => d.status === 'pending').length;
+            document.getElementById('ad-approved').textContent = docs.filter(d => d.status === 'approved').length;
+            document.getElementById('ad-reward').textContent = docs.filter(d => d.rewardStatus === 'qualified').length;
+            document.getElementById('ad-rejected').textContent = docs.filter(d => d.status === 'rejected').length;
+            const tbody = document.getElementById('admin-tbody');
+            if (docs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-c muted" style="padding:20px">Không có dữ liệu</td></tr>';
+                return;
+            }
+            tbody.innerHTML = docs.map(d => {
+                const price = d.importPrice ? `${d.importPrice.toLocaleString('vi-VN')} PHP` : '—';
+                const link = d.productLink ? `<a class="link" href="${d.productLink}" target="_blank" rel="noreferrer">Mở link</a>` : '<span class="muted">—</span>';
+                return `<tr><td style="font-weight:700">${d.name}</td><td>${d.date}</td><td><div style="font-weight:700">${d.productName}</div>${d.notes ? `<div class="muted" style="font-size:12px;margin-top:4px">${d.notes}</div>` : ''}</td><td>${d.source || '—'}</td><td>${link}</td><td>${price}</td><td>${statusBadge(d.status)}</td><td>${rewardBadge(d.rewardStatus)}</td><td><div class="actions"><button class="btn btn-approve btn-sm" onclick="updateDoc('${d.id}', { status: 'approved' }, 'Đã duyệt sản phẩm')">Duyệt</button><button class="btn btn-reject btn-sm" onclick="updateDoc('${d.id}', { status: 'rejected', rewardStatus: 'not_qualified' }, 'Đã từ chối sản phẩm')">Từ chối</button><button class="btn btn-reward btn-sm" onclick="updateDoc('${d.id}', { status: 'approved', rewardStatus: 'qualified' }, 'Đã đánh dấu đủ điều kiện thưởng')">Đủ thưởng</button><button class="btn btn-ghost btn-sm" onclick="updateDoc('${d.id}', { status: 'approved', rewardStatus: 'not_qualified' }, 'Đã đánh dấu không đủ điều kiện')">Không đủ</button></div></td></tr>`;
+            }).join('');
+        }
+
+        (async function init() {
+            const today = new Date();
+            const month = today.toISOString().slice(0, 7);
+            document.getElementById('inp-date').valueAsDate = today;
+            document.getElementById('hist-month').value = month;
+            document.getElementById('admin-month').value = month;
+            document.getElementById('inp-source').value = 'Facebook';
+            loadHistory();
+            await populateStaff();
+        })();
+    </script>
+</body>
+
+</html>
