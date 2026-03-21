@@ -1210,6 +1210,19 @@
             cursor: pointer;
         }
 
+        .fb-ad-body .fb-see-less {
+            color: #b0b3b8;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 4px;
+            display: inline-block;
+            padding: 2px 0;
+        }
+
+        .fb-ad-body .fb-see-less:hover {
+            text-decoration: underline;
+        }
+
         .fb-ad-media {
             width: 100%;
             aspect-ratio: 1 / 1;
@@ -1918,6 +1931,22 @@
             });
         }
 
+        // Fetch all pages from a paginated Facebook API endpoint
+        async function fbFetchAllPages(firstUrl) {
+            let results = [];
+            let url = firstUrl;
+            let pageCount = 0;
+            while (url && pageCount < 10) { // Max 10 pages = 2000 items safety cap
+                const resp = await fetch(url);
+                const data = await resp.json();
+                if (data.error) throw new Error(data.error.message);
+                results = results.concat(data.data || []);
+                url = data.paging?.next || null;
+                pageCount++;
+            }
+            return results;
+        }
+
         async function onFbConnected() {
             try {
                 // Get user info
@@ -1925,19 +1954,86 @@
                 fbUserInfo = await userResp.json();
                 updateFbUI(true);
 
-                // Load pages & ad accounts in parallel
-                const [pagesResp, accountsResp] = await Promise.all([
-                    fetch(`${FB_API}/me/accounts?fields=name,id,access_token&limit=100&access_token=${fbAccessToken}`),
-                    fetch(`${FB_API}/me/adaccounts?fields=name,account_id,account_status&limit=100&access_token=${fbAccessToken}`)
-                ]);
-                const pagesData = await pagesResp.json();
-                const accountsData = await accountsResp.json();
+                // Show loading status in dropdowns
+                const sdInp = (id) => { const el = document.querySelector(`#${id} .sd-input`); if (el) el.value = '⏳ Đang tải...'; };
+                sdInp('sd-page'); sdInp('sd-page-create'); sdInp('sd-account');
 
-                fbPages = pagesData.data || [];
-                fbAdAccounts = (accountsData.data || []).filter(a => a.account_status === 1); // only active
+                // ── 1. Load Pages (with pagination, limit 200/page) ──────────────
+                // /me/accounts only returns pages where user is ADMIN role.
+                // Users with Advertiser/Moderator role won't see their pages here.
+                let allPages = [];
+                try {
+                    allPages = await fbFetchAllPages(
+                        `${FB_API}/me/accounts?fields=name,id,access_token&limit=200&access_token=${fbAccessToken}`
+                    );
+                } catch(e) { console.warn('[FB] Pages fetch error:', e.message); }
+
+                // ── 2. Load Ad Accounts (with pagination) ────────────────────────
+                // /me/adaccounts returns accounts directly linked to user OR via BM.
+                // But only status=1 (ACTIVE) shown — disabled/pending silently dropped.
+                let allRawAccounts = [];
+                try {
+                    allRawAccounts = await fbFetchAllPages(
+                        `${FB_API}/me/adaccounts?fields=name,account_id,account_status&limit=200&access_token=${fbAccessToken}`
+                    );
+                } catch(e) { console.warn('[FB] AdAccounts fetch error:', e.message); }
+
+                // Include ALL non-disabled statuses (1=Active, 2=Disabled, 3=Unsettled, 7=Pending_closure, 8=Closed, 9=Pending_settlement, 100=Any_active, 101=Any_closed)
+                // Show active and unsettled; exclude truly closed/disabled
+                const activeAccounts = allRawAccounts.filter(a => ![2, 8, 101].includes(a.account_status));
+
+                // ── 3. Fallback: Get accounts via Business Manager ────────────────
+                // Covers accounts where user is BM Admin (owned + client)
+                let bmAccounts = [];
+                try {
+                    const bizResp = await fetch(`${FB_API}/me/businesses?fields=id,name&limit=50&access_token=${fbAccessToken}`);
+                    const bizData = await bizResp.json();
+                    const businesses = bizData.data || [];
+
+                    if (businesses.length > 0) {
+                        const bmFetches = businesses.map(biz => Promise.all([
+                            fbFetchAllPages(`${FB_API}/${biz.id}/owned_ad_accounts?fields=name,account_id,account_status&limit=200&access_token=${fbAccessToken}`).catch(() => []),
+                            fbFetchAllPages(`${FB_API}/${biz.id}/client_ad_accounts?fields=name,account_id,account_status&limit=200&access_token=${fbAccessToken}`).catch(() => [])
+                        ]));
+                        const bmResults = await Promise.all(bmFetches);
+                        bmResults.forEach(([owned, client]) => {
+                            bmAccounts = bmAccounts.concat(owned, client);
+                        });
+                    }
+                } catch(e) { console.warn('[FB] BM fallback error:', e.message); }
+
+                // ── 4. Fallback: assigned_ad_accounts (BM employee) ──────────────
+                // Covers accounts assigned to the user inside a BM where they are NOT admin
+                let assignedAccounts = [];
+                try {
+                    assignedAccounts = await fbFetchAllPages(
+                        `${FB_API}/me/assigned_ad_accounts?fields=name,account_id,account_status&limit=200&access_token=${fbAccessToken}`
+                    );
+                } catch(e) { console.warn('[FB] Assigned accounts error:', e.message); }
+
+                // Merge & deduplicate all ad accounts (direct + BM admin + BM employee)
+                const seenAccIds = new Set();
+                const mergedAccounts = [...activeAccounts, ...bmAccounts, ...assignedAccounts]
+                    .filter(a => ![2, 8, 101].includes(a.account_status))
+                    .filter(a => {
+                    const key = a.account_id || a.id;
+                    if (seenAccIds.has(key)) return false;
+                    seenAccIds.add(key);
+                    return true;
+                });
+
+                fbPages = allPages;
+                fbAdAccounts = mergedAccounts;
 
                 populatePageDropdowns();
                 populateAccountDropdown();
+
+                // Show summary toast
+                const allRawFiltered = allRawAccounts.filter(a => [2, 8, 101].includes(a.account_status));
+                let summary = `✅ Đã tải: ${allPages.length} Pages, ${mergedAccounts.length} TKQC`;
+                if (allRawFiltered.length > 0) summary += ` (${allRawFiltered.length} TKQC bị vô hiệu hoá đã ẩn)`;
+                if (allPages.length === 0) summary += ` | ⚠️ Không thấy Page — cần quyền Admin trên Page`;
+                showToast(summary, mergedAccounts.length > 0 ? 'success' : 'warning');
 
                 // Auto-select from saved config
                 const cfg = getConfig();
@@ -3215,9 +3311,11 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
         }
 
         function truncateText(text, maxLen) {
+            // text should already be HTML-escaped at this point
             if (!text || text.length <= maxLen) return text || '';
-            const truncated = text.slice(0, maxLen) + '... <span class="fb-see-more">Xem thêm</span>';
-            return `<span data-full-text="${text.replace(/"/g, '&quot;')}">${truncated}</span>`;
+            const truncated = text.slice(0, maxLen) + '... <span class="fb-see-more" onclick="event.preventDefault();handleSeeMore(event)">Xem thêm</span>';
+            // Store both escaped versions in data attributes
+            return `<div class="fb-text-toggle" data-truncated="${truncated.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" data-full="${text.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" data-expanded="false">${truncated}</div>`;
         }
 
         function renderFBPreview() {
@@ -3267,23 +3365,64 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
 
             updateFBCounter();
 
-            // Add event listeners for "Xem thêm" functionality
+            // Add event listeners for "Xem thêm" / "Thu gọn" functionality
             setTimeout(() => {
                 document.querySelectorAll('.fb-see-more').forEach(span => {
-                    span.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const bodyDiv = this.closest('.fb-ad-body');
-                        if (!bodyDiv) return;
-
-                        const wrapper = this.closest('span[data-full-text]');
-                        const fullText = wrapper ? wrapper.getAttribute('data-full-text') : null;
-                        if (fullText) {
-                            // Show full text with proper HTML escaping
-                            bodyDiv.innerHTML = fullText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g, '<br>');
-                        }
-                    });
+                    span.addEventListener('click', handleSeeMore);
                 });
             }, 100);
+        }
+
+        function handleSeeMore(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const seeMoreSpan = event.target;
+            const toggle = seeMoreSpan.closest('.fb-text-toggle');
+            if (!toggle) return;
+
+            const isExpanded = toggle.getAttribute('data-expanded') === 'true';
+
+            if (!isExpanded) {
+                // Expand to full text (already HTML-escaped, just decode entities and re-split by newlines)
+                const fullText = toggle.getAttribute('data-full');
+                // Decode HTML entities that are in the attribute
+                const decoded = fullText
+                    .replace(/&quot;/g, '"')
+                    .replace(/&#39;/g, "'")
+                    .replace(/&amp;/g, '&')
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>');
+                // Split by newline and join with <br>
+                const htmlFull = decoded.split('\n').join('<br>');
+                toggle.innerHTML = `${htmlFull}<br><span class="fb-see-less" onclick="event.preventDefault();handleSeeLess(event)">Thu gọn</span>`;
+                toggle.setAttribute('data-expanded', 'true');
+            }
+        }
+
+        function handleSeeLess(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const seeLessSpan = event.target;
+            const toggle = seeLessSpan.closest('.fb-text-toggle');
+            if (!toggle) return;
+
+            // Collapse to truncated text
+            const truncated = toggle.getAttribute('data-truncated');
+            // Decode HTML entities in the attribute value
+            const decoded = truncated
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'")
+                .replace(/&amp;/g, '&')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>');
+            toggle.innerHTML = decoded;
+            toggle.setAttribute('data-expanded', 'false');
+
+            // Re-attach event listener to new "Xem thêm" span
+            const seeMore = toggle.querySelector('.fb-see-more');
+            if (seeMore) {
+                seeMore.addEventListener('click', handleSeeMore);
+            }
         }
 
         function removeAdPreview(idx) {
