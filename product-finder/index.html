@@ -372,7 +372,7 @@
 
         .detail-item {
             display: grid;
-            grid-template-columns: 2fr 1.2fr 1fr;
+            grid-template-columns: 2fr 1.2fr 1fr 1fr;
             gap: 8px;
             padding: 8px 10px;
             background: var(--bg-input);
@@ -453,7 +453,7 @@
                     <input type="text" id="inp-tracking" class="inp" placeholder="VD: TK-9582018">
                 </div>
                 <div class="form-group">
-                    <label>💰 Giá sản phẩm / doanh số (PHP)</label>
+                    <label>💰 Giá sản phẩm (PHP)</label>
                     <input type="number" id="inp-price" class="inp" placeholder="127" min="0">
                 </div>
             </div>
@@ -584,6 +584,7 @@
                                 <th>Sản phẩm</th>
                                 <th>Mã tracking</th>
                                 <th>Giá sản phẩm</th>
+                                <th>Doanh số</th>
                                 <th>Trạng thái</th>
                                 <th>Thưởng</th>
                                 <th>Hành động</th>
@@ -742,7 +743,7 @@
                         <strong>${r.productName}</strong>
                         <div style="display:flex;gap:6px;flex-wrap:wrap">${statusBadge(r.status)} ${rewardBadge(r.rewardStatus)}</div>
                     </div>
-                    <div class="muted" style="font-size:12px;margin-top:4px">${r.date} · Tracking: ${r.trackingCode || '—'} · Doanh số: ${price}</div>
+                    <div class="muted" style="font-size:12px;margin-top:4px">${r.date} · Tracking: ${r.trackingCode || '—'} · Giá SP: ${price}</div>
                 </div>`;
             }).join('');
         }
@@ -772,7 +773,8 @@
                 grouped[d.name].products.push({
                     productName: d.productName,
                     trackingCode: d.trackingCode || '—',
-                    revenue: d.productPrice || d.importPrice || 0
+                    productPrice: d.productPrice || d.importPrice || 0,
+                    revenue: Number.isFinite(d.revenue) ? d.revenue : null
                 });
             });
             const rows = Object.values(grouped).sort((a, b) => b.reward - a.reward || b.approved - a.approved || b.total - a.total);
@@ -791,7 +793,7 @@
                 const encodedName = encodeURIComponent(r.name);
                 html += `<tr><td>${idx + 1}</td><td><button class="name-toggle" onclick="toggleHistoryDetail('${encodedName}')">${isOpen ? '▼' : '▶'} ${escapeHtml(r.name)}</button></td><td class="text-r">${r.total}</td><td class="text-r">${r.approved}</td><td class="text-r" style="color:#7dd3fc;font-weight:700">${r.reward}</td><td class="text-r">${r.total > 0 ? Math.round((r.reward / r.total) * 100) : 0}%</td></tr>`;
                 if (isOpen) {
-                    const productRows = r.products.map(p => `<div class="detail-item"><div><strong>${escapeHtml(p.productName)}</strong></div><div>Mã tracking: ${escapeHtml(p.trackingCode)}</div><div>Doanh số: ${(p.revenue || 0).toLocaleString('vi-VN')} PHP</div></div>`).join('');
+                    const productRows = r.products.map(p => `<div class="detail-item"><div><strong>${escapeHtml(p.productName)}</strong></div><div>Mã tracking: ${escapeHtml(p.trackingCode)}</div><div>Giá SP: ${(p.productPrice || 0).toLocaleString('vi-VN')} PHP</div><div>Doanh số: ${p.revenue === null ? 'Chưa nhập' : `${p.revenue.toLocaleString('vi-VN')} PHP`}</div></div>`).join('');
                     html += `<tr class="detail-row"><td colspan="6"><div class="detail-list">${productRows || '<div class="muted">Không có dữ liệu chi tiết</div>'}</div></td></tr>`;
                 }
             });
@@ -824,6 +826,25 @@
             loadHistory();
         }
 
+        async function saveRevenue(id) {
+            const inp = document.getElementById(`rev-${id}`);
+            if (!inp) return;
+            const raw = (inp.value || '').trim();
+            if (!raw) {
+                showToast('Nhập doanh số trước khi lưu', 'error');
+                return;
+            }
+            const value = parseFloat(raw.replace(/,/g, ''));
+            if (!Number.isFinite(value) || value < 0) {
+                showToast('Doanh số không hợp lệ', 'error');
+                return;
+            }
+            await db.collection(COL).doc(id).update({ revenue: value });
+            showToast('Đã lưu doanh số');
+            loadAdminData();
+            loadHistory();
+        }
+
         async function loadAdminData() {
             if (!isAdmin) return;
             const month = document.getElementById('admin-month').value;
@@ -841,12 +862,12 @@
             document.getElementById('ad-rejected').textContent = docs.filter(d => d.status === 'rejected').length;
             const tbody = document.getElementById('admin-tbody');
             if (docs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-c muted" style="padding:20px">Không có dữ liệu</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="text-c muted" style="padding:20px">Không có dữ liệu</td></tr>';
                 return;
             }
             tbody.innerHTML = docs.map(d => {
                 const price = d.productPrice || d.importPrice ? `${(d.productPrice || d.importPrice).toLocaleString('vi-VN')} PHP` : '—';
-                return `<tr><td style="font-weight:700">${d.name}</td><td>${d.date}</td><td style="font-weight:700">${d.productName}</td><td>${d.trackingCode || '—'}</td><td>${price}</td><td>${statusBadge(d.status)}</td><td>${rewardBadge(d.rewardStatus)}</td><td><div class="actions"><button class="btn btn-approve btn-sm" onclick="updateDoc('${d.id}', { status: 'approved' }, 'Đã duyệt sản phẩm')">Duyệt</button><button class="btn btn-reject btn-sm" onclick="updateDoc('${d.id}', { status: 'rejected', rewardStatus: 'not_qualified' }, 'Đã từ chối sản phẩm')">Từ chối</button><button class="btn btn-reward btn-sm" onclick="updateDoc('${d.id}', { status: 'approved', rewardStatus: 'qualified' }, 'Đã đánh dấu đủ điều kiện thưởng')">Đủ thưởng</button><button class="btn btn-ghost btn-sm" onclick="updateDoc('${d.id}', { status: 'approved', rewardStatus: 'not_qualified' }, 'Đã đánh dấu không đủ điều kiện')">Không đủ</button></div></td></tr>`;
+                return `<tr><td style="font-weight:700">${d.name}</td><td>${d.date}</td><td style="font-weight:700">${d.productName}</td><td>${d.trackingCode || '—'}</td><td>${price}</td><td><div style="display:flex;gap:6px;align-items:center"><input id="rev-${d.id}" class="inp" type="number" min="0" placeholder="Nhập" value="${Number.isFinite(d.revenue) ? d.revenue : ''}" style="max-width:130px;padding:6px 8px"><button class="btn btn-ghost btn-sm" onclick="saveRevenue('${d.id}')">Lưu</button></div></td><td>${statusBadge(d.status)}</td><td>${rewardBadge(d.rewardStatus)}</td><td><div class="actions"><button class="btn btn-approve btn-sm" onclick="updateDoc('${d.id}', { status: 'approved' }, 'Đã duyệt sản phẩm')">Duyệt</button><button class="btn btn-reject btn-sm" onclick="updateDoc('${d.id}', { status: 'rejected', rewardStatus: 'not_qualified' }, 'Đã từ chối sản phẩm')">Từ chối</button><button class="btn btn-reward btn-sm" onclick="updateDoc('${d.id}', { status: 'approved', rewardStatus: 'qualified' }, 'Đã đánh dấu đủ điều kiện thưởng')">Đủ thưởng</button><button class="btn btn-ghost btn-sm" onclick="updateDoc('${d.id}', { status: 'approved', rewardStatus: 'not_qualified' }, 'Đã đánh dấu không đủ điều kiện')">Không đủ</button></div></td></tr>`;
             }).join('');
         }
 
