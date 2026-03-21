@@ -1335,7 +1335,7 @@
     <div id="fb-root"></div>
     <div class="header">
         <div class="logo"><span style="font-size:22px">🚀</span>
-            <h1>Ads Automation</h1><span class="ver">v3.0</span>
+            <h1>Ads Automation</h1><span class="ver">v3.1</span>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
             <div id="header-fb-disconnected">
@@ -1375,8 +1375,7 @@
             <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
                 <div class="icon">🎬</div>
                 <div class="text">Kéo thả <strong>nhiều videos</strong> vào đây hoặc click để chọn</div>
-                <div style="font-size:10px;color:var(--text-muted);margin-top:4px">MP4, MOV — mỗi file tối đa 500MB
-                </div>
+                <div style="font-size:10px;color:var(--text-muted);margin-top:4px">MP4, MOV — mỗi file tối đa 4GB (Facebook limit)<br>💡 Video lớn >500MB có thể cần thời gian upload lâu</div>
             </div>
             <input type="file" id="file-input" accept="video/*" multiple style="display:none"
                 onchange="onFilesSelect(event)">
@@ -1528,6 +1527,7 @@
                     <div>
                         <div style="font-weight:700;font-size:13px;margin-bottom:2px">🤖 Step 2 — Ad Preview</div>
                         <div style="font-size:11px;color:var(--text-dim)">Xem demo & loại bỏ bài ads không cần thiết</div>
+                        <div style="font-size:10px;color:var(--yellow);margin-top:4px">💡 Tips: Video lớn đã được upload xong, có thể xóa preview để tiết kiệm memory</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:10px">
                         <div class="fb-preview-counter" id="fb-counter"></div>
@@ -1709,7 +1709,7 @@
                 <div class="form-group"><label>🔑 Gemini API Key</label><input type="password" id="cfg-gemini"
                         class="inp" placeholder="AIzaSyxxxxxx..."></div>
                 <div class="form-group"><label>🧠 Gemini Model</label><input type="text" id="cfg-model" class="inp"
-                        value="gemini-1.5-flash-latest" placeholder="gemini-1.5-flash-latest"></div>
+                        value="gemini-2.5-flash-latest" placeholder="gemini-2.5-flash-latest"></div>
             </div>
             <!-- OpenAI Config -->
             <div id="ai-config-openai" class="form-grid" style="margin-bottom:12px;display:none">
@@ -1766,7 +1766,7 @@
                         <option value="OUTCOME_AWARENESS">Awareness</option>
                     </select>
                 </div>
-                <div class="form-group"><label>💰 Budget / Ad Set / ngày (VNĐ)</label><input type="number"
+                <div class="form-group"><label>💰 Budget Campaign / ngày (CBO)</label><input type="number"
                         id="cfg-budget" class="inp" value="200000" min="50000" step="50000"></div>
                 <div class="form-group"><label>🌍 Target Country</label><input type="text" id="cfg-country" class="inp"
                         value="PH" placeholder="PH, VN, US..."></div>
@@ -1807,7 +1807,7 @@
         const CONFIG_KEY = 'ts_ads_config';
         const HISTORY_KEY = 'ts_ads_history';
         const FORMULA_KEY = 'ts_ads_formula';
-        const FB_API = 'https://graph.facebook.com/v21.0';
+        const FB_API = 'https://graph.facebook.com/v25.0';
 
         // ==================== CONTENT FORMULA ====================
         const formulaPresets = {
@@ -1878,7 +1878,7 @@
 
         // ==================== FACEBOOK SDK ====================
         window.fbAsyncInit = function () {
-            FB.init({ appId: FB_APP_ID, cookie: true, xfbml: true, version: 'v21.0' });
+            FB.init({ appId: FB_APP_ID, cookie: true, xfbml: true, version: 'v25.0' });
             FB.getLoginStatus(function (resp) {
                 if (resp.status === 'connected') {
                     fbAccessToken = resp.authResponse.accessToken;
@@ -2277,6 +2277,44 @@
             document.getElementById('launch-progress-text').textContent = Math.round(pct) + '%';
         }
 
+        function validateLaunchInputs({ activeToken, activeAccount, activePixel, pageId, objective }) {
+            if (!activeToken || !activeAccount) return 'Cần kết nối Facebook hoặc nhập Access Token + Ad Account!';
+            if (!videoFiles.length) return 'Cần tải lên ít nhất 1 video trước khi launch campaign!';
+            if (!pageId) return 'Thiếu Page ID. Hãy chọn Page trước khi launch.';
+            if (objective === 'OUTCOME_SALES' && !activePixel) {
+                return 'Pixel ID là bắt buộc cho Conversion campaign. Hãy chọn hoặc nhập Pixel ID trước khi launch.';
+            }
+            return '';
+        }
+
+        async function graphDeleteObject(objectId, activeToken, label) {
+            if (!objectId || !activeToken) return true;
+            try {
+                const resp = await fetch(`${FB_API}/${objectId}?access_token=${encodeURIComponent(activeToken)}`, {
+                    method: 'DELETE'
+                });
+                const data = await resp.json();
+                if (data && data.success) {
+                    addLog(`🧹 Rollback OK: ${label} ${objectId}`, 'warn');
+                    return true;
+                }
+                addLog(`⚠️ Rollback fail: ${label} ${objectId}`, 'warn');
+                return false;
+            } catch (err) {
+                addLog(`⚠️ Rollback error: ${label} ${objectId} · ${err.message}`, 'warn');
+                return false;
+            }
+        }
+
+        async function rollbackLaunch(created, activeToken) {
+            addLog('🧹 Bắt đầu rollback các object đã tạo...', 'warn');
+            for (const adId of [...created.adIds].reverse()) await graphDeleteObject(adId, activeToken, 'Ad');
+            for (const creativeId of [...created.creativeIds].reverse()) await graphDeleteObject(creativeId, activeToken, 'Creative');
+            for (const adSetId of [...created.adSetIds].reverse()) await graphDeleteObject(adSetId, activeToken, 'Ad Set');
+            for (const videoId of [...created.videoIds].reverse()) await graphDeleteObject(videoId, activeToken, 'Video');
+            if (created.campaignId) await graphDeleteObject(created.campaignId, activeToken, 'Campaign');
+        }
+
         function getConfig() { return JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}'); }
 
         // ==================== LIST MODELS ====================
@@ -2423,6 +2461,8 @@
             files.forEach(f => {
                 if (!f.type.startsWith('video/')) return;
                 if (f.size > 500 * 1024 * 1024) { showToast(`${f.name} quá lớn (max 500MB)!`, 'error'); return; }
+                // Additional Facebook limits check
+                if (f.size > 4000 * 1024 * 1024) { showToast(`${f.name} quá lớn cho Facebook Ads (max 4GB)!`, 'error'); return; }
                 if (videoFiles.find(v => v.file.name === f.name)) return; // skip duplicate
                 videoFiles.push({ file: f, headline: '', primary: '', desc: '' });
             });
@@ -3299,7 +3339,6 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
             const objective = cfg.objective || 'OUTCOME_SALES';
             const country = cfg.country || 'PH';
             const cta = cfg.cta || 'SHOP_NOW';
-            const totalBudget = budget * videoFiles.length;
             const schedule = getScheduleInfo();
 
             let scheduleHTML = '';
@@ -3330,8 +3369,8 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:16px">
       <div class="preview-card card"><div class="preview-label">🎯 Objective</div><div class="preview-value">${objective}</div></div>
       <div class="preview-card card"><div class="preview-label">🌍 Target</div><div class="preview-value">🇵🇭 ${country}</div></div>
-      <div class="preview-card card"><div class="preview-label">💰 Budget / Ad Set</div><div class="preview-value">${budget.toLocaleString()}đ</div></div>
-      <div class="preview-card card"><div class="preview-label">💰 Tổng budget/ngày</div><div class="preview-value" style="color:var(--yellow)">${totalBudget.toLocaleString()}đ</div></div>
+      <div class="preview-card card"><div class="preview-label">💰 Budget Campaign/ngày</div><div class="preview-value">${budget.toLocaleString()}đ</div></div>
+      <div class="preview-card card"><div class="preview-label">🎬 Số Ad Set</div><div class="preview-value" style="color:var(--yellow)">${videoFiles.length}</div></div>
     </div>
     ${scheduleHTML}
     <div class="structure-diagram">
@@ -3340,7 +3379,7 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
         <div style="font-size:10px;color:var(--text-muted)">Objective: ${objective} · Status: ${schedule ? '⏰ Hẹn ' + schedule.startDateDisplay : 'ACTIVE 🚀'}</div>
         ${videoFiles.map((v, i) => `
           <div class="structure-adset">
-            <strong>Ad Set ${i + 1}:</strong> ${v.file.name} · 💰 ${budget.toLocaleString()}đ/ngày<br>
+            <strong>Ad Set ${i + 1}:</strong> ${v.file.name} · 💰 Dùng chung budget Campaign<br>
             <span style="font-size:10px;color:var(--text-dim)">📌 ${v.headline} · CTA: ${cta}</span>
           </div>`).join('')}
       </div>
@@ -3368,7 +3407,18 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
             const country = cfg.country || 'PH';
             const cta = cfg.cta || 'SHOP_NOW';
             const objective = cfg.objective || 'OUTCOME_SALES';
+            const validationError = validateLaunchInputs({ activeToken, activeAccount, activePixel, pageId, objective });
+            if (validationError) { showToast(validationError, 'error'); switchTab('config'); return; }
             const account = activeAccount.startsWith('act_') ? activeAccount : 'act_' + activeAccount;
+
+            // Check for large files and warn user
+            const largeFiles = videoFiles.filter(v => v.file.size > 1000 * 1024 * 1024); // > 1GB
+            if (largeFiles.length > 0) {
+                const largeFileNames = largeFiles.map(v => v.file.name + ` (${(v.file.size / 1024 / 1024 / 1024).toFixed(1)}GB)`).join(', ');
+                addLog(`⚠️ Phát hiện ${largeFiles.length} video lớn: ${largeFileNames}`, 'warn');
+                addLog('⏳ Upload có thể mất 5-15 phút. Đừng đóng tab!', 'info');
+            }
+
             // Campaign naming: mã_mkt + mã_hàng + tuỳ_chỉnh
             const mktCode = document.getElementById('inp-mkt')?.value?.trim() || '';
             const productCode = document.getElementById('inp-product-code')?.value?.trim() || '';
@@ -3385,8 +3435,28 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
 
             goToStep(4);
             document.getElementById('btn-launch').disabled = true;
+            document.getElementById('btn-launch').innerHTML = '🚀 Launching...';
             document.getElementById('log-box').innerHTML = '';
             setProgress(0);
+
+            // Add cancel button
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'btn btn-ghost btn-sm';
+            cancelBtn.innerHTML = '❌ Cancel';
+            cancelBtn.style.marginLeft = '8px';
+            cancelBtn.onclick = () => {
+                if (confirm('Bạn có chắc muốn hủy launch campaign?')) {
+                    isCancelled = true;
+                    addLog('🛑 Đã hủy launch campaign', 'error');
+                    document.getElementById('btn-launch').disabled = false;
+                    document.getElementById('btn-launch').innerHTML = '🚀 Launch Campaign';
+                    cancelBtn.remove();
+                }
+            };
+            document.getElementById('btn-launch').parentNode.appendChild(cancelBtn);
+
+            const created = { campaignId: '', adSetIds: [], creativeIds: [], adIds: [], videoIds: [] };
+            let isCancelled = false;
 
             try {
                 // 1. Create Campaign
@@ -3419,6 +3489,7 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
                     throw new Error('Campaign: ' + e.message);
                 }
                 const campaignId = campData.id;
+                created.campaignId = campaignId;
                 addLog(`✅ Campaign created! ID: ${campaignId}`, 'success');
                 completedSteps++; setProgress((completedSteps / totalSteps) * 100);
 
@@ -3426,27 +3497,87 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
 
                 // 2. For each video → upload + ad set + creative + ad
                 for (let i = 0; i < videoFiles.length; i++) {
+                    if (isCancelled) {
+                        addLog('🛑 Launch đã bị hủy bởi user', 'error');
+                        break;
+                    }
+
                     const v = videoFiles[i];
                     const label = `[Ad Set ${i + 1}/${videoFiles.length}]`;
 
-                    // Upload video
+                    // Upload video with progress and retry
                     addLog(`${label} 📤 Upload: ${v.file.name} (${(v.file.size / 1024 / 1024).toFixed(1)}MB)...`, 'info');
-                    const vForm = new FormData();
-                    vForm.append('source', v.file);
-                    vForm.append('title', v.file.name);
-                    vForm.append('access_token', activeToken);
-                    const vResp = await fetch(`${FB_API}/${account}/advideos`, { method: 'POST', body: vForm });
-                    const vData = await vResp.json();
-                    console.log('[AdsAuto] Video upload response:', vData);
-                    if (vData.error) {
-                        const e = vData.error;
-                        const detail = e.error_user_msg || e.error_user_title || '';
-                        addLog(`❌ Error code: ${e.code} | subcode: ${e.error_subcode || 'N/A'} | type: ${e.type || 'N/A'}`, 'error');
-                        if (detail) addLog(`💡 ${detail}`, 'warn');
-                        addLog(`💡 Kiểm tra: Token có quyền ads_management trên Ad Account ${account}?`, 'warn');
-                        throw new Error(`${label} Video upload: ${e.message}`);
-                    }
+
+                    let uploadSuccess = false;
+                    let uploadAttempts = 0;
+                    const maxAttempts = 3;
+                    let vData;
+
+                    while (!uploadSuccess && uploadAttempts < maxAttempts) {
+                        uploadAttempts++;
+                        try {
+                            if (uploadAttempts > 1) {
+                                addLog(`${label} 🔄 Retry upload attempt ${uploadAttempts}/${maxAttempts}...`, 'info');
+                                await new Promise(r => setTimeout(r, 2000 * uploadAttempts)); // Exponential backoff
+                            }
+
+                            const vForm = new FormData();
+                            vForm.append('source', v.file);
+                            vForm.append('title', v.file.name);
+                            vForm.append('access_token', activeToken);
+
+                            // Add timeout and progress tracking
+                            const controller = new AbortController();
+                            const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes timeout
+
+                            const vResp = await fetch(`${FB_API}/${account}/advideos`, {
+                                method: 'POST',
+                                body: vForm,
+                                signal: controller.signal
+                            });
+
+                            clearTimeout(timeoutId);
+                            vData = await vResp.json();
+
+                            if (vData.error) {
+                                const e = vData.error;
+                                if (e.code === 1 || e.code === 2 || e.code >= 500) { // Retry on server errors
+                                    if (uploadAttempts < maxAttempts) {
+                                        addLog(`${label} ⚠️ Server error (code ${e.code}), will retry...`, 'warn');
+                                        continue;
+                                    }
+                                }
+                                const detail = e.error_user_msg || e.error_user_title || '';
+                                addLog(`❌ Error code: ${e.code} | subcode: ${e.error_subcode || 'N/A'} | type: ${e.type || 'N/A'}`, 'error');
+                                if (detail) addLog(`💡 ${detail}`, 'warn');
+                                addLog(`💡 Kiểm tra: Token có quyền ads_management trên Ad Account ${account}?`, 'warn');
+                                throw new Error(`${label} Video upload: ${e.message}`);
+                            }
+
+                    uploadSuccess = true;
                     addLog(`${label} ✅ Video uploaded: ${vData.id}`, 'success');
+
+                    // Free up memory for large files
+                    if (v.file.size > 500 * 1024 * 1024) { // > 500MB
+                        addLog(`${label} 🧹 Giải phóng memory cho file lớn...`, 'info');
+                        // Clear the file reference to free memory
+                        v.file = null;
+                    }
+
+                        } catch (fetchError) {
+                            if (fetchError.name === 'AbortError') {
+                                addLog(`${label} ⏰ Upload timeout (5 minutes)`, 'error');
+                            } else {
+                                addLog(`${label} 📡 Network error: ${fetchError.message}`, 'error');
+                            }
+
+                            if (uploadAttempts >= maxAttempts) {
+                                throw new Error(`${label} Video upload failed after ${maxAttempts} attempts: ${fetchError.message}`);
+                            }
+                        }
+                    }
+
+                    created.videoIds.push(vData.id);
                     completedSteps++; setProgress((completedSteps / totalSteps) * 100);
 
                     // Create Ad Set
@@ -3484,6 +3615,7 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
                         throw new Error(`${label} Ad Set: ${e.message}`);
                     }
                     addLog(`${label} ✅ Ad Set created: ${asData.id}`, 'success');
+                    created.adSetIds.push(asData.id);
                     completedSteps++; setProgress((completedSteps / totalSteps) * 100);
 
                     // Wait for video processing & get thumbnail
@@ -3540,6 +3672,7 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
                         throw new Error(`${label} Creative: ${e.message}`);
                     }
                     addLog(`${label} ✅ Creative created: ${crData.id}`, 'success');
+                    created.creativeIds.push(crData.id);
                     completedSteps++; setProgress((completedSteps / totalSteps) * 100);
 
                     // Create Ad
@@ -3557,6 +3690,7 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
                     const adData = await adResp.json();
                     if (adData.error) throw new Error(`${label} Ad: ${adData.error.message}`);
                     addLog(`${label} ✅ Ad created: ${adData.id}`, 'success');
+                    created.adIds.push(adData.id);
                     completedSteps++; setProgress((completedSteps / totalSteps) * 100);
 
                     adSetResults.push({ video: v.file.name, adsetId: asData.id, creativeId: crData.id, adId: adData.id, videoId: vData.id });
@@ -3585,22 +3719,30 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
         <div style="font-size:12px;color:var(--text-dim)">
           <strong>Campaign:</strong> ${campaignId}<br>
           <strong>Ad Sets:</strong> ${videoFiles.length}<br>
-          <strong>Budget:</strong> ${(budget * videoFiles.length).toLocaleString()}đ/ngày<br>
+          <strong>Budget Campaign:</strong> ${budget.toLocaleString()}đ/ngày (CBO)<br>
           <strong>Status:</strong> ${schedule ? `<span style="color:var(--purple)">⏰ Chạy từ ${schedule.startDateDisplay}</span>` : `<span style="color:var(--green)">🚀 ACTIVE - Đang chạy</span>`} —
           <a href="https://www.facebook.com/adsmanager" target="_blank" style="color:var(--blue)">Xem trên Ads Manager →</a>
         </div>
       </div>`;
             } catch (err) {
                 addLog(`❌ ERROR: ${err.message}`, 'error');
+                if (created.campaignId || created.adSetIds.length || created.creativeIds.length || created.adIds.length || created.videoIds.length) {
+                    await rollbackLaunch(created, activeToken);
+                }
                 showToast('❌ Lỗi: ' + err.message, 'error');
                 document.getElementById('launch-result').style.display = 'block';
                 document.getElementById('launch-result').innerHTML = `
       <div class="card" style="padding:16px;border-left:3px solid var(--red);background:var(--red-bg)">
         <div style="font-weight:700;color:var(--red)">❌ Lỗi</div>
         <div style="font-size:12px;color:var(--text-dim);margin-top:4px">${err.message}</div>
+        <div style="font-size:11px;color:var(--yellow);margin-top:8px">Đã thử rollback các object đã tạo trên Meta để tránh phát sinh campaign rác.</div>
       </div>`;
             }
             document.getElementById('btn-launch').disabled = false;
+            // Cleanup cancel button
+            if (cancelBtn && cancelBtn.parentNode) {
+                cancelBtn.remove();
+            }
         }
 
         // ==================== HISTORY ====================
@@ -3619,7 +3761,7 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
       <div>
         <div style="font-weight:700;font-size:13px">${h.name}</div>
         <div style="font-size:10px;color:var(--text-muted);margin-top:2px">
-          🎬 ${h.videoCount || (h.adSets ? h.adSets.length : 1)} videos · 🌍 ${h.country} · 💰 ${(h.budget || 0).toLocaleString()}đ/adset/ngày
+          🎬 ${h.videoCount || (h.adSets ? h.adSets.length : 1)} videos · 🌍 ${h.country} · 💰 ${(h.budget || 0).toLocaleString()}đ/campaign/ngày
         </div>
         ${scheduleInfo}
         <div style="font-size:10px;color:var(--text-muted)">Campaign: ${h.campaignId} · ${new Date(h.createdAt).toLocaleString('vi-VN')}</div>
