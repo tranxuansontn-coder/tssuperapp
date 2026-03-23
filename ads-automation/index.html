@@ -1204,6 +1204,13 @@
             line-height: 1.45;
             white-space: pre-wrap;
             word-break: break-word;
+            max-height: 140px;
+            overflow: auto;
+        }
+
+        .fb-ad-body-text {
+            white-space: pre-wrap;
+            word-break: break-word;
         }
         .fb-ad-body .fb-see-more {
             color: #b0b3b8;
@@ -1326,6 +1333,78 @@
             color: #b0b3b8;
             cursor: default;
             padding: 5px 0;
+        }
+
+        .fb-ad-inline-editor {
+            border-top: 1px solid rgba(255,255,255,.08);
+            padding: 8px 10px;
+            background: rgba(0,0,0,.12);
+        }
+
+        .fb-ad-inline-editor details {
+            width: 100%;
+        }
+
+        .fb-ad-inline-editor summary {
+            cursor: pointer;
+            font-size: 11px;
+            color: #b0b3b8;
+            font-weight: 700;
+            list-style: none;
+            user-select: none;
+        }
+
+        .fb-ad-inline-editor summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .fb-ad-inline-editor summary::after {
+            content: ' ▾';
+            color: #9ca3af;
+            font-weight: 600;
+        }
+
+        .fb-ad-inline-editor details[open] summary::after {
+            content: ' ▴';
+        }
+
+        .fb-edit-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .fb-edit-field label {
+            display: block;
+            font-size: 10px;
+            color: #9ca3af;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .fb-edit-field .inp {
+            font-size: 12px;
+            padding: 7px 10px;
+            background: rgba(17,24,39,.75);
+            border-color: rgba(255,255,255,.14);
+        }
+
+        .fb-edit-field textarea.inp {
+            min-height: 68px;
+            max-height: 180px;
+            resize: vertical;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .txt-pr {
+            min-height: 88px;
+            max-height: 240px;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
         }
 
         .fb-preview-counter {
@@ -3243,6 +3322,55 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
             else renderTextCards();
         }
 
+        function escapeHTML(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function escapeAttr(str) {
+            return escapeHTML(str)
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function updateVideoField(idx, field, value) {
+            if (!videoFiles[idx]) return;
+            videoFiles[idx][field] = value;
+
+            if (previewMode !== 'fb') return;
+
+            const card = document.getElementById(`fb-card-${idx}`);
+            if (!card) return;
+
+            if (field === 'primary') {
+                const bodyText = card.querySelector('.fb-ad-body-text');
+                if (bodyText) bodyText.textContent = value || '';
+            }
+            if (field === 'headline') {
+                const headline = card.querySelector('.fb-ad-headline');
+                if (headline) headline.textContent = value || 'Headline';
+            }
+            if (field === 'desc') {
+                const desc = card.querySelector('.fb-ad-desc');
+                if (!desc) {
+                    if ((value || '').trim()) {
+                        const info = card.querySelector('.fb-ad-link-info');
+                        if (info) {
+                            info.insertAdjacentHTML('beforeend', `<div class="fb-ad-desc">${escapeHTML(value)}</div>`);
+                        }
+                    }
+                } else if ((value || '').trim()) {
+                    desc.style.display = '';
+                    desc.textContent = value;
+                } else {
+                    desc.style.display = 'none';
+                    desc.textContent = '';
+                }
+            }
+        }
+
         function renderTextCards() {
             document.getElementById('text-cards').innerHTML = videoFiles.map((v, i) => `
     <div class="card" style="padding:14px;margin-bottom:10px;border-left:3px solid var(--blue)">
@@ -3251,9 +3379,9 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
         <span style="font-size:11px;color:var(--text-dim)">🎬 ${v.file.name}</span>
       </div>
       <div class="form-grid" style="gap:10px">
-        <div class="form-group"><label>📌 Headline</label><input type="text" class="inp txt-hl" data-idx="${i}" value="${v.headline}" onchange="videoFiles[${i}].headline=this.value"></div>
-        <div class="form-group"><label>📋 Description</label><input type="text" class="inp txt-desc" data-idx="${i}" value="${v.desc}" onchange="videoFiles[${i}].desc=this.value"></div>
-        <div class="form-group" style="grid-column:1/-1"><label>📝 Primary Text</label><textarea class="inp txt-pr" data-idx="${i}" rows="2" onchange="videoFiles[${i}].primary=this.value">${v.primary}</textarea></div>
+        <div class="form-group"><label>📌 Headline</label><input type="text" class="inp txt-hl" data-idx="${i}" value="${escapeAttr(v.headline)}" oninput="videoFiles[${i}].headline=this.value"></div>
+        <div class="form-group"><label>📋 Description</label><input type="text" class="inp txt-desc" data-idx="${i}" value="${escapeAttr(v.desc)}" oninput="videoFiles[${i}].desc=this.value"></div>
+        <div class="form-group" style="grid-column:1/-1"><label>📝 Primary Text</label><textarea class="inp txt-pr" data-idx="${i}" rows="4" oninput="videoFiles[${i}].primary=this.value">${escapeHTML(v.primary)}</textarea></div>
       </div>
     </div>`).join('');
             updateFBCounter();
@@ -3328,10 +3456,11 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
             grid.innerHTML = videoFiles.map((v, i) => {
                 // Create object URL for video thumbnail
                 const videoUrl = URL.createObjectURL(v.file);
-                const primaryText = (v.primary || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-                const primaryHTML = primaryText.length > 120 ? truncateText(primaryText, 120) : primaryText;
-                const headlineText = (v.headline || 'Headline').replace(/&/g,'&amp;').replace(/</g,'&lt;');
-                const descText = (v.desc || '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+                const primaryText = escapeHTML(v.primary || '');
+                const headlineText = escapeHTML(v.headline || 'Headline');
+                const descText = escapeHTML(v.desc || '');
+                const headlineAttr = escapeAttr(v.headline || '');
+                const descAttr = escapeAttr(v.desc || '');
 
                 return `<div class="fb-ad-card" id="fb-card-${i}">
                     <button class="fb-remove" onclick="removeAdPreview(${i})" title="Bỏ bài ads này">✕</button>
@@ -3342,7 +3471,7 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
                             <div class="fb-ad-sponsored">Quảng cáo · 🌐</div>
                         </div>
                     </div>
-                    <div class="fb-ad-body">${primaryHTML}</div>
+                    <div class="fb-ad-body"><div class="fb-ad-body-text">${primaryText}</div></div>
                     <div class="fb-ad-media">
                         <video src="${videoUrl}" muted preload="metadata" onloadedmetadata="this.currentTime=1"></video>
                         <div class="fb-play-btn"></div>
@@ -3355,6 +3484,25 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
                         </div>
                         <button class="fb-ad-cta">${ctaLabel}</button>
                     </div>
+                    <div class="fb-ad-inline-editor">
+                        <details>
+                            <summary>✏️ Sửa nhanh ngay trên preview</summary>
+                            <div class="fb-edit-grid">
+                                <div class="fb-edit-field">
+                                    <label>Headline</label>
+                                    <input class="inp" type="text" value="${headlineAttr}" oninput="updateVideoField(${i}, 'headline', this.value)">
+                                </div>
+                                <div class="fb-edit-field">
+                                    <label>Description</label>
+                                    <input class="inp" type="text" value="${descAttr}" oninput="updateVideoField(${i}, 'desc', this.value)">
+                                </div>
+                                <div class="fb-edit-field">
+                                    <label>Primary Text</label>
+                                    <textarea class="inp" rows="4" oninput="updateVideoField(${i}, 'primary', this.value)">${primaryText}</textarea>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
                     <div class="fb-ad-actions">
                         <span>👍 Thích</span>
                         <span>💬 Bình luận</span>
@@ -3364,13 +3512,6 @@ Generate exactly ${totalVariations} objects. Each MUST be completely unique.`;
             }).join('');
 
             updateFBCounter();
-
-            // Add event listeners for "Xem thêm" / "Thu gọn" functionality
-            setTimeout(() => {
-                document.querySelectorAll('.fb-see-more').forEach(span => {
-                    span.addEventListener('click', handleSeeMore);
-                });
-            }, 100);
         }
 
         function handleSeeMore(event) {
