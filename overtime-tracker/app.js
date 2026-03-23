@@ -327,7 +327,13 @@ function currentMonth() {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 }
+const OT_RATE_WEEKDAY = 45000;
+const OT_RATE_SUNDAY = 60000;
 function timeToMinutes(t) { const [h, m] = t.split(':').map(Number); return h * 60 + m; }
+function getOTRateByDate(dateStr) {
+    const dayOfWeek = new Date(dateStr + 'T00:00:00').getDay();
+    return dayOfWeek === 0 ? OT_RATE_SUNDAY : OT_RATE_WEEKDAY;
+}
 function formatDate(ds) {
     if (!ds) return '';
     return new Date(ds + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -548,12 +554,10 @@ async function refreshDashboard() {
         document.getElementById('stat-approved-pct').textContent = (data.length ? Math.round(approved / data.length * 100) : 0) + '%';
 
         // OT Earnings
-        const OT_RATE_WEEKDAY = 40000, OT_RATE_SUNDAY = 50000, BASE_SALARY = 6000000;
         let totalEarnings = 0;
         data.forEach(e => {
             if (!e.date || !e.total_hours) return;
-            const dayOfWeek = new Date(e.date + 'T00:00:00').getDay();
-            totalEarnings += e.total_hours * (dayOfWeek === 0 ? OT_RATE_SUNDAY : OT_RATE_WEEKDAY);
+            totalEarnings += e.total_hours * getOTRateByDate(e.date);
         });
         const fmtVND = n => n.toLocaleString('vi-VN') + 'đ';
         document.getElementById('stat-ot-earnings').textContent = fmtVND(totalEarnings);
@@ -564,7 +568,6 @@ async function refreshDashboard() {
         document.getElementById('stat-top-marketer').textContent = sorted.length ? sorted[0][0].split(' ').pop() : '—';
 
         // Ranking with OT earnings + detail
-        const OT_RATE_WEEKDAY_R = 40000, OT_RATE_SUNDAY_R = 50000;
         const rb = document.getElementById('ranking-body');
         const rd = document.getElementById('ranking-detail');
         if (!sorted.length) {
@@ -574,8 +577,8 @@ async function refreshDashboard() {
             rb.innerHTML = sorted.map(([name, hrs], i) => {
                 const entries = data.filter(e => e.marketer_name === name);
                 const earnings = entries.reduce((s, e) => {
-                    const dow = new Date(e.date + 'T00:00:00').getDay();
-                    return s + (e.total_hours || 0) * (dow === 0 ? OT_RATE_SUNDAY_R : OT_RATE_WEEKDAY_R);
+                    if (!e.date || !e.total_hours) return s;
+                    return s + (e.total_hours || 0) * getOTRateByDate(e.date);
                 }, 0);
                 const rc = i < 3 ? `rank-${i + 1}` : 'rank-default';
                 return `<tr style="cursor:pointer" onclick="showOTDetail('${name.replace(/'/g, "\\'")}')"><td><span class="rank-num ${rc}">${i + 1}</span></td><td><strong>${name}</strong></td><td>${hrs.toFixed(1)}h</td><td>${entries.length}</td><td style="color:#10b981;font-weight:600">${earnings.toLocaleString('vi-VN')}đ</td></tr>`;
@@ -624,13 +627,12 @@ function showOTDetail(marketerName) {
     const rd = document.getElementById('ranking-detail');
     if (!rd || !entries.length) return;
 
-    const OT_WD = 40000, OT_SU = 50000;
     const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
     let totalHrs = 0, totalEarn = 0;
 
     const rows = entries.map(e => {
         const dow = new Date(e.date + 'T00:00:00').getDay();
-        const rate = dow === 0 ? OT_SU : OT_WD;
+        const rate = getOTRateByDate(e.date);
         const earn = (e.total_hours || 0) * rate;
         totalHrs += (e.total_hours || 0);
         totalEarn += earn;
@@ -645,7 +647,7 @@ function showOTDetail(marketerName) {
             <td style="white-space:nowrap">${e.start_time || '—'} → ${e.end_time || '—'}</td>
             <td style="font-weight:600">${(e.total_hours || 0).toFixed(1)}h</td>
             <td style="font-size:.75rem;max-width:180px;word-break:break-all">${(e.campaign_id || '—').replace(/, /g, '<br>')}</td>
-            <td style="color:#10b981;font-weight:600;white-space:nowrap">${earn.toLocaleString('vi-VN')}đ <small style="color:#9aa0b8;font-weight:400">(${isSunday ? '50k' : '40k'}/h)</small></td>
+            <td style="color:#10b981;font-weight:600;white-space:nowrap">${earn.toLocaleString('vi-VN')}đ <small style="color:#9aa0b8;font-weight:400">(${isSunday ? '60k' : '45k'}/h)</small></td>
             <td>${statusBadge}</td>
         </tr>`;
     }).join('');
