@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ads Template Helper - TS Global</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg-deep: #0a0f1a;
+            --bg-card: #111827;
+            --bg-input: #1a2332;
+            --border: rgba(255, 255, 255, .06);
+            --text: #e5e7eb;
+            --text-dim: #6b7280;
+            --text-muted: #4b5563;
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, .15);
+            --red: #ef4444;
+            --red-bg: rgba(239, 68, 68, .08);
+            --blue: #3b82f6;
+            --yellow: #f59e0b;
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10, 15, 26, .85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo h1 {
+            font-size: 17px;
+            font-weight: 900;
+            color: var(--accent);
+        }
+        
+        .logo .badge-helper {
+            display: inline-block;
+            background: rgba(16, 185, 129, .15);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: 9px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 2px;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(17, 24, 39, .6);
+        }
+        
+        .tab {
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-dim);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all .2s;
+            background: none;
+            border: none;
+            font-family: inherit;
+        }
+        
+        .tab:hover { color: var(--text); }
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            font-weight: 700;
+        }
+        
+        .page {
+            padding: 20px 24px;
+            display: none;
+        }
+        
+        .page.show { display: block; }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .card h3 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--accent);
+        }
+        
+        .inp {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            color: var(--text);
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+        
+        .inp:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            transition: all .2s;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, .15);
+        }
+        
+        .btn-primary:hover { transform: translateY(-1px); }
+        
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover { background: rgba(255, 255, 255, .04); }
+        
+        .btn-danger {
+            background: rgba(239, 68, 68, .1);
+            color: var(--red);
+            border: 1px solid rgba(239, 68, 68, .2);
+        }
+        
+        .btn-danger:hover { background: rgba(239, 68, 68, .2); }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+        }
+        
+        .video-item {
+            padding: 12px;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .video-item .info {
+            flex: 1;
+        }
+        
+        .video-item .name {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        
+        .video-item .meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        .video-item .actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+            background: var(--bg-input);
+        }
+        
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, .03);
+        }
+        
+        .drop-zone .icon { font-size: 36px; margin-bottom: 8px; }
+        .drop-zone .text { font-size: 13px; color: var(--text-dim); }
+        .drop-zone .text strong { color: var(--accent); }
+        
+        .template-item {
+            padding: 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+        }
+        
+        .template-item .title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        
+        .template-item .content {
+            font-size: 12px;
+            color: var(--text-dim);
+            background: rgba(0, 0, 0, .2);
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            max-height: 80px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+        
+        .export-preview {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-bottom: 12px;
+            font-family: monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .instruction-box {
+            background: rgba(16, 185, 129, .08);
+            border: 1px solid rgba(16, 185, 129, .2);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        
+        .instruction-box h4 {
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .instruction-box ol {
+            margin-left: 20px;
+            color: var(--text-dim);
+        }
+        
+        .instruction-box li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        .log-item {
+            padding: 8px 12px;
+            background: rgba(16, 185, 129, .04);
+            border-left: 3px solid var(--accent);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .log-item .time {
+            color: var(--text-muted);
+            white-space: nowrap;
+            font-weight: 600;
+        }
+        
+        .log-item .msg {
+            flex: 1;
+            color: var(--text-dim);
+        }
+        
+        .success-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, .15);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+        
+        .toast-box {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .toast {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            animation: slideDown .3s ease;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .3);
+        }
+        
+        .toast-success {
+            background: #065f46;
+            color: #6ee7b7;
+        }
+        
+        .toast-error {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <h1>📋 Ads Template Helper <span class="badge-helper">v1.0 SAFE</span></h1>
+        </div>
+        <span style="color: var(--accent); font-size: 11px; font-weight: 600;">✅ Policy Compliant</span>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('create')">📝 Tạo Template</button>
+        <button class="tab" onclick="switchTab('templates')">📚 Thư viện</button>
+        <button class="tab" onclick="switchTab('export')">📤 Xuất & Đăng</button>
+        <button class="tab" onclick="switchTab('instructions')">📖 Hướng dẫn</button>
+        <button class="tab" onclick="switchTab('audit')">📊 Lịch sử</button>
+        <button class="tab" onclick="switchTab('settings')">⚙️ Cài đặt</button>
+    </div>
+    
+    <!-- TAB 1: CREATE TEMPLATE -->
+    <div id="page-create" class="page show">
+        <div class="card">
+            <h3>🎬 Step 1: Upload Videos</h3>
+            <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 12px;">
+                Upload video content. Mỗi video sẽ tạo 1 template ad riêng.
+            </div>
+            <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                <div class="icon">📹</div>
+                <div class="text">Kéo thả videos vào đây hoặc <strong>click để chọn</strong></div>
+                <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">MP4, MOV (max 4GB)</div>
+            </div>
+            <input type="file" id="file-input" accept="video/*" multiple style="display:none" onchange="onFilesSelect(event)">
+            
+            <div id="video-list" style="margin-top: 16px;"></div>
+        </div>
+        
+        <div class="card">
+            <h3>✍️ Step 2: Thêm Nội Dung (Headline & Description)</h3>
+            <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 12px;">
+                Chỉnh sửa hoặc tạo tiêu đề & mô tả cho từng video. Hoặc dùng AI để tạo tự động.
+            </div>
+            
+            <div class="form-group">
+                <label>🤖 Hoặc sử dụng AI tạo nội dung (cần Gemini API Key)</label>
+                <button class="btn btn-secondary" onclick="generateWithAI()">🔮 Generate với AI</button>
+            </div>
+            
+            <div id="templates-edit" style="margin-top: 12px;"></div>
+        </div>
+        
+        <div class="card">
+            <h3>⚙️ Step 3: Campaign Settings</h3>
+            
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>📢 Tên Campaign</label>
+                    <input type="text" id="campaign-name" class="inp" placeholder="vd: MKT_Product_March">
+                </div>
+                
+                <div class="form-group">
+                    <label>🎯 Objective</label>
+                    <select id="campaign-objective" class="inp">
+                        <option value="OUTCOME_SALES">Conversions (Bán hàng)</option>
+                        <option value="OUTCOME_LEADS">Leads</option>
+                        <option value="OUTCOME_ENGAGEMENT">Engagement</option>
+                        <option value="OUTCOME_AWARENESS">Awareness</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>🌍 Quốc gia Target</label>
+                    <input type="text" id="campaign-country" class="inp" placeholder="vd: PH, VN, US" value="PH">
+                </div>
+                
+                <div class="form-group">
+                    <label>💰 Budget (đ/campaign/ngày)</label>
+                    <input type="number" id="campaign-budget" class="inp" placeholder="vd: 200000" value="200000">
+                </div>
+                
+                <div class="form-group">
+                    <label>🔗 Landing Page URL</label>
+                    <input type="url" id="campaign-url" class="inp" placeholder="https://example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>📐 Pixel ID (Conversion Tracking)</label>
+                    <input type="text" id="campaign-pixel" class="inp" placeholder="vd: 123456789">
+                </div>
+
+                <div class="form-group">
+                    <label>📄 Page ID <span style="font-weight:400;color:var(--text-muted)">(Facebook Page ID — bắt buộc khi tạo ad)</span></label>
+                    <input type="text" id="campaign-page" class="inp" placeholder="vd: 123456789012345">
+                    <div style="font-size:10px;color:var(--text-muted);margin-top:4px">💡 Lấy Page ID: Facebook Page của bạn → Settings → About → cuộn xuống dưới cùng tìm dãy số "Page ID"</div>
+                </div>
+
+                <div class="form-group">
+                    <label>📣 CTA Button</label>
+                    <select id="campaign-cta" class="inp">
+                        <option value="SHOP_NOW">Shop Now</option>
+                        <option value="LEARN_MORE">Learn More</option>
+                        <option value="ORDER_NOW">Order Now</option>
+                        <option value="SIGN_UP">Sign Up</option>
+                        <option value="CONTACT_US">Contact Us</option>
+                        <option value="BOOK_TRAVEL">Book Travel</option>
+                        <option value="DOWNLOAD">Download</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="previewTemplate()">👀 Preview Template</button>
+        </div>
+    </div>
+    
+    <!-- TAB 2: TEMPLATES LIBRARY -->
+    <div id="page-templates" class="page">
+        <div class="card">
+            <h3>📚 Thư viện Template</h3>
+            <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 12px;">
+                Danh sách tất cả templates được tạo. Bạn có thể edit lại trước khi xuất.
+            </div>
+            <div id="templates-list" style="margin-top: 12px;"></div>
+        </div>
+    </div>
+    
+    <!-- TAB 3: EXPORT & PUBLISHING -->
+    <div id="page-export" class="page">
+        <div class="instruction-box">
+            <h4>✅ Bước Xuất & Đăng Quảng Cáo</h4>
+            <p style="margin-bottom: 12px;">Ứng dụng này chỉ tạo template. Bạn phải tự đăng trên Facebook Ads Manager:</p>
+            <ol>
+                <li><strong>Bước 1:</strong> Click "Xuất JSON" dưới đây → lưu file</li>
+                <li><strong>Bước 2:</strong> Vào Facebook Ads Manager</li>
+                <li><strong>Bước 3:</strong> Tạo campaign thủ công → copy nội dung từ JSON</li>
+                <li><strong>Bước 4:</strong> Click "Publish" trong Ads Manager</li>
+            </ol>
+        </div>
+        
+        <div class="card">
+            <h3>📤 Xuất Template</h3>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--accent);">Chọn templates để xuất:</label>
+                <div id="export-checklist" style="display: grid; gap: 8px; max-height: 300px; overflow-y: auto;"></div>
+            </div>
+            
+            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--accent);">📋 Preview JSON:</label>
+            <div class="export-preview" id="export-preview"># JSON sẽ hiển thị ở đây</div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-primary" onclick="exportAsJSON()">📥 Download JSON File</button>
+                <button class="btn btn-secondary" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- TAB 4: INSTRUCTIONS -->
+    <div id="page-instructions" class="page">
+        <div class="card">
+            <h3>📖 Hướng Dẫn Đầy Đủ</h3>
+            
+            <div class="instruction-box">
+                <h4>❓ Tại sao dùng ứng dụng này?</h4>
+                <p style="margin-bottom: 12px;">Ứng dụng này là một <strong>Helper Tool</strong> - không phải automation tool:</p>
+                <ul style="margin-left: 20px; color: var(--text-dim);">
+                    <li>✅ Giúp bạn <strong>organize & format</strong> nội dung quảng cáo</li>
+                    <li>✅ Tiết kiệm thời gian gõ headline & description</li>
+                    <li>✅ Preview trước khi đăng</li>
+                    <li>✅ Export thành định dạng dễ dùng</li>
+                </ul>
+            </div>
+            
+            <div class="instruction-box">
+                <h4>📝 Các Bước Chi Tiết</h4>
+                <ol>
+                    <li><strong>Upload Videos:</strong> Chọn các video quảng cáo</li>
+                    <li><strong>Thêm Text:</strong> Viết hoặc dùng AI generate headline & description</li>
+                    <li><strong>Cấu Hình:</strong> Chọn campaign name, objective, budget, targeting</li>
+                    <li><strong>Preview:</strong> Xem trước cách ads sẽ hiển thị</li>
+                    <li><strong>Export:</strong> Tải file JSON</li>
+                    <li><strong>Facebook Ads Manager:</strong> Tạo campaign → copy-paste nội dung → Publish</li>
+                </ol>
+            </div>
+            
+            <div class="instruction-box">
+                <h4>🔒 Tại sao an toàn?</h4>
+                <p style="margin-bottom: 12px;">Ứng dụng <strong>KHÔNG tự động tạo quảng cáo trên Facebook.</strong> Tất cả ads được tạo bởi bạn thủ công trong Ads Manager:</p>
+                <ul style="margin-left: 20px; color: var(--text-dim);">
+                    <li>✅ Bạn có toàn quyền kiểm soát</li>
+                    <li>✅ Meta không phát hiện "automation"</li>
+                    <li>✅ Không vi phạm chính sách</li>
+                    <li>✅ Không sợ bị ban account</li>
+                </ul>
+            </div>
+            
+            <div class="instruction-box">
+                <h4>⚠️ Lưu Ý Quan Trọng</h4>
+                <ul style="margin-left: 20px; color: var(--text-dim);">
+                    <li>Ứng dụng này chỉ là helper - không tạo ads trên Facebook</li>
+                    <li>Bạn phải đặt Ad Account ID & Pixel ID trong cài đặt</li>
+                    <li>Khi publish ads - hãy yêu cầu bạn bè/team xem trước</li>
+                    <li>Tuân thủ chính sách Facebook & các quy định địa phương</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- TAB 6: SETTINGS -->
+    <div id="page-settings" class="page">
+
+        <!-- CARD 1: API KEYS -->
+        <div class="card">
+            <h3>🔑 API Keys</h3>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:16px">Keys lưu local trên máy, không gửi đi đâu ngoài AI provider.</div>
+
+            <!-- GEMINI -->
+            <div style="border:1px solid rgba(16,185,129,.2);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;background:rgba(16,185,129,.03)">
+                <div style="font-weight:700;color:var(--accent);margin-bottom:10px;font-size:13px">🤖 Google Gemini</div>
+                <div style="display:flex;gap:8px;margin-bottom:8px">
+                    <input type="password" id="cfg-gemini" class="inp" placeholder="AIzaSy..." style="margin-bottom:0;flex:1">
+                    <button class="btn btn-secondary" style="padding:10px 12px;flex-shrink:0" onclick="toggleKey('cfg-gemini')">👁️</button>
+                    <button class="btn btn-secondary" style="padding:10px 12px;flex-shrink:0;white-space:nowrap" id="btn-scan-gemini" onclick="scanModels('gemini')">🔍 Quét Model</button>
+                </div>
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">Lấy tại: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--blue)">aistudio.google.com</a> (miễn phí)</div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Model Gemini</label>
+                    <select id="cfg-gemini-model" class="inp" style="margin-bottom:0">
+                        <option value="gemini-1.5-flash">gemini-1.5-flash (nhanh, miễn phí)</option>
+                        <option value="gemini-1.5-pro">gemini-1.5-pro (chất lượng cao)</option>
+                        <option value="gemini-2.0-flash">gemini-2.0-flash (mới nhất)</option>
+                        <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite</option>
+                    </select>
+                </div>
+                <div id="gemini-model-status" style="font-size:10px;color:var(--text-muted);margin-top:4px"></div>
+            </div>
+
+            <!-- OPENAI -->
+            <div style="border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;background:rgba(59,130,246,.03)">
+                <div style="font-weight:700;color:var(--blue);margin-bottom:10px;font-size:13px">🧠 OpenAI ChatGPT</div>
+                <div style="display:flex;gap:8px;margin-bottom:8px">
+                    <input type="password" id="cfg-openai" class="inp" placeholder="sk-proj-..." style="margin-bottom:0;flex:1">
+                    <button class="btn btn-secondary" style="padding:10px 12px;flex-shrink:0" onclick="toggleKey('cfg-openai')">👁️</button>
+                    <button class="btn btn-secondary" style="padding:10px 12px;flex-shrink:0;white-space:nowrap" id="btn-scan-openai" onclick="scanModels('openai')">🔍 Quét Model</button>
+                </div>
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">Lấy tại: <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--blue)">platform.openai.com</a></div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Model OpenAI</label>
+                    <select id="cfg-openai-model" class="inp" style="margin-bottom:0">
+                        <option value="gpt-4o-mini">gpt-4o-mini (nhanh, rẻ)</option>
+                        <option value="gpt-4o">gpt-4o (chất lượng cao)</option>
+                        <option value="gpt-4-turbo">gpt-4-turbo</option>
+                        <option value="gpt-3.5-turbo">gpt-3.5-turbo (cũ, rẻ nhất)</option>
+                    </select>
+                </div>
+                <div id="openai-model-status" style="font-size:10px;color:var(--text-muted);margin-top:4px"></div>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>⚡ Ưu tiên dùng AI</label>
+                    <select id="cfg-ai-provider" class="inp">
+                        <option value="gemini">Gemini (khuyên dùng, free)</option>
+                        <option value="openai">OpenAI ChatGPT</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>🌐 Ngôn ngữ generate</label>
+                    <select id="cfg-ai-lang" class="inp">
+                        <option value="vi">Tiếng Việt</option>
+                        <option value="en">English</option>
+                        <option value="fil">Filipino / Tagalog</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">💾 Lưu</button>
+            <span id="settings-saved" style="display:none;margin-left:12px;color:var(--accent);font-size:12px;font-weight:600">✅ Đã lưu!</span>
+        </div>
+
+        <!-- CARD 2: PROMPT EDITOR -->
+        <div class="card">
+            <h3>📝 Prompt Template</h3>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Chỉnh sửa prompt gửi cho AI. Dùng <code style="background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">{video_count}</code>, <code style="background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">{file_list}</code>, <code style="background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">{lang}</code> làm placeholder.</div>
+            <div class="form-group">
+                <label>📋 System Prompt (hướng dẫn vai trò AI)</label>
+                <textarea id="cfg-system-prompt" class="inp" rows="3" placeholder="Bạn là chuyên gia copywriting quảng cáo Facebook..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>💬 User Prompt (nội dung yêu cầu)</label>
+                <textarea id="cfg-user-prompt" class="inp" rows="8"></textarea>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-secondary" onclick="resetDefaultPrompt()">🔄 Reset Mặc Định</button>
+                <button class="btn btn-primary" onclick="saveSettings()">💾 Lưu Prompt</button>
+            </div>
+        </div>
+
+        <!-- CARD 3: TEST PROMPT + PREVIEW -->
+        <div class="card">
+            <h3>🧪 Test & Preview Content</h3>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Thử prompt với số video tùy ý → xem AI trả về Content Preview ngay bên dưới.</div>
+            <div style="display:flex;gap:12px;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap">
+                <div class="form-group" style="margin-bottom:0;flex:1;min-width:160px">
+                    <label>📹 Số video test</label>
+                    <input type="number" id="test-video-count" class="inp" value="3" min="1" max="20" style="margin-bottom:0">
+                </div>
+                <div class="form-group" style="margin-bottom:0;flex:2;min-width:200px">
+                    <label>📦 Mô tả sản phẩm (tùy chọn)</label>
+                    <input type="text" id="test-product-desc" class="inp" placeholder="vd: dụng cụ gạt nước xe hơi" style="margin-bottom:0">
+                </div>
+                <button class="btn btn-primary" id="btn-test-ai" onclick="testPrompt()">▶️ Chạy Test</button>
+            </div>
+
+            <!-- Content Output -->
+            <div id="test-output-wrap" style="display:none">
+                <div style="font-weight:700;font-size:12px;color:var(--accent);margin-bottom:8px">📄 Raw Output từ AI:</div>
+                <div id="test-raw-output" style="background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-family:monospace;font-size:11px;color:var(--text-dim);max-height:200px;overflow-y:auto;white-space:pre-wrap;margin-bottom:16px"></div>
+
+                <div style="font-weight:700;font-size:12px;color:var(--accent);margin-bottom:8px">🎨 Preview Demo (Facebook Ad Style):</div>
+                <div id="test-fb-preview" style="display:flex;flex-wrap:wrap;gap:12px"></div>
+            </div>
+
+            <div id="test-loading" style="display:none;color:var(--text-dim);font-size:12px;padding:12px">⏳ Đang gửi prompt đến AI...</div>
+            <div id="test-error" style="display:none;color:var(--red);font-size:12px;padding:8px 12px;background:var(--red-bg);border-radius:6px;margin-top:8px"></div>
+        </div>
+
+        <!-- CARD 4: DEFAULTS -->
+        <div class="card">
+            <h3>⚙️ Giá Trị Mặc Định Campaign</h3>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Tự điền khi mở tab Tạo Template.</div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>🌍 Quốc gia mặc định</label>
+                    <input type="text" id="cfg-default-country" class="inp" placeholder="PH">
+                </div>
+                <div class="form-group">
+                    <label>💰 Budget mặc định (đ/ngày)</label>
+                    <input type="number" id="cfg-default-budget" class="inp" placeholder="200000">
+                </div>
+                <div class="form-group">
+                    <label>📄 Page ID mặc định</label>
+                    <input type="text" id="cfg-default-page" class="inp" placeholder="123456789012345">
+                </div>
+                <div class="form-group">
+                    <label>📐 Pixel ID mặc định</label>
+                    <input type="text" id="cfg-default-pixel" class="inp" placeholder="123456789">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">💾 Lưu Mặc Định</button>
+        </div>
+    </div>
+
+    <!-- TAB 5: AUDIT LOG -->
+    <div id="page-audit" class="page">
+        <div class="card">
+            <h3>📊 Audit Log - Lịch Sử Xuất</h3>
+            <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 12px;">
+                Tracking tất cả templates được xuất + khi nào. Dùng để compliance & review.
+            </div>
+            <div id="audit-log" style="margin-top: 12px;"></div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>🚀 <strong>Ads Template Helper v1.0</strong> — Compliant Helper Tool | Not Automation</p>
+        <p style="margin-top: 8px; color: var(--text-muted);">✅ Policy Compliant | ✅ User-Controlled | ✅ Safe to Use</p>
+    </div>
+    
+    <div class="toast-box" id="toast-box"></div>
+    
+    <script>
+        // ==================== STATE ====================
+        let uploadedVideos = [];
+        let templates = JSON.parse(localStorage.getItem('templates') || '[]');
+        let auditLog = JSON.parse(localStorage.getItem('auditLog') || '[]');
+        
+        const HISTORY_KEY = 'adsTemplateHistory';
+        const TEMPLATES_KEY = 'templates';
+        const AUDIT_KEY = 'auditLog';
+        const SETTINGS_KEY = 'adsHelperSettings';
+
+        // ==================== SETTINGS ====================
+
+        const DEFAULT_SYSTEM_PROMPT = 'Bạn là chuyên gia copywriting quảng cáo Facebook với 10 năm kinh nghiệm. Hãy tạo nội dung ngắn gọn, hấp dẫn, kêu gọi hành động mạnh.';
+        const DEFAULT_USER_PROMPT = `Tạo nội dung quảng cáo bằng {lang} cho {video_count} video Facebook Ads:\n{file_list}\n{product_hint}\nMỗi video cần:\n- headline: Tiêu đề ngắn gọn hấp dẫn (≤ 40 ký tự)\n- primary_text: Mô tả chi tiết 2-3 câu, kêu gọi hành động\n\nTrả về JSON array, không giải thích thêm:\n[{"headline":"...","primary_text":"..."},...]`;
+
+        function loadSettings() {
+            const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+            if (document.getElementById('cfg-gemini')) document.getElementById('cfg-gemini').value = s.gemini || '';
+            if (document.getElementById('cfg-openai')) document.getElementById('cfg-openai').value = s.openai || '';
+            if (s.geminiModel) document.getElementById('cfg-gemini-model').value = s.geminiModel;
+            if (s.openaiModel) document.getElementById('cfg-openai-model').value = s.openaiModel;
+            if (s.aiProvider) document.getElementById('cfg-ai-provider').value = s.aiProvider;
+            if (s.aiLang) document.getElementById('cfg-ai-lang').value = s.aiLang;
+            document.getElementById('cfg-system-prompt').value = s.systemPrompt || DEFAULT_SYSTEM_PROMPT;
+            document.getElementById('cfg-user-prompt').value = s.userPrompt || DEFAULT_USER_PROMPT;
+            if (s.defaultCountry) document.getElementById('cfg-default-country').value = s.defaultCountry;
+            if (s.defaultBudget) document.getElementById('cfg-default-budget').value = s.defaultBudget;
+            if (s.defaultPage) document.getElementById('cfg-default-page').value = s.defaultPage;
+            if (s.defaultPixel) document.getElementById('cfg-default-pixel').value = s.defaultPixel;
+            // Apply defaults to create form
+            if (s.defaultCountry) document.getElementById('campaign-country').value = s.defaultCountry;
+            if (s.defaultBudget) document.getElementById('campaign-budget').value = s.defaultBudget;
+            if (s.defaultPage) document.getElementById('campaign-page').value = s.defaultPage;
+            if (s.defaultPixel) document.getElementById('campaign-pixel').value = s.defaultPixel;
+        }
+
+        function saveSettings() {
+            const s = {
+                gemini: document.getElementById('cfg-gemini').value.trim(),
+                openai: document.getElementById('cfg-openai').value.trim(),
+                geminiModel: document.getElementById('cfg-gemini-model').value,
+                openaiModel: document.getElementById('cfg-openai-model').value,
+                aiProvider: document.getElementById('cfg-ai-provider').value,
+                aiLang: document.getElementById('cfg-ai-lang').value,
+                systemPrompt: document.getElementById('cfg-system-prompt').value,
+                userPrompt: document.getElementById('cfg-user-prompt').value,
+                defaultCountry: document.getElementById('cfg-default-country').value.trim(),
+                defaultBudget: document.getElementById('cfg-default-budget').value,
+                defaultPage: document.getElementById('cfg-default-page').value.trim(),
+                defaultPixel: document.getElementById('cfg-default-pixel').value.trim(),
+            };
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+            const msg = document.getElementById('settings-saved');
+            msg.style.display = 'inline';
+            setTimeout(() => msg.style.display = 'none', 2000);
+            showToast('✅ Đã lưu cài đặt');
+        }
+
+        function resetDefaultPrompt() {
+            document.getElementById('cfg-system-prompt').value = DEFAULT_SYSTEM_PROMPT;
+            document.getElementById('cfg-user-prompt').value = DEFAULT_USER_PROMPT;
+            showToast('🔄 Đã reset prompt mặc định');
+        }
+
+        function toggleKey(id) {
+            const el = document.getElementById(id);
+            el.type = el.type === 'password' ? 'text' : 'password';
+        }
+
+        // ==================== SCAN MODELS ====================
+        async function scanModels(provider) {
+            const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+            const btn = document.getElementById(`btn-scan-${provider}`);
+            const statusEl = document.getElementById(`${provider}-model-status`);
+            const selectEl = document.getElementById(`cfg-${provider}-model`);
+
+            if (provider === 'gemini' && !s.gemini) { showToast('❌ Nhập Gemini API Key trước', 'error'); return; }
+            if (provider === 'openai' && !s.openai) { showToast('❌ Nhập OpenAI API Key trước', 'error'); return; }
+
+            btn.disabled = true; btn.textContent = '⏳ Đang quét...';
+            statusEl.textContent = '';
+
+            try {
+                let models = [];
+                if (provider === 'gemini') {
+                    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${s.gemini}`);
+                    const data = await resp.json();
+                    if (data.error) throw new Error(data.error.message);
+                    models = (data.models || [])
+                        .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
+                        .map(m => m.name.replace('models/', ''));
+                } else {
+                    const resp = await fetch('https://api.openai.com/v1/models', {
+                        headers: { 'Authorization': `Bearer ${s.openai}` }
+                    });
+                    const data = await resp.json();
+                    if (data.error) throw new Error(data.error.message);
+                    models = (data.data || [])
+                        .filter(m => m.id.includes('gpt'))
+                        .map(m => m.id)
+                        .sort();
+                }
+
+                // Populate select
+                const currentVal = selectEl.value;
+                selectEl.innerHTML = models.map(m => `<option value="${m}"${m === currentVal ? ' selected' : ''}>${m}</option>`).join('');
+                if (!models.includes(currentVal) && models.length) selectEl.value = models[0];
+                statusEl.textContent = `✅ Tìm thấy ${models.length} models`;
+                statusEl.style.color = 'var(--accent)';
+                showToast(`✅ Quét ${provider}: ${models.length} models`);
+            } catch(err) {
+                statusEl.textContent = '❌ ' + err.message;
+                statusEl.style.color = 'var(--red)';
+                showToast('❌ Lỗi quét: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false; btn.textContent = '🔍 Quét Model';
+            }
+        }
+
+        // ==================== TEST PROMPT ====================
+        async function testPrompt() {
+            const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+            const provider = s.aiProvider || 'gemini';
+            const count = parseInt(document.getElementById('test-video-count').value) || 3;
+            const productDesc = document.getElementById('test-product-desc').value.trim();
+
+            if (provider === 'gemini' && !s.gemini) { showToast('❌ Cần API Key trong cài đặt', 'error'); return; }
+            if (provider === 'openai' && !s.openai) { showToast('❌ Cần API Key trong cài đặt', 'error'); return; }
+
+            const btn = document.getElementById('btn-test-ai');
+            const loadEl = document.getElementById('test-loading');
+            const errEl = document.getElementById('test-error');
+            const outWrap = document.getElementById('test-output-wrap');
+            btn.disabled = true; loadEl.style.display = 'block';
+            outWrap.style.display = 'none'; errEl.style.display = 'none';
+
+            const langLabel = { vi: 'tiếng Việt', en: 'English', fil: 'Filipino/Tagalog' }[s.aiLang || 'vi'];
+            const fakeFiles = Array.from({length: count}, (_, i) => `${i+1}. video_ad_${i+1}.mp4`);
+            const productHint = productDesc ? `\nSản phẩm/dịch vụ: ${productDesc}` : '';
+
+            const systemPrompt = (s.systemPrompt || DEFAULT_SYSTEM_PROMPT);
+            const userPrompt = (s.userPrompt || DEFAULT_USER_PROMPT)
+                .replace('{video_count}', count)
+                .replace('{file_list}', fakeFiles.join('\n'))
+                .replace('{lang}', langLabel)
+                .replace('{product_hint}', productHint);
+
+            try {
+                let raw = '';
+                const geminiModel = s.geminiModel || 'gemini-1.5-flash';
+                const openaiModel = s.openaiModel || 'gpt-4o-mini';
+
+                if (provider === 'gemini') {
+                    const resp = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${s.gemini}`,
+                        { method: 'POST', headers: {'Content-Type':'application/json'},
+                          body: JSON.stringify({ contents:[{ parts:[{text: systemPrompt + '\n\n' + userPrompt}] }] }) }
+                    );
+                    const data = await resp.json();
+                    if (data.error) throw new Error(data.error.message);
+                    raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                } else {
+                    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json', 'Authorization': `Bearer ${s.openai}`},
+                        body: JSON.stringify({ model: openaiModel, messages: [
+                            {role:'system', content: systemPrompt},
+                            {role:'user', content: userPrompt}
+                        ], temperature: 0.85 })
+                    });
+                    const data = await resp.json();
+                    if (data.error) throw new Error(data.error.message);
+                    raw = data.choices?.[0]?.message?.content || '';
+                }
+
+                document.getElementById('test-raw-output').textContent = raw;
+
+                // Parse & render FB-style preview cards
+                const jsonMatch = raw.match(/\[.*\]/s);
+                let cards = [];
+                if (jsonMatch) { try { cards = JSON.parse(jsonMatch[0]); } catch(e) {} }
+
+                const previewEl = document.getElementById('test-fb-preview');
+                if (cards.length) {
+                    previewEl.innerHTML = cards.map((c, i) => `
+                        <div style="width:280px;background:#1c1e2e;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.1);font-size:12px">
+                            <div style="background:rgba(255,255,255,.04);padding:10px 12px;display:flex;align-items:center;gap:8px">
+                                <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px">📄</div>
+                                <div><div style="font-weight:700;color:var(--text)">Your Page</div><div style="font-size:10px;color:var(--text-muted)">Sponsored · 🌍</div></div>
+                            </div>
+                            <div style="padding:8px 12px;color:var(--text-dim);font-size:11px;line-height:1.5">${(c.primary_text||'').replace(/\n/g,'<br>')}</div>
+                            <div style="height:100px;background:linear-gradient(135deg,#1a2332,#0a0f1a);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:22px">🎬 Video ${i+1}</div>
+                            <div style="padding:8px 12px;background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.06)">
+                                <div style="font-weight:700;color:var(--text);margin-bottom:2px">${c.headline||''}</div>
+                                <div style="font-size:10px;color:var(--text-muted)">yourwebsite.com</div>
+                            </div>
+                            <div style="padding:6px 12px">
+                                <div style="background:var(--accent);color:#fff;font-weight:700;font-size:11px;padding:6px 12px;border-radius:6px;text-align:center">Shop Now</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    previewEl.innerHTML = '<div style="color:var(--yellow);font-size:12px">⚠️ Không parse được JSON từ output — xem Raw Output ở trên</div>';
+                }
+
+                outWrap.style.display = 'block';
+                showToast('✅ Test thành công!');
+            } catch(err) {
+                errEl.textContent = '❌ Lỗi: ' + err.message;
+                errEl.style.display = 'block';
+                showToast('❌ ' + err.message, 'error');
+            } finally {
+                btn.disabled = false; loadEl.style.display = 'none';
+            }
+        }
+        
+        // ==================== UI FUNCTIONS ====================
+        function switchTab(tabName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`page-${tabName}`).classList.add('show');
+            event.target.classList.add('active');
+            
+            if (tabName === 'templates') renderTemplatesList();
+            if (tabName === 'export') renderExportChecklist();
+            if (tabName === 'audit') renderAuditLog();
+            if (tabName === 'settings') loadSettings();
+        }
+        
+        function showToast(message, type = 'success') {
+            const toastBox = document.getElementById('toast-box');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            toastBox.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // ==================== FILE UPLOAD ====================
+        function onFilesSelect(event) {
+            const files = Array.from(event.target.files);
+            files.forEach(file => {
+                if (file.type.startsWith('video/')) {
+                    uploadedVideos.push({
+                        id: Date.now() + Math.random(),
+                        file,
+                        headline: `Video Ad - ${file.name}`,
+                        description: 'Mô tả chi tiết về sản phẩm'
+                    });
+                }
+            });
+            renderVideoList();
+            showToast(`✅ Đã upload ${files.length} videos`);
+        }
+        
+        function renderVideoList() {
+            const list = document.getElementById('video-list');
+            list.innerHTML = uploadedVideos.map((v, i) => `
+                <div class="video-item">
+                    <div class="info">
+                        <div class="name">📹 ${v.file.name}</div>
+                        <div class="meta">${(v.file.size / 1024 / 1024).toFixed(1)}MB · ${v.file.type}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-secondary" onclick="editVideoTemplate(${i})">✏️ Edit</button>
+                        <button class="btn btn-danger" onclick="removeVideo(${i})">❌ Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function removeVideo(idx) {
+            uploadedVideos.splice(idx, 1);
+            renderVideoList();
+            showToast('❌ Đã xóa video');
+        }
+        
+        function editVideoTemplate(idx) {
+            const v = uploadedVideos[idx];
+            const headline = prompt('📌 Headline:', v.headline);
+            const description = prompt('📝 Description:', v.description);
+            
+            if (headline) v.headline = headline;
+            if (description) v.description = description;
+            
+            showToast('✅ Cập nhật template');
+        }
+        
+        // ==================== TEMPLATE RENDERING ====================
+        (() => {
+            document.addEventListener('DOMContentLoaded', () => {
+                const editArea = document.getElementById('templates-edit');
+                editArea.innerHTML = uploadedVideos.map((v, i) => `
+                    <div class="card" style="padding: 12px; margin-bottom: 8px; background: var(--bg-input); border: 1px dashed var(--border);">
+                        <div style="font-weight: 600; margin-bottom: 8px;">📹 ${v.file.name}</div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 11px;">📌 Headline</label>
+                            <input type="text" class="inp" placeholder="Tiêu đề quảng cáo" value="${v.headline}" 
+                                   onchange="uploadedVideos[${i}].headline = this.value" 
+                                   style="margin-bottom: 8px; font-size: 12px; padding: 8px;">
+                            <label style="font-size: 11px;">📝 Description</label>
+                            <textarea class="inp" placeholder="Mô tả chi tiết" rows="3" onchange="uploadedVideos[${i}].description = this.value" 
+                                      style="margin-bottom: 0; font-size: 12px; padding: 8px;">${v.description}</textarea>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        })();
+        
+        function renderTemplatesList() {
+            const list = document.getElementById('templates-list');
+            if (templates.length === 0) {
+                list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Chưa có templates. Hãy tạo mới ở tab "Tạo Template"</p>';
+                return;
+            }
+            
+            list.innerHTML = templates.map((t, i) => `
+                <div class="template-item">
+                    <div class="title">📄 ${t.name}</div>
+                    <div class="content">
+Campaign: ${t.campaignName}
+Objective: ${t.objective}
+Videos: ${t.videoCount}
+Budget: ${t.budget}đ/day
+Pixel: ${t.pixelId}
+Created: ${new Date(t.createdAt).toLocaleString('vi-VN')}
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="deleteTemplate(${i})">🗑️ Xóa</button>
+                </div>
+            `).join('');
+        }
+        
+        function deleteTemplate(idx) {
+            if (confirm('Xóa template này?')) {
+                templates.splice(idx, 1);
+                localStorage.setItem(TEMPLATES_KEY, JSON.stringify(templates));
+                renderTemplatesList();
+                showToast('❌ Đã xóa template');
+            }
+        }
+        
+        // ==================== PREVIEW ====================
+        function previewTemplate() {
+            const campaignName = document.getElementById('campaign-name').value.trim();
+            const objective = document.getElementById('campaign-objective').value;
+            const budget = document.getElementById('campaign-budget').value;
+            const url = document.getElementById('campaign-url').value.trim();
+            const pixel = document.getElementById('campaign-pixel').value.trim();
+            const country = document.getElementById('campaign-country').value.trim();
+            const pageId = document.getElementById('campaign-page').value.trim();
+            const cta = document.getElementById('campaign-cta').value;
+            
+            if (!campaignName) {
+                showToast('❌ Cần nhập Campaign Name', 'error');
+                return;
+            }
+            if (uploadedVideos.length === 0) {
+                showToast('❌ Cần upload ít nhất 1 video', 'error');
+                return;
+            }
+            if (!pageId) {
+                showToast('⚠️ Thiếu Page ID — vẫn lưu nhưng JSON sẽ thiếu trường này', 'error');
+            }
+            
+            const videosSnapshot = uploadedVideos.map(v => ({
+                filename: v.file ? v.file.name : '',
+                headline: v.headline,
+                description: v.description
+            }));
+
+            const template = {
+                id: Date.now(),
+                name: campaignName,
+                campaignName,
+                objective,
+                budget,
+                url,
+                pixelId: pixel,
+                pageId,
+                cta,
+                country,
+                videoCount: uploadedVideos.length,
+                videos: videosSnapshot,
+                createdAt: new Date().toISOString()
+            };
+            
+            templates.push(template);
+            localStorage.setItem(TEMPLATES_KEY, JSON.stringify(templates));
+            
+            showToast(`✅ Template "${campaignName}" đã lưu. Vào tab "Xuất & Đăng" để export.`);
+            document.getElementById('campaign-name').value = '';
+            uploadedVideos = [];
+            renderVideoList();
+        }
+        
+        // ==================== EXPORT ====================
+        function renderExportChecklist() {
+            const checklist = document.getElementById('export-checklist');
+            checklist.innerHTML = templates.map((t, i) => `
+                <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: var(--bg-input); border-radius: 6px; cursor: pointer;">
+                    <input type="checkbox" onchange="updateExportPreview()">
+                    <span style="flex: 1; font-size: 12px;">📄 ${t.name} (${t.videoCount} videos)</span>
+                </label>
+            `).join('');
+            updateExportPreview();
+        }
+        
+        function updateExportPreview() {
+            const checked = document.querySelectorAll('#export-checklist input:checked');
+            const selected = Array.from(checked).map((cb, i) => templates[i]).filter(Boolean);
+
+            const preview = selected.map(t => JSON.stringify({
+                campaign_name: t.campaignName,
+                objective: t.objective,
+                budget_daily: Number(t.budget),
+                targeting: { countries: [t.country] },
+                pixel_id: t.pixelId || 'NHAP_PIXEL_ID',
+                page_id: t.pageId || 'NHAP_PAGE_ID',
+                call_to_action: t.cta || 'SHOP_NOW',
+                landing_url: t.url,
+                created_at: t.createdAt,
+                ad_sets: (t.videos || []).map((v, i) => ({
+                    ad_set_name: `AdSet${i+1}_${(v.filename || v.file && v.file.name || 'video').replace(/\.[^/.]+$/, '')}`,
+                    headline: v.headline || '',
+                    primary_text: v.description || '',
+                    video_filename: v.filename || (v.file && v.file.name) || ''
+                }))
+            }, null, 2)).join('\n\n');
+
+            document.getElementById('export-preview').textContent = preview || '# Chọn template để xem preview';
+        }
+        
+        function exportAsJSON() {
+            const checked = Array.from(document.querySelectorAll('#export-checklist input:checked'));
+            if (checked.length === 0) {
+                showToast('❌ Chọn ít nhất 1 template', 'error');
+                return;
+            }
+            
+            const selected = checked.map((_, i) => templates[i]);
+            const data = {
+                exported_at: new Date().toISOString(),
+                templates: selected,
+                instructions: 'Import templates to Facebook Ads Manager and publish manually.'
+            };
+            
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ads-templates-${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            
+            // Log to audit
+            auditLog.push({
+                action: 'EXPORT',
+                count: selected.length,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem(AUDIT_KEY, JSON.stringify(auditLog));
+            
+            showToast('✅ JSON đã tải xuống');
+        }
+        
+        function copyToClipboard() {
+            const text = document.getElementById('export-preview').textContent;
+            navigator.clipboard.writeText(text);
+            showToast('📋 Đã copy to clipboard');
+        }
+        
+        // ==================== AUDIT LOG ====================
+        function renderAuditLog() {
+            const log = document.getElementById('audit-log');
+            if (auditLog.length === 0) {
+                log.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Chưa có lịch sử</p>';
+                return;
+            }
+            
+            log.innerHTML = auditLog.map(entry => `
+                <div class="log-item">
+                    <div class="time">${new Date(entry.timestamp).toLocaleString('vi-VN')}</div>
+                    <div class="msg">${entry.action} - ${entry.count} templates</div>
+                </div>
+            `).join('');
+        }
+
+        // ==================== AI GENERATION ====================
+        async function generateWithAI() {
+            if (uploadedVideos.length === 0) { showToast('❌ Upload ít nhất 1 video trước', 'error'); return; }
+            const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+            const provider = s.aiProvider || 'gemini';
+            const langLabel = { vi: 'tiếng Việt', en: 'English', fil: 'Filipino/Tagalog' }[s.aiLang || 'vi'];
+
+            if (provider === 'gemini' && !s.gemini) { showToast('❌ Nhập Gemini API Key trong tab Cài đặt', 'error'); return; }
+            if (provider === 'openai' && !s.openai) { showToast('❌ Nhập ChatGPT API Key trong tab Cài đặt', 'error'); return; }
+
+            const btn = document.querySelector('[onclick="generateWithAI()"]');
+            btn.disabled = true; btn.textContent = '⏳ Đang generate...';
+
+            const fileList = uploadedVideos.map((v, i) => `${i+1}. ${v.file ? v.file.name : 'video'}`).join('\n');
+            const systemPrompt = s.systemPrompt || DEFAULT_SYSTEM_PROMPT;
+            const userPrompt = (s.userPrompt || DEFAULT_USER_PROMPT)
+                .replace('{video_count}', uploadedVideos.length)
+                .replace('{file_list}', fileList)
+                .replace('{lang}', langLabel)
+                .replace('{product_hint}', '');
+
+            const geminiModel = s.geminiModel || 'gemini-1.5-flash';
+            const openaiModel = s.openaiModel || 'gpt-4o-mini';
+
+            try {
+                let results = [];
+                if (provider === 'gemini') {
+                    const resp = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${s.gemini}`,
+                        { method: 'POST', headers: {'Content-Type':'application/json'},
+                          body: JSON.stringify({ contents:[{ parts:[{text: systemPrompt+'\n\n'+userPrompt}] }] }) }
+                    );
+                    const data = await resp.json();
+                    if (data.error) throw new Error(data.error.message);
+                    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    const m = raw.match(/\[.*\]/s); if (m) results = JSON.parse(m[0]);
+                } else {
+                    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json','Authorization':`Bearer ${s.openai}`},
+                        body: JSON.stringify({ model: openaiModel, messages:[
+                            {role:'system',content:systemPrompt},{role:'user',content:userPrompt}
+                        ], temperature:0.85 })
+                    });
+                    const data = await resp.json();
+                    if (data.error) throw new Error(data.error.message);
+                    const raw = data.choices?.[0]?.message?.content || '';
+                    const m = raw.match(/\[.*\]/s); if (m) results = JSON.parse(m[0]);
+                }
+
+                if (results.length > 0) {
+                    results.forEach((r, i) => {
+                        if (uploadedVideos[i]) {
+                            uploadedVideos[i].headline = r.headline || uploadedVideos[i].headline;
+                            uploadedVideos[i].description = r.primary_text || uploadedVideos[i].description;
+                        }
+                    });
+                    renderTemplatesEditArea();
+                    showToast(`✅ AI generate xong ${results.length} nội dung!`);
+                } else { showToast('⚠️ AI trả về rỗng, thử lại', 'error'); }
+            } catch(err) { showToast('❌ Lỗi AI: ' + err.message, 'error'); }
+            finally { btn.disabled = false; btn.textContent = '🔮 Generate với AI'; }
+        }
+
+        function renderTemplatesEditArea() {
+            const editArea = document.getElementById('templates-edit');
+            if (!editArea) return;
+            editArea.innerHTML = uploadedVideos.map((v, i) => `
+                <div style="background:var(--bg-input);border:1px dashed var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px">
+                    <div style="font-weight:600;margin-bottom:8px">📹 ${v.file ? v.file.name : ''}</div>
+                    <label style="font-size:11px;color:var(--text-dim);display:block;margin-bottom:4px">📌 Headline</label>
+                    <input type="text" class="inp" value="${(v.headline||'').replace(/"/g,'&quot;')}" oninput="uploadedVideos[${i}].headline=this.value" style="margin-bottom:8px;font-size:12px;padding:8px">
+                    <label style="font-size:11px;color:var(--text-dim);display:block;margin-bottom:4px">📝 Primary Text</label>
+                    <textarea class="inp" rows="3" oninput="uploadedVideos[${i}].description=this.value" style="margin-bottom:0;font-size:12px;padding:8px">${v.description||''}</textarea>
+                </div>
+            `).join('');
+        }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+            if (s.defaultCountry) document.getElementById('campaign-country').value = s.defaultCountry;
+            if (s.defaultBudget) document.getElementById('campaign-budget').value = s.defaultBudget;
+            if (s.defaultPage) document.getElementById('campaign-page').value = s.defaultPage;
+            if (s.defaultPixel) document.getElementById('campaign-pixel').value = s.defaultPixel;
+        });
+    </script>
+</body>
+</html>
