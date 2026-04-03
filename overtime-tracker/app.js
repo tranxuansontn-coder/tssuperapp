@@ -327,12 +327,18 @@ function currentMonth() {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 }
-const OT_RATE_WEEKDAY = 45000;
-const OT_RATE_SUNDAY = 60000;
+const OT_RATE_WEEKDAY = 49285;
+const OT_RATE_SUNDAY = 65714;
 function timeToMinutes(t) { const [h, m] = t.split(':').map(Number); return h * 60 + m; }
 function getOTRateByDate(dateStr) {
     const dayOfWeek = new Date(dateStr + 'T00:00:00').getDay();
     return dayOfWeek === 0 ? OT_RATE_SUNDAY : OT_RATE_WEEKDAY;
+}
+function formatVND(amount) {
+    return Math.round(amount || 0).toLocaleString('vi-VN') + 'đ';
+}
+function formatRatePerHour(rate) {
+    return Math.round(rate).toLocaleString('vi-VN') + 'đ/h';
 }
 function formatDate(ds) {
     if (!ds) return '';
@@ -559,8 +565,7 @@ async function refreshDashboard() {
             if (!e.date || !e.total_hours) return;
             totalEarnings += e.total_hours * getOTRateByDate(e.date);
         });
-        const fmtVND = n => n.toLocaleString('vi-VN') + 'đ';
-        document.getElementById('stat-ot-earnings').textContent = fmtVND(totalEarnings);
+        document.getElementById('stat-ot-earnings').textContent = formatVND(totalEarnings);
 
         const mh = {};
         data.forEach(e => { mh[e.marketer_name] = (mh[e.marketer_name] || 0) + (e.total_hours || 0); });
@@ -581,7 +586,7 @@ async function refreshDashboard() {
                     return s + (e.total_hours || 0) * getOTRateByDate(e.date);
                 }, 0);
                 const rc = i < 3 ? `rank-${i + 1}` : 'rank-default';
-                return `<tr style="cursor:pointer" onclick="showOTDetail('${name.replace(/'/g, "\\'")}')"><td><span class="rank-num ${rc}">${i + 1}</span></td><td><strong>${name}</strong></td><td>${hrs.toFixed(1)}h</td><td>${entries.length}</td><td style="color:#10b981;font-weight:600">${earnings.toLocaleString('vi-VN')}đ</td></tr>`;
+                return `<tr style="cursor:pointer" onclick="showOTDetail('${name.replace(/'/g, "\\'")}')"><td><span class="rank-num ${rc}">${i + 1}</span></td><td><strong>${name}</strong></td><td>${hrs.toFixed(1)}h</td><td>${entries.length}</td><td style="color:#10b981;font-weight:600">${formatVND(earnings)}</td></tr>`;
             }).join('');
             // Auto-show first marketer detail
             if (sorted.length) showOTDetail(sorted[0][0]);
@@ -647,7 +652,7 @@ function showOTDetail(marketerName) {
             <td style="white-space:nowrap">${e.start_time || '—'} → ${e.end_time || '—'}</td>
             <td style="font-weight:600">${(e.total_hours || 0).toFixed(1)}h</td>
             <td style="font-size:.75rem;max-width:180px;word-break:break-all">${(e.campaign_id || '—').replace(/, /g, '<br>')}</td>
-            <td style="color:#10b981;font-weight:600;white-space:nowrap">${earn.toLocaleString('vi-VN')}đ <small style="color:#9aa0b8;font-weight:400">(${isSunday ? '60k' : '45k'}/h)</small></td>
+            <td style="color:#10b981;font-weight:600;white-space:nowrap">${formatVND(earn)} <small style="color:#9aa0b8;font-weight:400">(${formatRatePerHour(rate)})</small></td>
             <td>${statusBadge}</td>
         </tr>`;
     }).join('');
@@ -656,7 +661,7 @@ function showOTDetail(marketerName) {
         <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px;margin-top:8px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
                 <h4 style="margin:0;font-size:.95rem;color:#e2e8f0">📋 Chi tiết OT — <span style="color:#818cf8">${marketerName}</span></h4>
-                <div style="font-size:.85rem;color:#10b981;font-weight:600">${totalHrs.toFixed(1)}h · ${totalEarn.toLocaleString('vi-VN')}đ</div>
+                <div style="font-size:.85rem;color:#10b981;font-weight:600">${totalHrs.toFixed(1)}h · ${formatVND(totalEarn)}</div>
             </div>
             <div class="table-wrapper" style="max-height:300px;overflow-y:auto">
                 <table style="font-size:.8rem">
@@ -665,7 +670,7 @@ function showOTDetail(marketerName) {
                     </tr></thead>
                     <tbody>${rows}</tbody>
                     <tfoot><tr style="font-weight:700;border-top:2px solid rgba(255,255,255,.1)">
-                        <td>Tổng</td><td></td><td>${totalHrs.toFixed(1)}h</td><td></td><td style="color:#10b981">${totalEarn.toLocaleString('vi-VN')}đ</td><td></td>
+                        <td>Tổng</td><td></td><td>${totalHrs.toFixed(1)}h</td><td></td><td style="color:#10b981">${formatVND(totalEarn)}</td><td></td>
                     </tr></tfoot>
                 </table>
             </div>
